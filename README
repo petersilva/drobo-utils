@@ -1,0 +1,71 @@
+
+This software is copyright under GPL.  see near end file for details...
+
+	python setup.py build
+
+Then you can  kick the tires by starting it up with: 
+
+	./droboview
+
+haven't worked out how to install it correctly yet.
+
+gparted failed and seems to have a 2 TB limit on devices.
+It's just the GUI, libparted is fine, and other tools based on it
+still work, one can created a label with:
+
+(assuming the disk is /dev/sdd)
+
+parted /dev/sdd mklabel gpt
+
+and use gnu-fdisk to create the partition.  
+
+From the Doboshare forums, building a file system:
+
+mke2fs –j –i 262144 –L Drobo01 -m 0 –O sparse_super,^resize_inode  /dev/sdd1
+
+MANIFEST:
+
+Pieces:
+  droboview   - GUI 
+  drobodump   - CLI script, accesses Drobo.py with no GUI stuff.
+  DroboGUI.py - implements GUI. uses Drobo.py for Drobo related stuff.
+  Drobo.py   -- overall Drobo io manager, provides API & "python CLI"
+                uses DroboDMP.c to do raw io.
+  DroboDMP.c -- python module to perform the detailed drobo ioctls.
+                only platform specific stuff is in here...
+  setup.py --   python version of a Makefile
+
+
+deps:     - packages needed to run the package (assuming already built elsewhere.)
+  python
+  python-qt
+  gtksudo or kdesudo - searches on startup for one or the other.
+           if neither are around, then get a graphical sudo of you choice
+	   and add it to the search list at the end of DroboGUI.__init__ 
+
+   
+build-deps:   - packages needed to build the package.
+  libsgutils1-dev -- ioctl support.
+  python-dev      -- to build DroboDMP extension.
+
+
+Notes:
+   droboview isn't suited to run continuously for long periods, 
+   as it has a memory leak...  total foot print starts out at 32M
+   with a 14 MB resident set size, of which 10 MB are shared, so only 
+   about 4M of real memory consumed.   RSS grows at about 2MB/hour.
+
+   best to restart it daily, or use it when necessary, but not leave it
+   on for days.
+
+Developer access:
+	https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils
+
+
+
+copyright:
+
+Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
+named COPYING in the root of the source directory tree.
+Installation:
