@@ -1,0 +1,72 @@
+#!/usr/bin/python
+
+
+import Drobo, time
+
+print "Display info on all accessible Drobos "
+
+l=Drobo.DiscoverLUNs()
+print 'The list of detected Drobos is: ' + str(l)
+
+for dev in l:
+  print '---------------------------------------------------------'
+  print 'Dumping info about Drobo ' + dev
+  print '---------------------------------------------------------'
+  print
+  d = Drobo.Drobo(dev)
+  
+  config=d.GetSubPageConfig()
+  print 'query config result: '
+  print config
+  print 'max lun size is: ', config[2]
+  print
+  
+  c=d.GetSubPageCapacity()
+  print 'query capacity result:'
+  print c
+  print 'Physical space... used: ',  c[1] , ' free: ' , c[0],  ' Total: ', c[2]
+  print
+  
+  protocol=d.GetSubPageProtocol()
+  print 'query protocol version result: '
+  print protocol 
+  print
+  
+  settings=d.GetSubPageSettings()
+  print 'query settings result:' 
+  print settings
+  print
+
+  #print 'drobo says it is now: ', time.ctime(settings[0]), ' GMT offset:', str(settings[1])
+  print
+  
+  slotinfo=d.GetSubPageSlotInfo()
+  print 'query slotinfo result:  number of slots:'
+  print slotinfo[0]
+  print slotinfo[1]
+  print slotinfo[2]
+  print slotinfo[3]
+  print
+  
+  firmware=d.GetSubPageFirmware()
+  print 'query firmware result:' 
+  print firmware
+  print 'drobo says firmware revision: ', str(firmware[0]), '.', str(firmware[1]), '(', str(firmware[2]), ') was built: ', firmware[5]
+  print
+  
+  status=d.GetSubPageStatus()
+  print 'query status result:' 
+  print status
+  print
+  
+  options=d.GetSubPageOptions()
+  print 'query options result:'
+  print options
+  print
+  
+  luninfo=d.GetSubPageLUNs()
+  print 'query luninfo result:'
+  print luninfo
+  print
+
+  print '---------------------------------------------------------'

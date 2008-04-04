@@ -1,5 +1,7 @@
 
-This software is copyright under GPL.  see near end file for details...
+This software is copyright under GPL.  See near end file for details...
+
+To try this stuff out:
 
 	python setup.py build
 
@@ -7,21 +9,41 @@ Then you can  kick the tires by starting it up with:
 
 	./droboview
 
+which should start a GUI for each drobo attached to your machine, that
+you have permission to access (depends on the setup, usually USB devices 
+on desktops are accessible to users, so you can see them.  Servers might be setup 
 haven't worked out how to install it correctly yet.
 
-gparted failed and seems to have a 2 TB limit on devices.
-It's just the GUI, libparted is fine, and other tools based on it
-still work, one can created a label with:
+setup Drobo with Linux:
+
+Drobos with firmware 1.1.1 or later work fine under linux with ext3.
+You can, of course set up an NTFS or HPS+ or FAT32 if you really want,
+but it seems actively counter-intuitive on Linux.  Unless you are
+going to physically move the disk to between systems, the native format
+has many advantages.
+
+There are a couple of gotchas related to linux tools which aren't
+2TB ready...  
+
+gparted fails, and seems to have a 2 TB limit on devices.
+(bug #524948 reported to bugzilla.gnome.org) It's just the GUI, 
+as libparted is fine, and other tools based on it
+still work. One can created a label with:
 
 (assuming the disk is /dev/sdd)
 
+I have read somewhere of a 2TB limit on 
 parted /dev/sdd mklabel gpt
+mkpart ext2 0 100%
 
-and use gnu-fdisk to create the partition.  
+and use gnu-fdisk to create the partition.  Wanted to use gparted, but
+had to submit bug for 2TB file systems instead.
 
 From the Doboshare forums, building a file system:
 
 mke2fs –j –i 262144 –L Drobo01 -m 0 –O sparse_super,^resize_inode  /dev/sdd1
+
+
 
 MANIFEST:
 
@@ -53,15 +75,42 @@ Notes:
    droboview isn't suited to run continuously for long periods, 
    as it has a memory leak...  total foot print starts out at 32M
    with a 14 MB resident set size, of which 10 MB are shared, so only 
-   about 4M of real memory consumed.   RSS grows at about 2MB/hour.
+   about 4M of real memory consumed.   but the RSS grows at about 
+   2MB/hour.
 
    best to restart it daily, or use it when necessary, but not leave it
    on for days.
 
 Developer access:
-	https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils
+
+   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils
+
+   for commit access, you need a sourceforge user account.
+
+TODO:
+   -- dialog for formatting.
+   -- formatting itself.
+   -- labels for max lun size slider... which is strange... shouldn't that
+      be inthe format thing? seems kind a dangerous to do without formatting.
+   -- slider not updated from drobo, so number is always 2.
+
+   stuff I don't know how to do:
+   -- Diagnostics dump.
+   -- blink lights.
+   -- set anything.
+
+   stuff I would like:
+   -- some sort of indicator of how long 'relay out' will be in progress.
+      and when it is busy, it should say so... like when I emptied an
+      ntfs it took hours for the led indicators to drop from 70% to 0.
+   -- should this be integrated with dbus somehow ? dunno...
+   -- awaiting hints from drobo.com about how to 'do' stuff...
+
+   of interest:
+   -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
 
 
+Revision date: 2008/04/03
 
 copyright:
 
