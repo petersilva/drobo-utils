@@ -27,18 +27,26 @@ named COPYING in the root of the source directory tree.
 
 import fcntl, struct, socket, array, commands, time
 import exceptions
-import os, sys
+import os, sys, regex
 
 #
 # FIXME: if installed with "python setup.py install" then this 
 # insert is not needed.  This is to be able to test it before 
 # installation. best to remove this once installed.
+#  this might be considered a security issue as it is...
 #
 # on kubuntu hardy:
 #sys.path.insert(1, os.path.normpath('build/lib.linux-i686-2.5') )
+#on Debian Lenny, it's the same except 2.4... 
+#on a Droboshare... who knows?
+m = regex.compile("lib.*")
 
-#on Debian Lenny:
-sys.path.insert(1, os.path.normpath('build/lib.linux-i686-2.4') )
+for l in os.listdir("build"):
+    print l
+    if m.match(l) :
+        sys.path.insert(1, os.path.normpath("build/" + l ))
+
+
 import DroboDMP
 
 class DroboException(exceptions.Exception):
