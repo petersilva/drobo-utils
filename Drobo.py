@@ -34,7 +34,11 @@ import os, sys
 # insert is not needed.  This is to be able to test it before 
 # installation. best to remove this once installed.
 #
-sys.path.insert(1, os.path.normpath('build/lib.linux-i686-2.5') )
+# on kubuntu hardy:
+#sys.path.insert(1, os.path.normpath('build/lib.linux-i686-2.5') )
+
+#on Debian Lenny:
+sys.path.insert(1, os.path.normpath('build/lib.linux-i686-2.4') )
 import DroboDMP
 
 class DroboException(exceptions.Exception):
