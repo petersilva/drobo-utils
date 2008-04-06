@@ -378,17 +378,17 @@ class Drobo:
     self.__issueCommand(0x0d)
 
 
-  def dumpDiagnostics(self):
+  def __GetDiagRecord(self,diagcode):
     """ returns diagnostics as a string...
 	STATUS: totally borked!  loops forever!  
          don't know how to read the count of bytes actually provided by Drobo.
     """
     print "Dumping Diagnostics..."
-    buflen=32000
+    # tried 32000 ... it only returned 5K, so try something small.
+    buflen=4096
 
-    df=open("diags.txt", "w")
     modepageblock=struct.pack( ">BBBBBBBHB", 
-      0xea, 0x10, 0x80, 0x04, 0x00, self.transactionID, 
+      0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 
       (0x01 <<5)|0x01, buflen, 0x00 )
 
     todev=0
@@ -398,9 +398,9 @@ class Drobo:
     diags=cmdout
     i=0
     while len(cmdout) == buflen:
-        df.write(cmdout)
         modepageblock=struct.pack( ">BBBBBBBHB", 
-            0xea, 0x10, 0x80, 0x04, 0x00, self.transactionID, 0x01, buflen, 0x00 )
+            0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 0x01, 
+            buflen, 0x00 )
 
         cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
                    buflen, modepageblock, todev )
@@ -408,14 +408,18 @@ class Drobo:
 	diags=diags+cmdout
         print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
        
-    if len(cmdout) > 0:
-       df.write(cmdout)
-
-    df.close()
-    self.__transactionNext()
-
     
     return diags
+
+  def dumpDiagnostics(self):
+    df=open("/tmp/diags.txt", "w")
+    d=self.__GetDiagRecord(4)
+    df.write(d)
+    d=self.__GetDiagRecord(7)
+    self.__transactionNext()
+    df.write(d)
+    df.close()
+
 
   def GetCharDev(self):
      return self.char_dev_file
@@ -526,11 +530,15 @@ class Drobo:
 
   def GetSubPageProtocol(self):
      """ 
-         I don't get this one, spec says Major & Minor, but there are three
-         values... hmm...
-         returns ( Major, Minor, Undocumented )
+        returns ( Major, Minor )
+
+        STATUS: working... 
+            soupcon: at firmware 1.0.3, seemed to demand and additional byte.
+              might be a confused artifact of dev.
+            at 1.1.1 the additional byte leads to resid > 0 in the C call, 
+            so matches docs. 
      """
-     return self.__getsubpage( 0x06, 'BBB' )
+     return self.__getsubpage( 0x06, 'BB' )
 
   def GetSubPageFirmware(self):
      """

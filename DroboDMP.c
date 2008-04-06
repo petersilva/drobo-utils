@@ -53,12 +53,13 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
     /* Prepare MODE command */
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
  
-    if (DEBUG) {
+/*    if (DEBUG) {
       fprintf( stderr, "\nCDB dump\n:" );
       for (i=0; i < 11; i++) {
          fprintf(stderr, "CDB[%d] = 0x%02x\n", i, *(char*)(mcb+i) );
       };
     };
+ */
     io_hdr.interface_id = 'S';
     io_hdr.dxfer_direction = (out) ? SG_DXFER_TO_DEV : SG_DXFER_FROM_DEV;
     io_hdr.cmd_len = mcblen;
@@ -80,12 +81,18 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
         close(sg_fd);
         return(-1);
     }
+
     fprintf(stderr, 
         "\nread.. size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
           size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
 
-    if (io_hdr.resid > 0) {
+    if (io_hdr.status != 0) {
+       fprintf( stderr, "oh no! io_hdr status is: %d\n",  io_hdr.status );
+       return(-1);
+    } else {
+      if (io_hdr.resid > 0) {
         size -= io_hdr.resid   ;
+      }
     }
 
     return(size);
