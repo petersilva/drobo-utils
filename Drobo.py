@@ -412,7 +412,10 @@ class Drobo:
     return diags
 
   def dumpDiagnostics(self):
-    df=open("/tmp/diags.txt", "w")
+
+    n=time.gmtime()
+
+    df=open("/tmp/DroboDiag_%d_%02d%02d_%02d%02d%02d.log" % ( n[0:6] ))
     d=self.__GetDiagRecord(4)
     df.write(d)
     d=self.__GetDiagRecord(7)
