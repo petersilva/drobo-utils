@@ -72,7 +72,7 @@ for dev in l:
   print '---------------------------------------------------------'
 
   # blink...
-  d.issueCommand(0x06)
+  d.Blink()
  
   # standby
-  #d.issueCommand(0x0d) 
+  #d.Standby() 

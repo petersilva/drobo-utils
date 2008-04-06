@@ -352,11 +352,12 @@ class Drobo:
 
     cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), 1, modepageblock,1)
 
-    self.transactionNext()
+    self.__transactionNext()
 
     if ( len(cmdout) != 1 ):
        raise DroboException
     # only way to verify success is to look at the Drobo...
+
 
   def Blink(self):
     """ asks the Drobo nicely to blink it's lights. aka. Identification 
@@ -365,6 +366,7 @@ class Drobo:
         STATUS: works no issues.
     """
     self.__issueCommand(6)
+
 
   def Standby(self):
     """ asks the Drobo nicely to shutdown, flashing all manner of caches.
@@ -375,11 +377,13 @@ class Drobo:
     """
     self.__issueCommand(0x0d)
 
+
   def dumpDiagnostics(self):
     """ returns diagnostics as a string...
 	STATUS: totally borked!  loops forever!  
          don't know how to read the count of bytes actually provided by Drobo.
     """
+    print "Dumping Diagnostics..."
     buflen=32000
 
     df=open("diags.txt", "w")
@@ -387,22 +391,30 @@ class Drobo:
       0xea, 0x10, 0x80, 0x04, 0x00, self.transactionID, 
       (0x01 <<5)|0x01, buflen, 0x00 )
 
-    cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), buflen, modepageblock,0)
-    df.write(cmdout)
+    todev=0
+    print "Page 0..."
+    cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
+                buflen, modepageblock, todev )
     diags=cmdout
     i=0
     while len(cmdout) == buflen:
+        df.write(cmdout)
         modepageblock=struct.pack( ">BBBBBBBHB", 
             0xea, 0x10, 0x80, 0x04, 0x00, self.transactionID, 0x01, buflen, 0x00 )
 
-        cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), buflen, modepageblock,0)
-        df.write(cmdout)
+        cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
+                   buflen, modepageblock, todev )
         i=i+1
 	diags=diags+cmdout
-        print "diags", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
+        print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
        
+    if len(cmdout) > 0:
+       df.write(cmdout)
+
     df.close()
-    self.transactionNext()
+    self.__transactionNext()
+
+    
     return diags
 
   def GetCharDev(self):

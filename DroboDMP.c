@@ -42,8 +42,9 @@
 
 #define DEBUG (1)
 
-int get_mode_page(int sg_fd, void *page_struct, int size, 
+signed int get_mode_page(int sg_fd, void *page_struct, int size, 
     void*mcb, int mcblen, int out)
+/* return the number of bytes placed in the sense buffer */
 {
     unsigned char sense_buffer[32];
     sg_io_hdr_t io_hdr;
@@ -52,14 +53,12 @@ int get_mode_page(int sg_fd, void *page_struct, int size,
     /* Prepare MODE command */
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
  
-/*
     if (DEBUG) {
       fprintf( stderr, "\nCDB dump\n:" );
       for (i=0; i < 11; i++) {
          fprintf(stderr, "CDB[%d] = 0x%02x\n", i, *(char*)(mcb+i) );
       };
     };
- */
     io_hdr.interface_id = 'S';
     io_hdr.dxfer_direction = (out) ? SG_DXFER_TO_DEV : SG_DXFER_FROM_DEV;
     io_hdr.cmd_len = mcblen;
@@ -69,16 +68,28 @@ int get_mode_page(int sg_fd, void *page_struct, int size,
     io_hdr.cmdp = mcb;
     io_hdr.sbp = sense_buffer;
     io_hdr.timeout = 20000;     /* 20000 millisecs == 20 seconds */
+    
+    /* these are set by the ioctl... initializing just in case. */
+    io_hdr.sb_len_wr=0;   
+    io_hdr.resid=0;
+    io_hdr.status=99;  
 
     i=ioctl(sg_fd, SG_IO, &io_hdr);
     if (i < 0) {
         perror("Drobo get_mode_page SG_IO ioctl error");
         close(sg_fd);
-        return 0;
+        return(-1);
     }
-    if (DEBUG)
-       fprintf(stderr, "ioctl return value: %d\n",  i );
-    return 1;
+    fprintf(stderr, 
+        "\nread.. size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
+          size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
+
+    if (io_hdr.resid > 0) {
+        size -= io_hdr.resid   ;
+    }
+
+    return(size);
+
 }
 
 
@@ -89,6 +100,7 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     char * buffer = NULL;
     long sz = 0 ;
     long out = 0;
+    long  szwritten = 0;
     unsigned char * mcb = NULL;
     long mcblen;
     PyObject *retval;
@@ -124,8 +136,9 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     //buffer=calloc(sz,1);
     bzero(buffer,sz);
  
-    if (get_mode_page(sg_fd, buffer, sz, mcb, mcblen, out))  {
-         retval = PyString_FromStringAndSize(buffer, sz );
+    szwritten = get_mode_page(sg_fd, buffer, sz, mcb, mcblen, out);
+    if (szwritten > 0)  {
+         retval = PyString_FromStringAndSize(buffer, szwritten );
     } else {
          PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
          return(NULL);
