@@ -40,16 +40,28 @@
 #include <scsi/sg_lib.h>
 #include <scsi/sg_io_linux.h>
 
+#define DEBUG (1)
+
 int get_mode_page(int sg_fd, void *page_struct, int size, 
-    void*mcb, int mcblen)
+    void*mcb, int mcblen, int out)
 {
     unsigned char sense_buffer[32];
     sg_io_hdr_t io_hdr;
+    int i;
 
     /* Prepare MODE command */
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
+ 
+/*
+    if (DEBUG) {
+      fprintf( stderr, "\nCDB dump\n:" );
+      for (i=0; i < 11; i++) {
+         fprintf(stderr, "CDB[%d] = 0x%02x\n", i, *(char*)(mcb+i) );
+      };
+    };
+ */
     io_hdr.interface_id = 'S';
-    io_hdr.dxfer_direction = SG_DXFER_FROM_DEV;
+    io_hdr.dxfer_direction = (out) ? SG_DXFER_TO_DEV : SG_DXFER_FROM_DEV;
     io_hdr.cmd_len = mcblen;
     io_hdr.mx_sb_len = sizeof(sense_buffer);
     io_hdr.dxfer_len = size;
@@ -58,11 +70,14 @@ int get_mode_page(int sg_fd, void *page_struct, int size,
     io_hdr.sbp = sense_buffer;
     io_hdr.timeout = 20000;     /* 20000 millisecs == 20 seconds */
 
-    if (ioctl(sg_fd, SG_IO, &io_hdr) < 0) {
+    i=ioctl(sg_fd, SG_IO, &io_hdr);
+    if (i < 0) {
         perror("Drobo get_mode_page SG_IO ioctl error");
         close(sg_fd);
         return 0;
     }
+    if (DEBUG)
+       fprintf(stderr, "ioctl return value: %d\n",  i );
     return 1;
 }
 
@@ -73,15 +88,16 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     char * file_name = NULL;
     char * buffer = NULL;
     long sz = 0 ;
+    long out = 0;
     unsigned char * mcb = NULL;
     long mcblen;
     PyObject *retval;
     PyObject *empty_tuple;
 
     // parse arguments... 
-    if (!PyArg_ParseTuple(args, "sls#", &file_name, &sz, &mcb, &mcblen )){
+    if (!PyArg_ParseTuple(args, "sls#l", &file_name, &sz, &mcb, &mcblen, &out )){
         PyErr_SetString( PyExc_ValueError, 
-	  "requires 5 arguments: filename (/dev/sd?), length, mcb" );
+	  "requires 6 arguments: filename (/dev/sd?), length, mcb, out-boolean" );
         return(NULL);
     }
 
@@ -108,7 +124,7 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     //buffer=calloc(sz,1);
     bzero(buffer,sz);
  
-    if (get_mode_page(sg_fd, buffer, sz, mcb, mcblen))  {
+    if (get_mode_page(sg_fd, buffer, sz, mcb, mcblen, out))  {
          retval = PyString_FromStringAndSize(buffer, sz );
     } else {
          PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
@@ -118,8 +134,6 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     PyMem_Free(buffer);
     return(retval);
 };
-
-
 
 static PyMethodDef DroboDMPMethods[] = {
     { "get_sub_page", drobodmp_get_sub_page, METH_VARARGS|METH_KEYWORDS, 

@@ -70,3 +70,9 @@ for dev in l:
   print
 
   print '---------------------------------------------------------'
+
+  # blink...
+  d.issueCommand(0x06)
+ 
+  # standby
+  #d.issueCommand(0x0d) 

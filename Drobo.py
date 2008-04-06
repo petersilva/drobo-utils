@@ -27,7 +27,7 @@ named COPYING in the root of the source directory tree.
 
 import fcntl, struct, socket, array, commands, time
 import exceptions
-import os, sys, regex
+import os, sys, re
 
 #
 # FIXME: if installed with "python setup.py install" then this 
@@ -39,10 +39,9 @@ import os, sys, regex
 #sys.path.insert(1, os.path.normpath('build/lib.linux-i686-2.5') )
 #on Debian Lenny, it's the same except 2.4... 
 #on a Droboshare... who knows?
-m = regex.compile("lib.*")
+m = re.compile("lib.*")
 
 for l in os.listdir("build"):
-    print l
     if m.match(l) :
         sys.path.insert(1, os.path.normpath("build/" + l ))
 
@@ -267,6 +266,7 @@ class Drobo:
      """   
      self.char_dev_file = chardev  
      self.features = []    
+     self.transactionID=1
 
 
   def format(self,pscheme,fstype,maxlunsz,devsz):
@@ -323,7 +323,7 @@ class Drobo:
          0x5a, 0, 0x3a, sub_page, 0, 0, 0, paklen, 0 )
 
     cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), paklen, 
-       modepageblock)
+       modepageblock,0)
 
     if ( len(cmdout) == paklen ):
       result = struct.unpack(mypack, cmdout)
@@ -332,7 +332,79 @@ class Drobo:
     else:
       raise DroboException
 
-  
+  def __transactionNext(self):
+    if (self.transactionID > 200):
+       self.transactionID=0
+    self.transactionID=self.transactionID+1
+
+
+  def __issueCommand(self,command):
+    """ issue a command to a Drobo...
+     0x06 - blink.
+     0x0d - Standby
+
+     returns nothing, look at the drobo to see if it worked.
+     note: command is asynchronous, returns before operation is complete.
+    """
+
+    modepageblock=struct.pack( ">BBBBBBBHB", 
+         0xea, 0x10, 0x00, command, 0x00, self.transactionID, 0x01 <<5, 0x01, 0x00 )
+
+    cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), 1, modepageblock,1)
+
+    self.transactionNext()
+
+    if ( len(cmdout) != 1 ):
+       raise DroboException
+    # only way to verify success is to look at the Drobo...
+
+  def Blink(self):
+    """ asks the Drobo nicely to blink it's lights. aka. Identification 
+        If you happen to have five in a row (drool), you can know which is which.
+
+        STATUS: works no issues.
+    """
+    self.__issueCommand(6)
+
+  def Standby(self):
+    """ asks the Drobo nicely to shutdown, flashing all manner of caches.
+        best do invoke this after file systems are umounted, and before 
+        unplugging the USB.
+
+        STATUS: works no issues.... only light tests so far.
+    """
+    self.__issueCommand(0x0d)
+
+  def dumpDiagnostics(self):
+    """ returns diagnostics as a string...
+	STATUS: totally borked!  loops forever!  
+         don't know how to read the count of bytes actually provided by Drobo.
+    """
+    buflen=32000
+
+    df=open("diags.txt", "w")
+    modepageblock=struct.pack( ">BBBBBBBHB", 
+      0xea, 0x10, 0x80, 0x04, 0x00, self.transactionID, 
+      (0x01 <<5)|0x01, buflen, 0x00 )
+
+    cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), buflen, modepageblock,0)
+    df.write(cmdout)
+    diags=cmdout
+    i=0
+    while len(cmdout) == buflen:
+        modepageblock=struct.pack( ">BBBBBBBHB", 
+            0xea, 0x10, 0x80, 0x04, 0x00, self.transactionID, 0x01, buflen, 0x00 )
+
+        cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), buflen, modepageblock,0)
+        df.write(cmdout)
+        i=i+1
+	diags=diags+cmdout
+        print "diags", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
+       
+    df.close()
+    self.transactionNext()
+    return diags
+
   def GetCharDev(self):
      return self.char_dev_file
 
@@ -520,8 +592,9 @@ def DiscoverLUNs():
 	  dev_file= devdir + '/' + potential
           d = Drobo( dev_file )
           try: 
-              d.GetSubPageCapacity()
-	      devices.append(dev_file)
+              fw=d.GetSubPageFirmware()
+              if ( len(fw) >= 8 ) and (len(fw[7]) >= 5):
+	          devices.append(dev_file)
           except:
  	      pass
        else:
