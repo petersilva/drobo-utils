@@ -86,14 +86,15 @@ def ledstatus(n):
         my drobo says: 
                 high order bits always 0. status seems to use whole byte.
 		green is 3,  
-		flashing red-green is 4...  which DMP says is yellow green...
+		flashing red-green is 4...  which dmp.h says is yellow green
+                flashing red-black is 6...  agrees with dmp.h
 		0x80 is indeed an empty slot, as per dmp.h
-                unknown-- yello-green...
+                unknown-- yellow-green...
         matches neither... hmm...        
     """
     #print 'colourstats, argument n is: ', n
     colourstats=[ 'black', 'red', 'yellow', 'green', ['red', 'green'], 
-      ['red', 'black'], [ 'red', 'yellow' ] ] 
+      [ 'red', 'yellow' ], ['red', 'black'] ] 
     if ( n == 0x80 ):  # empty
        return 'gray'
     return colourstats[n & 0x0f ]
@@ -415,7 +416,7 @@ class Drobo:
 
     n=time.gmtime()
 
-    df=open("/tmp/DroboDiag_%d_%02d%02d_%02d%02d%02d.log" % ( n[0:6] ))
+    df=open("/tmp/DroboDiag_%d_%02d%02d_%02d%02d%02d.log" % ( n[0:6] ), "w")
     d=self.__GetDiagRecord(4)
     df.write(d)
     d=self.__GetDiagRecord(7)
