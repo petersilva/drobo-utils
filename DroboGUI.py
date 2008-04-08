@@ -285,7 +285,7 @@ class DroboGUI(QtGui.QMainWindow):
 
 	self.__initToolTab()
 
-	self.__updatewithQueryStatus()
+	#self.__updatewithQueryStatus()
         self.updateTimer = QtCore.QTimer(self)
         self.connect(self.updateTimer, QtCore.SIGNAL("timeout()"),
 		self.__updateStatus )

@@ -359,6 +359,22 @@ class Drobo:
        raise DroboException
     # only way to verify success is to look at the Drobo...
 
+  def Sync(self):
+    """  Set the time to the host's time
+
+     ( utc, offset, name ) = self.__getsubpage(0x05, 'LB32s' )
+    """
+    pass
+    modepageblock=struct.pack( ">BBBBBBBHB", 
+      0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 
+      (0x01 <<5)|0x01, buflen, 0x00 )
+
+    todev=0
+    print "Page 0..."
+    cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
+                buflen, modepageblock, todev )
+    diags=cmdout
+    i=0
 
   def Blink(self):
     """ asks the Drobo nicely to blink it's lights. aka. Identification 
