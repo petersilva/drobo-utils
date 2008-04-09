@@ -82,10 +82,11 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
         return(-1);
     }
 
+/*
     fprintf(stderr, 
         "\nread.. size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
           size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
-
+ */
     if (io_hdr.status != 0) {
        fprintf( stderr, "oh no! io_hdr status is: %d\n",  io_hdr.status );
        return(-1);

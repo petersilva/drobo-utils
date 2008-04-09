@@ -72,7 +72,7 @@ for dev in l:
   print '---------------------------------------------------------'
 
   # blink...
-  d.Blink()
+  #d.Blink()
  
   # standby
   #d.Standby() 
