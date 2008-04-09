@@ -6,6 +6,19 @@ To try this stuff out:
 	python setup.py build
 
 Then you can  kick the tires by starting it up with: 
+         
+        ./drobom status 
+
+see if something sensible happens... on my system with a drobo
+the following happens:
+
+% ./drobom status
+/dev/sdd 100% full - ['Red alert', 'Bad disk', 'No redundancy']
+%
+very scary, but my drobo is in bad shape right now... you should just get []
+as a status, which means there is nothing wrong.
+To get all kinds of information on your drobo, try './drobom dump'
+Once that is working, and assuming you have python-qt4 installed, try:
 
 	./droboview
 
@@ -49,7 +62,7 @@ MANIFEST:
 
 Pieces:
   droboview   - GUI 
-  drobodump   - CLI script, accesses Drobo.py with no GUI stuff.
+  drobom      - CLI script, accesses Drobo.py with no GUI stuff.
   DroboGUI.py - implements GUI. uses Drobo.py for Drobo related stuff.
   Drobo.py   -- overall Drobo io manager, provides API & "python CLI"
                 uses DroboDMP.c to do raw io.

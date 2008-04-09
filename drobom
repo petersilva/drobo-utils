@@ -1,19 +1,15 @@
 #!/usr/bin/python
 
 
-import Drobo, time
+import sys
+import Drobo
+import time
 
-print "Display info on all accessible Drobos "
-
-l=Drobo.DiscoverLUNs()
-print 'The list of detected Drobos is: ' + str(l)
-
-for dev in l:
+def dump(d):
   print '---------------------------------------------------------'
-  print 'Dumping info about Drobo ' + dev
+  print 'Dumping info about Drobo ' + d.char_dev_file
   print '---------------------------------------------------------'
   print
-  d = Drobo.Drobo(dev)
   
   config=d.GetSubPageConfig()
   print 'query config result: '
@@ -71,8 +67,46 @@ for dev in l:
 
   print '---------------------------------------------------------'
 
-  # blink...
-  #d.Blink()
- 
-  # standby
-  #d.Standby() 
+
+
+# Mainline...
+
+
+if len(sys.argv) > 2:
+  try:
+     d =Drobo.Drobo( sys.argv[2] )
+  except:
+    print "Second argument is supposed to be a character device file. (e.g. /dev/sdd)"
+    sys.exit()
+else:
+  l=Drobo.DiscoverLUNs()
+  if len(l) > 1:
+     print "More than one Drobo connected, please pick one: " + str(l) 
+     sys.exit()
+  else:
+     d = Drobo.Drobo( l[0] )
+
+#assert d is a valid drobo object...
+
+if len(sys.argv) == 1:
+   print "Usage: drobom <command> [ <device> ] \n\ncommand is one of: \n\tblink\tidentify the drobo by making the lights blink\n\tstandby\tshutdown drobo (umount first!)\n\tstatus\thow is the Drobo doing\n\tdump\tprint all available information on a Drobo\n\nDevice\tis the raw character device of a drobo. If not given, will search.\n"
+   sys.exit()
+
+cmd=sys.argv[1]
+if cmd == "blink":
+   d.Blink() 
+   
+elif cmd == "standby":
+   d.Standby() 
+   
+elif cmd == "status":
+   c=d.GetSubPageCapacity()
+   pfull = 100 * ((c[1]+1.0)/c[2])
+   print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
+
+elif cmd == 'dump':
+   dump(d)
+
+else:
+   print "known commands: blink, standby, dump"
+   print "Unknown Command: ", cmd

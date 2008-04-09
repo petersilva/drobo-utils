@@ -351,7 +351,13 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB", 
          0xea, 0x10, 0x00, command, 0x00, self.transactionID, 0x01 <<5, 0x01, 0x00 )
 
-    cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), 1, modepageblock,1)
+    try:
+       cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), 1, modepageblock,1)
+
+    except:
+       print 'IF you see, "bad address", it is because you need to be the super user...'
+       print " try sudo or su ...       "
+       sys.exit()
 
     self.__transactionNext()
 
