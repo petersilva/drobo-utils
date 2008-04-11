@@ -369,6 +369,8 @@ class Drobo:
     """  Set the time to the host's time
 
      ( utc, offset, name ) = self.__getsubpage(0x05, 'LB32s' )
+
+     STATUS: not tested yet.
     """
     pass
     modepageblock=struct.pack( ">BBBBBBBHB", 

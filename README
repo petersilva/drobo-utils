@@ -106,11 +106,7 @@ TODO:
    -- labels for max lun size slider... which is strange... shouldn't that
       be inthe format thing? seems kind a dangerous to do without formatting.
    -- slider not updated from drobo, so number is always 2.
-
-   stuff I don't know how to do:
-   -- Diagnostics dump.
-   -- blink lights.
-   -- set anything.
+   -- blink & Standby actuation...
 
    stuff I would like:
    -- some sort of indicator of how long 'relay out' will be in progress.
@@ -118,6 +114,10 @@ TODO:
       ntfs it took hours for the led indicators to drop from 70% to 0.
    -- should this be integrated with dbus somehow ? dunno...
    -- awaiting hints from drobo.com about how to 'do' stuff...
+		format, set lun size.
+
+   -- have status queries be asynchronous from the GUI.
+      right now, if the GUI
 
    of interest:
    -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/

@@ -16,7 +16,7 @@ import string
 
 def toGB(num):
   g = num*1.0/(1000*1000*1000)
-  return "%6.2f" % g
+  return "%6.1f" % g
 
 def setDiskLabel(model,capacity): 
     if (capacity == ''):
@@ -64,6 +64,9 @@ class DroboGUI(QtGui.QMainWindow):
         #self.connect(button, QtCore.SIGNAL('focusInEvent()'), 
 	#	self.__StatusBar_space)
         return button
+
+    def __Blink(self):
+        self.drobo.Blink()
 
     def __StatusBar_space(self):
         c=self.drobo.GetSubPageCapacity()
@@ -212,9 +215,11 @@ class DroboGUI(QtGui.QMainWindow):
         x=xo
         y=y+h+s
         Blinkybutton = QtGui.QPushButton('Blink Lights', self.Tools)
-        Blinkybutton.setStyleSheet( "QWidget { color: gray }" )
         Blinkybutton.setCheckable(False)
         Blinkybutton.move(x,y)
+
+        self.connect(Blinkybutton, QtCore.SIGNAL('clicked()'), 
+                self.drobo.Blink)
 
         x=x+w+s
         Renamebutton = QtGui.QPushButton('Rename', self.Tools)
@@ -285,7 +290,7 @@ class DroboGUI(QtGui.QMainWindow):
 
 	self.__initToolTab()
 
-	#self.__updatewithQueryStatus()
+	self.__updatewithQueryStatus()
         self.updateTimer = QtCore.QTimer(self)
         self.connect(self.updateTimer, QtCore.SIGNAL("timeout()"),
 		self.__updateStatus )
