@@ -394,12 +394,25 @@ class Drobo:
 
 
   def Standby(self):
-    """ asks the Drobo nicely to shutdown, flashing all manner of caches.
-        best do invoke this after file systems are umounted, and before 
-        unplugging the USB.
+    """ asks the Drobo nicely to shutdown, flushing all manner of caches.
 
-        STATUS: works no issues.... only light tests so far.
+        STATUS: command itself works, no issues.... only light tests so far.
+                still testing umount code.
     """
+    mounts=open("/etc/mtab")
+    dlen=len(self.char_dev_file)
+    toumount=[]
+    for l in mounts.readlines():
+       fields=l.split()
+       if fields[0][0:dlen] == self.char_dev_file:
+          toumount.append(fields[1])
+
+    if len(toumount) > 0:
+       for i in toumount:
+           umresult=os.system("umount " + i )
+           if umresult != 0:
+                return
+
     self.__issueCommand(0x0d)
 
 

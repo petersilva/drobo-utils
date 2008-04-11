@@ -198,9 +198,11 @@ class DroboGUI(QtGui.QMainWindow):
         #
         y=y+h+s
         Standbybutton = QtGui.QPushButton('Standby', self.Tools)
-        Standbybutton.setStyleSheet( "QWidget { color: gray }" )
         Standbybutton.setCheckable(False)
         Standbybutton.move(x,y)
+
+        self.connect(Standbybutton, QtCore.SIGNAL('clicked()'), 
+                self.drobo.Standby)
 
 	w=Standbybutton.width()
         x=x+w+s
@@ -209,8 +211,6 @@ class DroboGUI(QtGui.QMainWindow):
         Formatbutton.setCheckable(False)
         Formatbutton.move(x,y)
 
-        Standbybutton.setStyleSheet( "QWidget { color: gray }" )
-        
         h=Formatbutton.height()
         x=xo
         y=y+h+s
