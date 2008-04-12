@@ -1,20 +1,26 @@
-TODO:
+
+FORMAT
    -- dialog for formatting.
         -- labels for max lun size slider... which is strange... shouldn't that
            be in the format thing? seems kind a dangerous to do without formatting.
         -- slider not updated from drobo, so number is always 2.
+   -- awaiting hints from drobo.com about how to 'do' stuff...
+		format, set lun size.
+      maybe it's already there... dunno...
 
-   stuff I would like:
+Better STATUS reporting:
    -- some sort of indicator of how long 'relay out' will be in progress.
       and when it is busy, it should say so... like when I emptied an
       ntfs it took hours for the led indicators to drop from 70% to 0.
-   -- should this be integrated with dbus somehow ? dunno...
-   -- awaiting hints from drobo.com about how to 'do' stuff...
-		format, set lun size.
 
+
+LIVELIER GUI:
    -- have status queries proceed asynchronously from the GUI.
       right now, if the drobo is slow, the GUI makes it slower, and gets very slow too.
       should run as a daemon, async. from the GUI.
+
+Better Linux Integration:
+   -- should this be integrated with dbus somehow ? dunno...
 
    of interest:
    -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
