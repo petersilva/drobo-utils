@@ -1,0 +1,30 @@
+TODO:
+   -- dialog for formatting.
+        -- labels for max lun size slider... which is strange... shouldn't that
+           be in the format thing? seems kind a dangerous to do without formatting.
+        -- slider not updated from drobo, so number is always 2.
+
+   stuff I would like:
+   -- some sort of indicator of how long 'relay out' will be in progress.
+      and when it is busy, it should say so... like when I emptied an
+      ntfs it took hours for the led indicators to drop from 70% to 0.
+   -- should this be integrated with dbus somehow ? dunno...
+   -- awaiting hints from drobo.com about how to 'do' stuff...
+		format, set lun size.
+
+   -- have status queries proceed asynchronously from the GUI.
+      right now, if the drobo is slow, the GUI makes it slower, and gets very slow too.
+      should run as a daemon, async. from the GUI.
+
+   of interest:
+   -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
+
+
+Revision date: 2008/04/12
+
+copyright:
+
+Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
+named COPYING in the root of the source directory tree.
+Installation:

@@ -11,6 +11,6 @@ setup (name = 'Drobo-utils',
        description = 'Drobo Management Protocol io package',
        ext_modules = [module1],
        py_modules=['Drobo','DroboGUI'],
-       scripts=['drobodump', 'droboview']
+       scripts=['drobom', 'droboview']
       )
 

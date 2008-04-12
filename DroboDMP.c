@@ -87,7 +87,9 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
         "\nread.. size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
           size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
  */
-    if (io_hdr.status != 0) {
+
+    /* SG_INFO_DIRECT_IO       0x2     -- direct IO requested and performed */
+    if ((io_hdr.status != 0) && (io_hdr.status != 2)) {
        fprintf( stderr, "oh no! io_hdr status is: %d\n",  io_hdr.status );
        return(-1);
     } else {

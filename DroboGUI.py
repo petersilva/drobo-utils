@@ -129,7 +129,7 @@ class DroboGUI(QtGui.QMainWindow):
         self.__updateLEDs() # only update display...
 
         # try not to poll the device too often, so only every 'n' screen updates
-        if (self.updates % 10 == 0 ): # query device for new info...
+        if (self.updates % 30 == 0 ): # query device for new info...
 	    self.__updatewithQueryStatus()
 
 
@@ -239,6 +239,15 @@ class DroboGUI(QtGui.QMainWindow):
         Registerbutton.setStyleSheet( "QWidget { color: gray }" )
         Registerbutton.setCheckable(False)
         Registerbutton.move(x,y)
+
+        x=xo
+        y=y+h+s
+        Diagbutton = QtGui.QPushButton('Dump Diagnostics', self.Tools)
+        Diagbutton.setCheckable(False)
+        Diagbutton.move(x,y)
+
+        self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), 
+                self.drobo.dumpDiagnostics)
 
         self.tab.addTab(self.Tools, "Tools")
 

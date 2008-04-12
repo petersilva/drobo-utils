@@ -71,7 +71,7 @@ Pieces:
   setup.py --   python version of a Makefile
 
 
-deps:     - packages needed to run the package (assuming already built elsewhere.)
+dependendcies:     - packages needed to run the package (assuming already built elsewhere.)
   python
   python-qt
   gtksudo or kdesudo - searches on startup for one or the other.
@@ -79,7 +79,7 @@ deps:     - packages needed to run the package (assuming already built elsewhere
 	   and add it to the search list at the end of DroboGUI.__init__ 
 
    
-build-deps:   - packages needed to build the package.
+build-dependencies:   - packages needed to build the package.
   libsgutils1-dev -- ioctl support.
   python-dev      -- to build DroboDMP extension.
 
@@ -100,30 +100,8 @@ Developer access:
 
    for commit access, you need a sourceforge user account.
 
-TODO:
-   -- dialog for formatting.
-   -- formatting itself.
-   -- labels for max lun size slider... which is strange... shouldn't that
-      be inthe format thing? seems kind a dangerous to do without formatting.
-   -- slider not updated from drobo, so number is always 2.
-   -- blink & Standby actuation...
 
-   stuff I would like:
-   -- some sort of indicator of how long 'relay out' will be in progress.
-      and when it is busy, it should say so... like when I emptied an
-      ntfs it took hours for the led indicators to drop from 70% to 0.
-   -- should this be integrated with dbus somehow ? dunno...
-   -- awaiting hints from drobo.com about how to 'do' stuff...
-		format, set lun size.
-
-   -- have status queries be asynchronous from the GUI.
-      right now, if the GUI
-
-   of interest:
-   -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
-
-
-Revision date: 2008/04/03
+Revision date: 2008/04/12
 
 copyright:
 
