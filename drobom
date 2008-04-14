@@ -1,0 +1,112 @@
+#!/usr/bin/python
+
+
+import sys
+import Drobo
+import time
+
+def dump(d):
+  print '---------------------------------------------------------'
+  print 'Dumping info about Drobo ' + d.char_dev_file
+  print '---------------------------------------------------------'
+  print
+  
+  config=d.GetSubPageConfig()
+  print 'query config result: '
+  print config
+  print 'max lun size is: ', config[2]
+  print
+  
+  c=d.GetSubPageCapacity()
+  print 'query capacity result:'
+  print c
+  print 'Physical space... used: ',  c[1] , ' free: ' , c[0],  ' Total: ', c[2]
+  print
+  
+  protocol=d.GetSubPageProtocol()
+  print 'query protocol version result: '
+  print protocol 
+  print
+  
+  settings=d.GetSubPageSettings()
+  print 'query settings result:' 
+  print settings
+  print
+
+  #print 'drobo says it is now: ', time.ctime(settings[0]), ' GMT offset:', str(settings[1])
+  print
+  
+  slotinfo=d.GetSubPageSlotInfo()
+  print 'query slotinfo result:  number of slots:'
+  print slotinfo[0]
+  print slotinfo[1]
+  print slotinfo[2]
+  print slotinfo[3]
+  print
+  
+  firmware=d.GetSubPageFirmware()
+  print 'query firmware result:' 
+  print firmware
+  print 'drobo says firmware revision: ', str(firmware[0]), '.', str(firmware[1]), '(', str(firmware[2]), ') was built: ', firmware[5]
+  print
+  
+  status=d.GetSubPageStatus()
+  print 'query status result:' 
+  print status
+  print
+  
+  options=d.GetSubPageOptions()
+  print 'query options result:'
+  print options
+  print
+  
+  luninfo=d.GetSubPageLUNs()
+  print 'query luninfo result:'
+  print luninfo
+  print
+
+  print '---------------------------------------------------------'
+
+
+
+# Mainline...
+
+
+if len(sys.argv) > 2:
+  try:
+     d =Drobo.Drobo( sys.argv[2] )
+  except:
+    print "Second argument is supposed to be a character device file. (e.g. /dev/sdd)"
+    sys.exit()
+else:
+  l=Drobo.DiscoverLUNs()
+  if len(l) > 1:
+     print "More than one Drobo connected, please pick one: " + str(l) 
+     sys.exit()
+  else:
+     d = Drobo.Drobo( l[0] )
+
+#assert d is a valid drobo object...
+
+if len(sys.argv) == 1:
+   print "Usage: drobom <command> [ <device> ] \n\ncommand is one of: \n\tblink\tidentify the drobo by making the lights blink\n\tstandby\tshutdown drobo (umount first!)\n\tstatus\thow is the Drobo doing\n\tdump\tprint all available information on a Drobo\n\nDevice\tis the raw character device of a drobo. If not given, will search.\n"
+   sys.exit()
+
+cmd=sys.argv[1]
+if cmd == "blink":
+   d.Blink() 
+   
+elif cmd == "standby":
+   d.Standby() 
+   
+elif cmd == "status":
+   c=d.GetSubPageCapacity()
+   pfull = 100 * ((c[1]+1.0)/c[2])
+   print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
+
+elif cmd == 'dump':
+   dump(d)
+
+else:
+   print "known commands: blink, standby, dump"
+   print "Unknown Command: ", cmd
