@@ -36,18 +36,6 @@ def runPartitioner():
    print "partitioner = ", partitioner
    subprocess.Popen( partitioner, shell=True)
 
-class DroboFormatWizard(QtGui.QDialog):
-
-    def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
-
-
-class DroboFormatDialog(QtGui.QWidget):
-    def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
-        self.button = QtGui.QPushButton('hoho', self)
-        self.hide() 
-
 
 class DroboGUI(QtGui.QMainWindow):
     """ GUI for a single Drobo, start one for each drobo.
@@ -173,6 +161,62 @@ class DroboGUI(QtGui.QMainWindow):
         self.tab.addTab(self.Device, "Device")
 
 
+
+    def __initFormatTab(self):
+
+	self.Format = QtGui.QWidget()
+        self.Format.setObjectName("Format")
+        self.Format.setStyleSheet( "QWidget { color: gray }" )
+        xo=20
+        w=160
+        h=16
+        s=10
+
+        x=10
+        y=30
+        self.Format.header = QtGui.QLabel("WARNING: Format erases whole Drobo", self.Format)
+        self.Format.header.setStyleSheet( "QWidget { color: red }" )
+        self.Format.header.move(x,y)
+
+        x=xo
+        y=y+h+s
+        self.Format.lunsztitle = QtGui.QLabel("Maximum LUN size on Drobo", self.Format)
+        self.Format.lunsztitle.move(x,y)
+
+        y=y+h+s
+        self.Format.horizontalSlider = QtGui.QSlider(self.Format)
+        self.Format.horizontalSlider.setGeometry(QtCore.QRect(x,y,w,h))
+        self.Format.horizontalSlider.setMaximum(16)
+        self.Format.horizontalSlider.setSingleStep(2)
+        self.Format.horizontalSlider.setPageStep(9)
+        self.Format.horizontalSlider.setProperty("value",QtCore.QVariant(2))
+        self.Format.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.Format.horizontalSlider.setTickPosition(QtGui.QSlider.TicksBelow)
+        self.Format.horizontalSlider.setTickInterval(2)
+        self.Format.horizontalSlider.setObjectName("horizontalSlider")
+
+        y=y+h+s
+        self.Format.ext3 = QtGui.QRadioButton("Ext3 ", self.Format)
+        self.Format.ext3.move(x,y)
+
+        y=y+h+s
+        self.Format.msdos = QtGui.QRadioButton("FAT32 (MS-DOS)", self.Format)
+        self.Format.msdos.move(x,y)
+
+        y=y+h+s
+        self.Format.ntfs = QtGui.QRadioButton("NTFS", self.Format)
+        self.Format.ntfs.move(x,y)
+
+        y=y+h+s
+
+        x=x+20
+        Formatbutton = QtGui.QPushButton('Format', self.Format)
+        Formatbutton.setCheckable(False)
+        Formatbutton.move(x,y)
+
+        self.tab.addTab(self.Format, "Format")
+  
+
     def __initToolTab(self):
 
 	self.Tools = QtGui.QWidget()
@@ -183,20 +227,10 @@ class DroboGUI(QtGui.QMainWindow):
         w=160
         h=16
         s=10
-        self.Tools.horizontalSlider = QtGui.QSlider(self.Tools)
-        self.Tools.horizontalSlider.setGeometry(QtCore.QRect(x,y,w,h))
-        self.Tools.horizontalSlider.setMaximum(16)
-        self.Tools.horizontalSlider.setSingleStep(2)
-        self.Tools.horizontalSlider.setPageStep(9)
-        self.Tools.horizontalSlider.setProperty("value",QtCore.QVariant(2))
-        self.Tools.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.Tools.horizontalSlider.setTickPosition(QtGui.QSlider.TicksBelow)
-        self.Tools.horizontalSlider.setTickInterval(2)
-        self.Tools.horizontalSlider.setObjectName("horizontalSlider")
 
+        #
         # Set the tool colors to grey, to indicate non-functional...
         #
-        y=y+h+s
         Standbybutton = QtGui.QPushButton('Standby', self.Tools)
         Standbybutton.setCheckable(False)
         Standbybutton.move(x,y)
@@ -206,14 +240,7 @@ class DroboGUI(QtGui.QMainWindow):
 
 	w=Standbybutton.width()
         x=x+w+s
-        Formatbutton = QtGui.QPushButton('Format', self.Tools)
-        Formatbutton.setStyleSheet( "QWidget { color: gray }" )
-        Formatbutton.setCheckable(False)
-        Formatbutton.move(x,y)
 
-        h=Formatbutton.height()
-        x=xo
-        y=y+h+s
         Blinkybutton = QtGui.QPushButton('Blink Lights', self.Tools)
         Blinkybutton.setCheckable(False)
         Blinkybutton.move(x,y)
@@ -221,33 +248,38 @@ class DroboGUI(QtGui.QMainWindow):
         self.connect(Blinkybutton, QtCore.SIGNAL('clicked()'), 
                 self.drobo.Blink)
 
-        x=x+w+s
+        h=Standbybutton.height()
+        x=xo
+        y=y+h+s
         Renamebutton = QtGui.QPushButton('Rename', self.Tools)
         Renamebutton.setStyleSheet( "QWidget { color: gray }" )
         Renamebutton.setCheckable(False)
         Renamebutton.move(x,y)
         
-        x=xo
-        y=y+h+s
+        x=x+w+s
         Updatebutton = QtGui.QPushButton('Update', self.Tools)
         Updatebutton.setStyleSheet( "QWidget { color: gray }" )
         Updatebutton.setCheckable(False)
         Updatebutton.move(x,y)
 
-        x=x+w+s
+        x=xo
+        y=y+h+s
         Registerbutton = QtGui.QPushButton('Register', self.Tools)
         Registerbutton.setStyleSheet( "QWidget { color: gray }" )
         Registerbutton.setCheckable(False)
         Registerbutton.move(x,y)
 
-        x=xo
-        y=y+h+s
-        Diagbutton = QtGui.QPushButton('Dump Diagnostics', self.Tools)
+        x=x+w+s
+        Diagbutton = QtGui.QPushButton('Diagnostics', self.Tools)
         Diagbutton.setCheckable(False)
         Diagbutton.move(x,y)
 
         self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), 
                 self.drobo.dumpDiagnostics)
+
+        # next button...
+        x=xo
+        y=y+h+s
 
         self.tab.addTab(self.Tools, "Tools")
 
@@ -296,8 +328,8 @@ class DroboGUI(QtGui.QMainWindow):
         self.tab.setObjectName("tabs")
         
 	self.__initDeviceTab()
-
 	self.__initToolTab()
+	self.__initFormatTab()
 
 	self.__updatewithQueryStatus()
         self.updateTimer = QtCore.QTimer(self)
@@ -313,4 +345,3 @@ class DroboGUI(QtGui.QMainWindow):
            gsudo = commands.getoutput("which kdesudo")
         partitioner= gsudo + " gparted"
 
-        self.fmtdlg=DroboFormatDialog()

@@ -373,12 +373,13 @@ class Drobo:
      STATUS: not tested yet.
     """
     pass
+    dateblock=struct.pack(">LH32s", 0,0,"Hi There!" )
+    buflen(dateblock)
     modepageblock=struct.pack( ">BBBBBBBHB", 
-      0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 
+      0xea, 0x10, 0x80, 0x05, 0x00, self.transactionID, 
       (0x01 <<5)|0x01, buflen, 0x00 )
 
     todev=0
-    print "Page 0..."
     cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
                 buflen, modepageblock, todev )
     diags=cmdout

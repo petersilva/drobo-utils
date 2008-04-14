@@ -1,4 +1,26 @@
 
+SYNC
+   -- mode select ...
+      It is a ModeSelect using the SystemInfo page.
+
+      Send the following:
+
+      Standard 4-byte subpage header, followed by:
+
+            uint32  currentTime; ///< Current time (in # of seconds since Jan 1, 1970)
+
+            int16   GMTOffset;   ///< GMT offset
+            char    name[32];  /// -unused, but best to set ...
+
+      the systemInfo read page is hard coded to return 2048 as the time zone, which
+      is obviously wrong, so treating it as a single byte.  apparently hard coded in
+      firmware as of 1.1.1. (source: drobo/rsharpe)
+
+Remember, everything is in network byte order (well, almost J
+
+
+
+
 FORMAT
    -- dialog for formatting.
         -- labels for max lun size slider... which is strange... shouldn't that
