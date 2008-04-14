@@ -1,4 +1,10 @@
 
+FIRMWARE UPGRADE:
+   -- where do I get firmware from?
+   -- how to test without bricking my Drobo?
+   -- how do I resuscitate if I brick it?
+
+
 SYNC
    -- mode select ...
       It is a ModeSelect using the SystemInfo page.
@@ -30,10 +36,11 @@ FORMAT
 		format, set lun size.
       maybe it's already there... dunno...
 
-Better STATUS reporting:
+Better STATUS progress reporting:
    -- some sort of indicator of how long 'relay out' will be in progress.
-      and when it is busy, it should say so... like when I emptied an
+   -- when it is busy, it should say so... like when I emptied an
       ntfs it took hours for the led indicators to drop from 70% to 0.
+      It should say something about what is going on.
 
 
 LIVELIER GUI:
