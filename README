@@ -22,11 +22,60 @@ Components:
                 only platform specific stuff is in here...
   setup.py --   python version of a Makefile
 
+Requirements:
+drobo-utils was developed on pre-release version of Kubuntu Hardy Heron.
+Any similarly recent distro ought to do.
+
+To get drobo-utils running, you need packages something like (these are
+ubuntu packages, names may vary on other distros):
+
+essential:
+  python      -- interpreter for python language
+  python-qt4  -- python-qt4... This is actually a new version only in 
+                              the newest distros.
+  libsgutils1-dev -- ioctl support.
+  python-dev      -- to build DroboDMP extension.
+  gcc             -- a c compiler for python to invoke during setup.
+                     ought to be automatically installed as a pre-requisite
+		     for pyton-dev
+
+options:
+  gtksudo or kdesudo - searches on startup for one or the other.
+           if neither are around, then get a graphical sudo of you choice
+	   and add it to the search list at the end of DroboGUI.__init__ 
+  parted   for >= 2TB file systems, need GPT support.
+           just use fdisk  for smaller stuff.
+
 INSTALL:
+Assuming you have all of the above parts, you should be able to just do:
 
 	python setup.py build
 
-Then you can  kick the tires by starting it up with: 
+which on my system looks like this:
+alu% python ./setup.py build
+running build
+running build_py
+creating build
+creating build/lib.linux-i686-2.5
+copying Drobo.py -> build/lib.linux-i686-2.5
+copying DroboGUI.py -> build/lib.linux-i686-2.5
+running build_ext
+building 'DroboDMP' extension
+creating build/temp.linux-i686-2.5
+gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.5 -c DroboDMP.c -o build/temp.linux-i686-2.5/DroboDMP.o
+gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions build/temp.linux-i686-2.5/DroboDMP.o -o build/lib.linux-i686-2.5/DroboDMP.so
+running build_scripts
+creating build/scripts-2.5
+copying and adjusting drobom -> build/scripts-2.5
+copying and adjusting droboview -> build/scripts-2.5
+changing mode of build/scripts-2.5/drobom from 644 to 755
+changing mode of build/scripts-2.5/droboview from 644 to 755
+alu%   
+
+It should create a build/lib<somthing> sub-directory.  It will also
+compile DroboDMP.c a put the result in a shared object object library 
+in that directory.  If all has gone well, you can kick the tires 
+by starting it up with: 
          
         ./drobom status 
 
@@ -140,10 +189,14 @@ Writing superblocks and filesystem accounting information: done
 This filesystem will be automatically checked every 26 mounts or
 180 days, whichever comes first.  Use tune2fs -c or -i to override.
 root@alu:~#
-root@alu:~# mount /dev/sdd1
+root@alu:~# mount /dev/sdd1 /mnt
+
 -------------------
 
+NOTE:
 
+This is completely untested with multiple LUNS.  Best to make LUN
+large enough to span all your space.
 
 ON LUNSIZES >= 2TB:
  -- On older distributions, there are a couple of gotchas related to 
@@ -158,20 +211,6 @@ ON LUNSIZES >= 2TB:
 
 (assuming the disk is /dev/sdd)
 
-dependencies:     - packages needed to run the package (assuming already built elsewhere.)
-  python
-  python-qt
-  gtksudo or kdesudo - searches on startup for one or the other.
-           if neither are around, then get a graphical sudo of you choice
-	   and add it to the search list at the end of DroboGUI.__init__ 
-  parted   for >= 2TB file systems, need GPT support.
-   
-
-   
-build-dependencies:   - packages needed to build the package.
-  libsgutils1-dev -- ioctl support.
-  python-dev      -- to build DroboDMP extension.
-  gcc             -- a c compiler for python to invoke... 
 
 
 Caveats:
