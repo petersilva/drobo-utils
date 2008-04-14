@@ -24,6 +24,20 @@ SYNC
 
 Remember, everything is in network byte order (well, almost J
 
+MULTIPLE LUN support:
+  ON multiple Drobos with a single LUN:
+        That is the assumed case.  In that case, when you invoke ./droboview,
+        it will start up one GUI per Drobo.
+
+  ON MULTIPLE LUNS on a single Drobo:
+        Currently it will start up one GUI per LUN, which will get confusing.
+
+        Don´t know how to tell when two ways to get at a single drobo are
+        the same one.  Serial number?
+
+        cannot test this configuration.  anyone want to send me a couple
+        of terabytes?
+
 
 
 
