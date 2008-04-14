@@ -57,6 +57,11 @@ Better STATUS progress reporting:
       It should say something about what is going on.
 
 
+Documentation Dialogs:
+   -- need a blame/credit window.
+   -- maybe a help window.
+
+
 LIVELIER GUI:
    -- have status queries proceed asynchronously from the GUI.
       right now, if the drobo is slow, the GUI makes it slower, and gets very slow too.
