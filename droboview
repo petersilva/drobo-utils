@@ -1,0 +1,31 @@
+#!/usr/bin/python
+
+#
+#
+# copyright 2008 (C) Peter.A.Silva@gmail.com -- All Rights Reserved.
+#
+#
+#
+
+import sys,subprocess
+from PyQt4 import QtGui
+from PyQt4 import QtCore
+from Drobo import Drobo,DiscoverLUNs 
+from DroboGUI import DroboGUI 
+
+
+if ( (len(sys.argv) == 2 ) ):
+   # fire up a GUI for the given LUN, stays foreground...
+   d=Drobo( sys.argv[1] )
+   app = QtGui.QApplication(sys.argv)
+   tb = DroboGUI(d)
+   tb.show()
+   app.exec_()
+else:
+   # find all the Drobo LUN's connected, and fire up a GUI for each one.
+   # launched as sub-processes.
+   l = DiscoverLUNs()
+   for df in l:
+      cmd = sys.argv[0] + ' ' + df
+      subprocess.Popen( cmd , shell=True)
+
