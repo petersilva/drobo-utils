@@ -28,4 +28,7 @@ else:
    for df in l:
       cmd = sys.argv[0] + ' ' + df
       subprocess.Popen( cmd , shell=True)
-
+   if len(l) < 1:
+      print "No Drobos detected, so no dashboard started."
+   else:
+      print str(len(l)) + " drobos detected, one dashboard started per drobo."
