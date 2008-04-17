@@ -35,9 +35,6 @@ essential:
                               the newest distros.
   libsgutils1-dev -- ioctl support.
   python-dev      -- to build DroboDMP extension.
-  gcc             -- a c compiler for python to invoke during setup.
-                     ought to be automatically installed as a pre-requisite
-		     for pyton-dev
 
 options:
   gtksudo or kdesudo - searches on startup for one or the other.
@@ -45,6 +42,19 @@ options:
 	   and add it to the search list at the end of DroboGUI.__init__ 
   parted   for >= 2TB file systems, need GPT support.
            just use fdisk  for smaller stuff.
+
+INSTALLING pre-requisites.:  
+On ubuntu, it would typically look like so:
+
+	open a shell window. they enter the following package installation commands:
+
+	% sudo aptitude install python-qt4 libsgutils1-dev libsgutils1 python-dev  
+	% sudo aptitude install parted kdesudo
+
+On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' and
+some of the package names will change.
+
+
 
 INSTALL:
 Assuming you have all of the above parts, you should be able to just do:
@@ -227,7 +237,8 @@ Caveats:
 
 Getting a Snapshot:
 
-   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils
+   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
+
 
    for commit access, you need a sourceforge user account.
 
