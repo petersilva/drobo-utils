@@ -83,6 +83,9 @@ else:
   if len(l) > 1:
      print "More than one Drobo connected, please pick one: " + str(l) 
      sys.exit()
+  elif len(l) < 1:
+     print "No Drobo discovered, is one connected?"
+     sys.exit()
   else:
      d = Drobo.Drobo( l[0] )
 
