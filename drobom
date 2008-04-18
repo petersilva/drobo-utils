@@ -5,9 +5,9 @@ import sys
 import Drobo
 import time
 
-def dump(d):
+def info(d):
   print '---------------------------------------------------------'
-  print 'Dumping info about Drobo ' + d.char_dev_file
+  print 'Info about Drobo ' + d.char_dev_file
   print '---------------------------------------------------------'
   print
   
@@ -31,7 +31,7 @@ def dump(d):
   settings=d.GetSubPageSettings()
   print 'query settings result:' 
   print settings
-  print
+  print 'Drobo time is', time.ctime(settings[0])
 
   #print 'drobo says it is now: ', time.ctime(settings[0]), ' GMT offset:', str(settings[1])
   print
@@ -92,13 +92,17 @@ else:
 #assert d is a valid drobo object...
 
 if len(sys.argv) == 1:
-   print "Usage: drobom <command> [ <device> ] \n\ncommand is one of: \n\tblink\tidentify the drobo by making the lights blink\n\tstandby\tshutdown drobo (umount first!)\n\tstatus\thow is the Drobo doing\n\tdump\tprint all available information on a Drobo\n\nDevice\tis the raw character device of a drobo. If not given, will search.\n"
+   print "Usage: drobom <command> [ <device> ] \n\ncommand is one of: \n\tblink\tidentify the drobo by making the lights blink\n\tstandby\tshutdown drobo (umount first!)\n\tstatus\thow is the Drobo doing\n\tinfo\tprint all available information on a Drobo\n\nDevice\tis the raw character device of a drobo. If not given, will search.\n"
    sys.exit()
 
 cmd=sys.argv[1]
+
 if cmd == "blink":
    d.Blink() 
    
+elif cmd == 'info':
+   info(d)
+
 elif cmd == "standby":
    d.Standby() 
    
@@ -107,9 +111,13 @@ elif cmd == "status":
    pfull = 100 * ((c[1]+1.0)/c[2])
    print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
 
-elif cmd == 'dump':
-   dump(d)
+elif cmd == "sync":
+  d.Sync()
+
+elif cmd == "time":
+  settings=d.GetSubPageSettings()
+  print "Drobo says it is:", time.ctime(settings[0])
 
 else:
-   print "known commands: blink, standby, dump"
+   print "known commands: blink, standby, info"
    print "Unknown Command: ", cmd
