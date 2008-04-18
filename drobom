@@ -75,9 +75,11 @@ def info(d):
 if len(sys.argv) > 2:
   try:
      d =Drobo.Drobo( sys.argv[2] )
+
   except:
-    print "Second argument is supposed to be a character device file. (e.g. /dev/sdd)"
-    sys.exit()
+     print "Second argument is supposed to be a character device file. (e.g. /dev/sdd)"
+     sys.exit()
+
 else:
   l=Drobo.DiscoverLUNs()
   if len(l) > 1:
