@@ -275,7 +275,7 @@ class Drobo:
      
   def __del__(self):
       if (self.fd >0):
-           os.close(self.fd)
+           DroboDMP.closefd()
 
   def format(self,pscheme,fstype,maxlunsz,devsz):
      """ return a shell script giving the code to commands required to 
