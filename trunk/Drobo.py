@@ -93,9 +93,10 @@ def ledstatus(n):
                 unknown-- yellow-green...
         matches neither... hmm...        
     """
-    #print 'colourstats, argument n is: ', n
     colourstats=[ 'black', 'red', 'yellow', 'green', ['red', 'green'], 
       [ 'red', 'yellow' ], ['red', 'black'] ] 
+    if DEBUG > 0:
+         print 'colourstats, argument n is: ', n
     if ( n == 0x80 ):  # empty
        return 'gray'
     return colourstats[n & 0x0f ]
@@ -267,9 +268,14 @@ class Drobo:
          the character device associated with the drobo unit
      """   
      self.char_dev_file = chardev  
+     self.fd=0
+     self.fd=DroboDMP.openfd(chardev,0,DEBUG)
      self.features = []    
      self.transactionID=1
-
+     
+  def __del__(self):
+      if (self.fd >0):
+           os.close(self.fd)
 
   def format(self,pscheme,fstype,maxlunsz,devsz):
      """ return a shell script giving the code to commands required to 
@@ -324,12 +330,11 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB", 
          0x5a, 0, 0x3a, sub_page, 0, 0, 0, paklen, 0 )
 
-    cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), paklen, 
-       modepageblock,0,"", DEBUG)
+    cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0,"", DEBUG)
 
     if ( len(cmdout) == paklen ):
       result = struct.unpack(mypack, cmdout)
-      if (DEBUG):
+      if DEBUG >0:
           print 'the 4 byte header on the returned sense buffer: ', result[0:3]
           #print 'result is: ', result[3:]
       return result[3:]
@@ -355,7 +360,7 @@ class Drobo:
          0xea, 0x10, 0x00, command, 0x00, self.transactionID, 0x01 <<5, 0x01, 0x00 )
 
     try:
-       cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), 1, modepageblock,1,"",DEBUG)
+       cmdout = DroboDMP.get_sub_page(1, modepageblock,1,"",DEBUG)
 
     except:
        print 'IF you see, "bad address", it is because you need to be the super user...'
@@ -382,12 +387,11 @@ class Drobo:
     sblen=len(sensebuffer)
 
     # mode select CDB. 
-    modepageblock=struct.pack( ">BBBBBBBHB", 
-      0x55, 0x01, 0, 0, 0, 0, 0, sblen, 0)
+    modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0, 0, 0, 0, 0, sblen, 0)
 
     todev=1
     print "sblen=", sblen
-    cmdout = DroboDMP.put_sub_page( str(self.char_dev_file), sblen, modepageblock, todev, sensebuffer, DEBUG )
+    cmdout = DroboDMP.put_sub_page( sblen, modepageblock, todev, sensebuffer, DEBUG )
     diags=cmdout
     i=0
 
@@ -423,12 +427,15 @@ class Drobo:
     self.__issueCommand(0x0d)
 
 
-  def __GetDiagRecord(self,diagcode):
+  def GetDiagRecord(self,diagcode):
     """ returns diagnostics as a string...
-	STATUS: totally borked!  loops forever!  
-         don't know how to read the count of bytes actually provided by Drobo.
+              diagcodes are either 4 or 7 for the two different Records available.
+
+	STATUS: works fine.
     """
-    print "Dumping Diagnostics..."
+    if DEBUG > 0:
+      print "Dumping Diagnostics..."
+
     # tried 32000 ... it only returned 5K, so try something small.
     buflen=4096
 
@@ -437,9 +444,10 @@ class Drobo:
       (0x01 <<5)|0x01, buflen, 0x00 )
 
     todev=0
-    print "Page 0..."
-    cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
-                buflen, modepageblock, todev,"", DEBUG )
+    if DEBUG > 0:
+        print "Page 0..."
+
+    cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev,"", DEBUG )
     diags=cmdout
     i=0
     while len(cmdout) == buflen:
@@ -447,27 +455,27 @@ class Drobo:
             0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 0x01, 
             buflen, 0x00 )
 
-        cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
-                   buflen, modepageblock, todev,"", DEBUG )
+        cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev,"", DEBUG )
         i=i+1
 	diags=diags+cmdout
-        print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
+        if DEBUG > 0:
+            print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
        
-    
     return diags
 
   def dumpDiagnostics(self):
 
     n=time.gmtime()
 
-    df=open("/tmp/DroboDiag_%d_%02d%02d_%02d%02d%02d.log" % ( n[0:6] ), "w")
-    d=self.__GetDiagRecord(4)
+    dfname="/tmp/DroboDiag_%d_%02d%02d_%02d%02d%02d.log" % ( n[0:6] )
+    df=open(dfname, "w")
+    d=self.GetDiagRecord(4)
     df.write(d)
-    d=self.__GetDiagRecord(7)
+    d=self.GetDiagRecord(7)
     self.__transactionNext()
     df.write(d)
     df.close()
-
+    return dfname
 
   def GetCharDev(self):
      return self.char_dev_file
@@ -658,8 +666,8 @@ def DiscoverLUNs():
     for potential in os.listdir(devdir):
        if ( potential[0:2] == "sd" and len(potential) == 3 ):
 	  dev_file= devdir + '/' + potential
-          d = Drobo( dev_file )
           try: 
+              d = Drobo( dev_file )
               fw=d.GetSubPageFirmware()
               if ( len(fw) >= 8 ) and (len(fw[7]) >= 5):
 	          devices.append(dev_file)

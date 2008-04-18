@@ -42,6 +42,9 @@
 
 #define DEBUG (1)
 
+static int drobo_fd = -1;
+static int debug = 0;
+
 signed int put_mode_page(int sg_fd, void *page_struct, int size, 
     void*mcb, int mcblen, int out, long debug)
 /* return the number of bytes placed in the sense buffer */
@@ -262,29 +265,22 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     long debug =0;
 
     // parse arguments... 
-    if (!PyArg_ParseTuple(args, "sls#ls#l", &file_name, &sz, &mcb, &mcblen, &out, &sbpg, &sbpglen, &debug )){
+    if (drobo_fd < 0) {
+        PyErr_SetString( PyExc_ValueError, "no open drobo.  Call open first" );
+        return(NULL);
+    }
+    if (!PyArg_ParseTuple(args, "ls#ls#l", &sz, &mcb, &mcblen, &out, &sbpg, &sbpglen, &debug )){
         PyErr_SetString( PyExc_ValueError, 
-	  "requires 7 arguments: filename (/dev/sd?), length, mcb, out-boolean, sensebuffer" );
+	  "requires 5 arguments: length, mcb, out-boolean, sensebuffer, debug" );
         return(NULL);
     }
 
    if (debug) fprintf(stderr, "get_sub_page 2\n");
 
-    /* N.B. An access mode of O_RDWR is required for some SCSI commands */
-    if ((sg_fd = open(file_name, O_RDONLY)) < 0) {
-        PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
-        return(NULL);
-    }
 
     empty_tuple=PyTuple_New(0);
     if (debug) fprintf(stderr, "get_sub_page 3\n");
 
-    /* Just to be safe, check we have a new sg device by trying an ioctl */
-    if ((ioctl(sg_fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
-        PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
-        close(sg_fd);
-        return(NULL);
-    }
     if (debug) fprintf(stderr, "get_sub_page 4\n");
 
     if ( sbpglen == 0 ) {
@@ -308,13 +304,12 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
  
     if (debug) fprintf(stderr, "get_sub_page 5\n");
 
-    szwritten = get_mode_page(sg_fd, buffer, sbpglen?sbpglen:sz, mcb, mcblen, out, debug);
+    szwritten = get_mode_page(drobo_fd, buffer, sbpglen?sbpglen:sz, mcb, mcblen, out, debug);
     if (szwritten > 0)  {
          retval = PyString_FromStringAndSize(buffer, szwritten );
     } else {
          retval = NULL;
     }
-    close(sg_fd);
 
     if (debug) fprintf(stderr, "get_sub_page 6\n");
 
@@ -325,11 +320,50 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     return(retval);
 };
 
+PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
+    char *file_name = NULL;
+    int readwrite;
+    int k;
+
+    if (!PyArg_ParseTuple(args, "sll", &file_name, &readwrite, &debug )){
+        PyErr_SetString( PyExc_ValueError, 
+	  "requires 3 arguments: filename, rwflag, debugflag.  rwflag=0 --> rdonly " );
+        return(NULL);
+    }
+    if (debug) fprintf( stderr, "openfd/open %s, \n", file_name );
+
+    if ((drobo_fd = open(file_name, readwrite?O_RDWR:O_RDONLY)) < 0) {
+        PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
+        return(NULL);
+    }
+
+    if (debug) fprintf( stderr, "openfd/ioctl %s, \n", file_name );
+
+    /* Just to be safe, check we have a new sg device by trying an ioctl */
+    if ((ioctl(drobo_fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
+        PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
+        close(drobo_fd);
+        drobo_fd=-1;
+        return(NULL);
+    }
+    if (debug) fprintf( stderr, "openfd/ioctl %s, worked...\n", file_name );
+
+   return(Py_BuildValue("i", drobo_fd));
+}
+
+PyObject *drobodmp_close( PyObject* self, PyObject* args ) {
+
+   if (drobo_fd >= 0) close(drobo_fd);
+   drobo_fd=-1;
+   return(Py_BuildValue("i", 0));
+}
 static PyMethodDef DroboDMPMethods[] = {
     { "get_sub_page", drobodmp_get_sub_page, METH_VARARGS|METH_KEYWORDS, 
                   "retrieve a Drobo Management Protocol formatted scsi control block" },
     { "put_sub_page", drobodmp_get_sub_page, METH_VARARGS|METH_KEYWORDS, 
                   "set a Drobo Management Protocol formatted scsi control block" },
+    { "openfd", drobodmp_openfd, METH_VARARGS|METH_KEYWORDS, 
+                  "open drobo file descriptor" },
     { NULL, NULL, 0, NULL}
 };
 
