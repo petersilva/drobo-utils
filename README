@@ -1,5 +1,6 @@
 This software is copyright under GPL.  See near end file for details...
-What is this?
+
+WHAT IS THIS?
 
 Drobo-utils is a set of linux tools to query and manage Data Robotics
 Drobo storage systems.   If you fire up droboview, it should look pretty
@@ -11,7 +12,8 @@ For experienced Linux hands, there is a command line interface, drobom,
 which offers the same functionality as droboview.
 
 
-Components:
+COMPONENTS:
+
   droboview   - Graphical User interface to see how the Drobo is doing.
                 this is a bit like the ´dashboard´ app for other OS´s.
   drobom      - CLI script, accesses Drobo.py with no GUI stuff.
@@ -22,7 +24,8 @@ Components:
                 only platform specific stuff is in here...
   setup.py --   python version of a Makefile
 
-Requirements:
+REQUIREMENTS:
+
 drobo-utils was developed on pre-release version of Kubuntu Hardy Heron.
 Any similarly recent distro ought to do.
 
