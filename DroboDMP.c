@@ -42,6 +42,10 @@
 
 #define DEBUG (1)
 
+/* FIXME: this is crap... I did not want to bother with a full python 
+ * object, so I settled for a couple global variables.
+ * this means that a single process can only have a single drobo_fd open at once.
+ */
 static int drobo_fd = -1;
 static int debug = 0;
 
@@ -351,12 +355,13 @@ PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
    return(Py_BuildValue("i", drobo_fd));
 }
 
-PyObject *drobodmp_close( PyObject* self, PyObject* args ) {
+PyObject *drobodmp_closefd( PyObject* self, PyObject* args ) {
 
    if (drobo_fd >= 0) close(drobo_fd);
    drobo_fd=-1;
    return(Py_BuildValue("i", 0));
 }
+
 static PyMethodDef DroboDMPMethods[] = {
     { "get_sub_page", drobodmp_get_sub_page, METH_VARARGS|METH_KEYWORDS, 
                   "retrieve a Drobo Management Protocol formatted scsi control block" },
@@ -364,6 +369,8 @@ static PyMethodDef DroboDMPMethods[] = {
                   "set a Drobo Management Protocol formatted scsi control block" },
     { "openfd", drobodmp_openfd, METH_VARARGS|METH_KEYWORDS, 
                   "open drobo file descriptor" },
+    { "closefd", drobodmp_closefd, METH_VARARGS|METH_KEYWORDS, 
+                  "close drobo file descriptor" },
     { NULL, NULL, 0, NULL}
 };
 
