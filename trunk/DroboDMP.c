@@ -19,7 +19,7 @@
  * This code is heavily based on sample code from Data Robotics Inc...
  * which is in turn based on code in sg_simple1 from sg3_utils and which is:
  *
- * Copyright (C) 1999-2007 D. Gilbert
+ *  Copyright (C) 1999-2007 D. Gilbert
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2, or (at your option)
@@ -42,24 +42,89 @@
 
 #define DEBUG (1)
 
-signed int get_mode_page(int sg_fd, void *page_struct, int size, 
-    void*mcb, int mcblen, int out)
+signed int put_mode_page(int sg_fd, void *page_struct, int size, 
+    void*mcb, int mcblen, int out, long debug)
 /* return the number of bytes placed in the sense buffer */
 {
     unsigned char sense_buffer[32];
     sg_io_hdr_t io_hdr;
     int i;
+    unsigned char c;
 
     /* Prepare MODE command */
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
  
-/*    if (DEBUG) {
-      fprintf( stderr, "\nCDB dump\n:" );
-      for (i=0; i < 11; i++) {
-         fprintf(stderr, "CDB[%d] = 0x%02x\n", i, *(char*)(mcb+i) );
+    if (debug) {
+      fprintf( stderr, "\nCDB DUMP START:" );
+      for (i=0; i < mcblen; i++) {
+         if ((i%8)==0) fprintf(stderr, "\nCDB[%3d] ", i );
+         c= *((char*)(mcb+i));
+         fprintf(stderr, " 0x%02x", c );
       };
+      fprintf(stderr,"\nCDB DUMP COMPLETE\n");
     };
- */
+
+    io_hdr.interface_id = 'S';
+    io_hdr.dxfer_direction = SG_DXFER_TO_DEV;
+    io_hdr.cmd_len = mcblen;
+    io_hdr.mx_sb_len = sizeof(sense_buffer);
+    io_hdr.dxfer_len = size;
+    io_hdr.dxferp = page_struct;
+    io_hdr.cmdp = mcb;
+    io_hdr.sbp = sense_buffer;
+    io_hdr.timeout = 20000;     /* 20000 millisecs == 20 seconds */
+    
+    /* these are set by the ioctl... initializing just in case. */
+    io_hdr.sb_len_wr=0;   
+    io_hdr.resid=0;
+    io_hdr.status=99;  
+
+    i=ioctl(sg_fd, SG_IO, &io_hdr);
+    if (i < 0) {
+        perror("Drobo get_mode_page SG_IO ioctl error");
+        close(sg_fd);
+        return(-1);
+    }
+
+    if (debug) fprintf(stderr, 
+        "\nread.. size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
+          size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
+
+    /* SG_INFO_DIRECT_IO       0x2     -- direct IO requested and performed */
+    if ((io_hdr.status != 0) && (io_hdr.status != 2)) {
+       fprintf( stderr, "oh no! io_hdr status is: %d\n",  io_hdr.status );
+       return(-1);
+    } else {
+      if (io_hdr.resid > 0) {
+        size -= io_hdr.resid   ;
+      }
+    }
+
+    return(size);
+}
+
+signed int get_mode_page(int sg_fd, void *page_struct, int size, 
+    void*mcb, int mcblen, int out, long debug)
+/* return the number of bytes placed in the sense buffer */
+{
+    unsigned char sense_buffer[32];
+    sg_io_hdr_t io_hdr;
+    int i;
+    unsigned char c;
+
+    /* Prepare MODE command */
+    memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
+ 
+    if (debug) {
+      fprintf( stderr, "\nCDB DUMP START:" );
+      for (i=0; i < mcblen; i++) {
+         if ((i%8)==0) fprintf(stderr, "\nCDB[%3d] ", i );
+         c= *((char*)(mcb+i));
+         fprintf(stderr, " 0x%02x", c );
+      };
+      fprintf(stderr,"\nCDB DUMP COMPLETE\n");
+    };
+
     io_hdr.interface_id = 'S';
     io_hdr.dxfer_direction = (out) ? SG_DXFER_TO_DEV : SG_DXFER_FROM_DEV;
     io_hdr.cmd_len = mcblen;
@@ -82,11 +147,9 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
         return(-1);
     }
 
-/*
-    fprintf(stderr, 
+    if (debug) fprintf(stderr, 
         "\nread.. size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
           size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
- */
 
     /* SG_INFO_DIRECT_IO       0x2     -- direct IO requested and performed */
     if ((io_hdr.status != 0) && (io_hdr.status != 2)) {
@@ -102,35 +165,42 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
 
 }
 
-
-PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
-
+PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
     int sg_fd, k;
     char * file_name = NULL;
     char * buffer = NULL;
     long sz = 0 ;
+    int i;
+    char c;
     long out = 0;
     long  szwritten = 0;
     unsigned char * mcb = NULL;
     long mcblen;
+    char * sbpg;
+    long sbpglen;
     PyObject *retval;
     PyObject *empty_tuple;
+    long debug =0;
 
     // parse arguments... 
-    if (!PyArg_ParseTuple(args, "sls#l", &file_name, &sz, &mcb, &mcblen, &out )){
+    fprintf(stderr, "put_sub_page 1\n");
+
+    if (!PyArg_ParseTuple(args, "sls#ls#l", &file_name, &sz, &mcb, &mcblen, &out, &sbpg, &sbpglen, &debug )){
         PyErr_SetString( PyExc_ValueError, 
-	  "requires 6 arguments: filename (/dev/sd?), length, mcb, out-boolean" );
+	  "requires 7 arguments: filename (/dev/sd?), length, mcb, out-boolean, sensebuffer" );
         return(NULL);
     }
 
+   if (debug) fprintf(stderr, "put_sub_page 2\n");
+
     /* N.B. An access mode of O_RDWR is required for some SCSI commands */
-    if ((sg_fd = open(file_name, O_RDONLY)) < 0) {
+    if ((sg_fd = open(file_name, O_RDWR)) < 0) {
         PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
         return(NULL);
-
     }
 
     empty_tuple=PyTuple_New(0);
+    if (debug) fprintf(stderr, "put_sub_page 3\n");
 
     /* Just to be safe, check we have a new sg device by trying an ioctl */
     if ((ioctl(sg_fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
@@ -138,29 +208,128 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
         close(sg_fd);
         return(NULL);
     }
+    if (debug) fprintf(stderr, "put_sub_page 4\n");
 
-    buffer = PyMem_Malloc(sz);
-    if (buffer == NULL) {
-        PyErr_SetString( PyExc_RuntimeError, "failed to allocate read buffer");
+    if ( sbpglen == 0 ) {
+       buffer = PyMem_Malloc(sz);
+       if (buffer == NULL)  {
+          PyErr_SetString( PyExc_RuntimeError, "failed to allocate read buffer");
+       }
+       bzero(buffer,sz);
+    } else {
+       buffer=sbpg;
+       if (debug) {
+         fprintf( stderr, "\nSB DUMP START:" );
+         for (i=0; i < sbpglen; i++) {
+            if ((i%8)==0) fprintf(stderr, "\nSB[%3d] ", i );
+            c= *((char*)(buffer+i));
+            fprintf(stderr, " 0x%02x", c );
+         };
+         fprintf(stderr,"\nSB DUMP COMPLETE\n");
+       };
     }
-    //buffer=calloc(sz,1);
-    bzero(buffer,sz);
  
-    szwritten = get_mode_page(sg_fd, buffer, sz, mcb, mcblen, out);
+    if (debug) fprintf(stderr, "put_sub_page 5\n");
+    put_mode_page(sg_fd, buffer, sbpglen, mcb, mcblen, out, debug);
+  
+    close(sg_fd);
+    if (debug) fprintf(stderr, "put_sub_page 6\n");
+
+    if ((sz > 0 ) && ( sbpglen == 0 )) {
+          PyMem_Free(buffer);
+    }
+
+    return(retval);
+};
+
+
+PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
+
+    int sg_fd, k;
+    char * file_name = NULL;
+    char * buffer = NULL;
+    long sz = 0 ;
+    int i;
+    char c;
+    long out = 0;
+    long  szwritten = 0;
+    unsigned char * mcb = NULL;
+    long mcblen;
+    char * sbpg;
+    long sbpglen;
+    PyObject *retval;
+    PyObject *empty_tuple;
+    long debug =0;
+
+    // parse arguments... 
+    if (!PyArg_ParseTuple(args, "sls#ls#l", &file_name, &sz, &mcb, &mcblen, &out, &sbpg, &sbpglen, &debug )){
+        PyErr_SetString( PyExc_ValueError, 
+	  "requires 7 arguments: filename (/dev/sd?), length, mcb, out-boolean, sensebuffer" );
+        return(NULL);
+    }
+
+   if (debug) fprintf(stderr, "get_sub_page 2\n");
+
+    /* N.B. An access mode of O_RDWR is required for some SCSI commands */
+    if ((sg_fd = open(file_name, O_RDONLY)) < 0) {
+        PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
+        return(NULL);
+    }
+
+    empty_tuple=PyTuple_New(0);
+    if (debug) fprintf(stderr, "get_sub_page 3\n");
+
+    /* Just to be safe, check we have a new sg device by trying an ioctl */
+    if ((ioctl(sg_fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
+        PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
+        close(sg_fd);
+        return(NULL);
+    }
+    if (debug) fprintf(stderr, "get_sub_page 4\n");
+
+    if ( sbpglen == 0 ) {
+       buffer = PyMem_Malloc(sz);
+       if (buffer == NULL)  {
+          PyErr_SetString( PyExc_RuntimeError, "failed to allocate read buffer");
+       }
+       bzero(buffer,sz);
+    } else {
+       buffer=sbpg;
+       if (debug) {
+         fprintf( stderr, "\nSB DUMP START:" );
+         for (i=0; i < sbpglen; i++) {
+            if ((i%8)==0) fprintf(stderr, "\nSB[%3d] ", i );
+            c= *((char*)(buffer+i));
+            fprintf(stderr, " 0x%02x", c );
+         };
+         fprintf(stderr,"\nSB DUMP COMPLETE\n");
+       };
+    }
+ 
+    if (debug) fprintf(stderr, "get_sub_page 5\n");
+
+    szwritten = get_mode_page(sg_fd, buffer, sbpglen?sbpglen:sz, mcb, mcblen, out, debug);
     if (szwritten > 0)  {
          retval = PyString_FromStringAndSize(buffer, szwritten );
     } else {
-         PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
-         return(NULL);
+         retval = NULL;
     }
     close(sg_fd);
-    PyMem_Free(buffer);
+
+    if (debug) fprintf(stderr, "get_sub_page 6\n");
+
+    if ((sz > 0 ) && ( sbpglen == 0 )) {
+          PyMem_Free(buffer);
+    }
+
     return(retval);
 };
 
 static PyMethodDef DroboDMPMethods[] = {
     { "get_sub_page", drobodmp_get_sub_page, METH_VARARGS|METH_KEYWORDS, 
                   "retrieve a Drobo Management Protocol formatted scsi control block" },
+    { "put_sub_page", drobodmp_get_sub_page, METH_VARARGS|METH_KEYWORDS, 
+                  "set a Drobo Management Protocol formatted scsi control block" },
     { NULL, NULL, 0, NULL}
 };
 

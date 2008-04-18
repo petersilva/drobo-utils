@@ -29,6 +29,7 @@ import fcntl, struct, socket, array, commands, time
 import exceptions
 import os, sys, re
 
+DEBUG = 0
 #
 # FIXME: if installed with "python setup.py install" then this 
 # insert is not needed.  This is to be able to test it before 
@@ -324,11 +325,13 @@ class Drobo:
          0x5a, 0, 0x3a, sub_page, 0, 0, 0, paklen, 0 )
 
     cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), paklen, 
-       modepageblock,0)
+       modepageblock,0,"", DEBUG)
 
     if ( len(cmdout) == paklen ):
       result = struct.unpack(mypack, cmdout)
-      #print 'result is: ', result[3:]
+      if (DEBUG):
+          print 'the 4 byte header on the returned sense buffer: ', result[0:3]
+          #print 'result is: ', result[3:]
       return result[3:]
     else:
       raise DroboException
@@ -352,7 +355,7 @@ class Drobo:
          0xea, 0x10, 0x00, command, 0x00, self.transactionID, 0x01 <<5, 0x01, 0x00 )
 
     try:
-       cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), 1, modepageblock,1)
+       cmdout = DroboDMP.get_sub_page(str(self.char_dev_file), 1, modepageblock,1,"",DEBUG)
 
     except:
        print 'IF you see, "bad address", it is because you need to be the super user...'
@@ -366,22 +369,25 @@ class Drobo:
     # only way to verify success is to look at the Drobo...
 
   def Sync(self):
-    """  Set the time to the host's time
+    """  Set the Drobo's current time to the host's time.
 
-     ( utc, offset, name ) = self.__getsubpage(0x05, 'LB32s' )
 
-     STATUS: not tested yet.
+     STATUS: not tested yet. may eat your children
     """
-    pass
-    dateblock=struct.pack(">LH32s", 0,0,"Hi There!" )
-    buflen(dateblock)
-    modepageblock=struct.pack( ">BBBBBBBHB", 
-      0xea, 0x10, 0x80, 0x05, 0x00, self.transactionID, 
-      (0x01 <<5)|0x01, buflen, 0x00 )
+    print "not yet implemented"
+    return  # comment out to work on this routine...
+    #now=time.time()
+    now=0
+    sensebuffer=struct.pack( ">BBHLH32s" , 0x3a, 0x05, 0x2a, now, 0 ,"Hi There" )
+    sblen=len(sensebuffer)
 
-    todev=0
-    cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
-                buflen, modepageblock, todev )
+    # mode select CDB. 
+    modepageblock=struct.pack( ">BBBBBBBHB", 
+      0x55, 0x01, 0, 0, 0, 0, 0, sblen, 0)
+
+    todev=1
+    print "sblen=", sblen
+    cmdout = DroboDMP.put_sub_page( str(self.char_dev_file), sblen, modepageblock, todev, sensebuffer, DEBUG )
     diags=cmdout
     i=0
 
@@ -433,7 +439,7 @@ class Drobo:
     todev=0
     print "Page 0..."
     cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
-                buflen, modepageblock, todev )
+                buflen, modepageblock, todev,"", DEBUG )
     diags=cmdout
     i=0
     while len(cmdout) == buflen:
@@ -442,7 +448,7 @@ class Drobo:
             buflen, 0x00 )
 
         cmdout = DroboDMP.get_sub_page( str(self.char_dev_file), 
-                   buflen, modepageblock, todev )
+                   buflen, modepageblock, todev,"", DEBUG )
         i=i+1
 	diags=diags+cmdout
         print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
