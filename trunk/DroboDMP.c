@@ -262,8 +262,6 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     long  szwritten = 0;
     unsigned char * mcb = NULL;
     long mcblen;
-    char * sbpg;
-    long sbpglen;
     PyObject *retval;
     PyObject *empty_tuple;
     long debug =0;
@@ -273,7 +271,7 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
         PyErr_SetString( PyExc_ValueError, "no open drobo.  Call open first" );
         return(NULL);
     }
-    if (!PyArg_ParseTuple(args, "ls#ls#l", &sz, &mcb, &mcblen, &out, &sbpg, &sbpglen, &debug )){
+    if (!PyArg_ParseTuple(args, "ls#ll", &sz, &mcb, &mcblen, &out, &debug )){
         PyErr_SetString( PyExc_ValueError, 
 	  "requires 5 arguments: length, mcb, out-boolean, sensebuffer, debug" );
         return(NULL);
@@ -287,39 +285,24 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
 
     if (debug) fprintf(stderr, "get_sub_page 4\n");
 
-    if ( sbpglen == 0 ) {
-       buffer = PyMem_Malloc(sz);
-       if (buffer == NULL)  {
+    buffer = PyMem_Malloc(sz);
+    if (buffer == NULL)  {
           PyErr_SetString( PyExc_RuntimeError, "failed to allocate read buffer");
-       }
-       bzero(buffer,sz);
-    } else {
-       buffer=sbpg;
-       if (debug) {
-         fprintf( stderr, "\nSB DUMP START:" );
-         for (i=0; i < sbpglen; i++) {
-            if ((i%8)==0) fprintf(stderr, "\nSB[%3d] ", i );
-            c= *((char*)(buffer+i));
-            fprintf(stderr, " 0x%02x", c );
-         };
-         fprintf(stderr,"\nSB DUMP COMPLETE\n");
-       };
     }
+    bzero(buffer,sz);
  
     if (debug) fprintf(stderr, "get_sub_page 5\n");
 
-    szwritten = get_mode_page(drobo_fd, buffer, sbpglen?sbpglen:sz, mcb, mcblen, out, debug);
+    szwritten = get_mode_page(drobo_fd, buffer, sz, mcb, mcblen, out, debug);
     if (szwritten > 0)  {
          retval = PyString_FromStringAndSize(buffer, szwritten );
     } else {
          retval = NULL;
+         PyMem_Free(buffer);
     }
 
     if (debug) fprintf(stderr, "get_sub_page 6\n");
 
-    if ((sz > 0 ) && ( sbpglen == 0 )) {
-          PyMem_Free(buffer);
-    }
 
     return(retval);
 };
