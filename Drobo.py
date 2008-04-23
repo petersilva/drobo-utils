@@ -341,7 +341,10 @@ class Drobo:
     else:
       raise DroboException
 
+
   def __transactionNext(self):
+    """ Increment the transaction member for some modeSelect pages.
+    """
     if (self.transactionID > 200):
        self.transactionID=0
     self.transactionID=self.transactionID+1
@@ -376,7 +379,6 @@ class Drobo:
   def Sync(self):
     """  Set the Drobo's current time to the host's time.
 
-
      STATUS: not tested yet. may eat your children
     """
     print "not yet implemented"
@@ -399,7 +401,7 @@ class Drobo:
     """ asks the Drobo nicely to blink it's lights. aka. Identification 
         If you happen to have five in a row (drool), you can know which is which.
 
-        STATUS: works no issues.
+        STATUS: works, no issues.
     """
     self.__issueCommand(6)
 
@@ -429,7 +431,7 @@ class Drobo:
 
   def GetDiagRecord(self,diagcode):
     """ returns diagnostics as a string...
-              diagcodes are either 4 or 7 for the two different Records available.
+        diagcodes are either 4 or 7 for the two different Records available.
 
 	STATUS: works fine.
     """
@@ -462,6 +464,7 @@ class Drobo:
             print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
        
     return diags
+
 
   def dumpDiagnostics(self):
 
