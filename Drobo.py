@@ -330,7 +330,7 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB", 
          0x5a, 0, 0x3a, sub_page, 0, 0, 0, paklen, 0 )
 
-    cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0,"", DEBUG)
+    cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
 
     if ( len(cmdout) == paklen ):
       result = struct.unpack(mypack, cmdout)
@@ -363,7 +363,7 @@ class Drobo:
          0xea, 0x10, 0x00, command, 0x00, self.transactionID, 0x01 <<5, 0x01, 0x00 )
 
     try:
-       cmdout = DroboDMP.get_sub_page(1, modepageblock,1,"",DEBUG)
+       cmdout = DroboDMP.get_sub_page(1, modepageblock,1,DEBUG)
 
     except:
        print 'IF you see, "bad address", it is because you need to be the super user...'
@@ -449,7 +449,7 @@ class Drobo:
     if DEBUG > 0:
         print "Page 0..."
 
-    cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev,"", DEBUG )
+    cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
     diags=cmdout
     i=0
     while len(cmdout) == buflen:
@@ -457,7 +457,7 @@ class Drobo:
             0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 0x01, 
             buflen, 0x00 )
 
-        cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev,"", DEBUG )
+        cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
         i=i+1
 	diags=diags+cmdout
         if DEBUG > 0:
