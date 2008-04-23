@@ -88,7 +88,7 @@ signed int put_mode_page(int sg_fd, void *page_struct, int size,
 
     i=ioctl(sg_fd, SG_IO, &io_hdr);
     if (i < 0) {
-        perror("Drobo get_mode_page SG_IO ioctl error");
+        perror("Drobo put_mode_page SG_IO ioctl error");
         close(sg_fd);
         return(-1);
     }
@@ -252,12 +252,18 @@ PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
 
 PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
 
-    int sg_fd, k;
-    char * file_name = NULL;
+/*  Perform ioctl to retrieve a sub-page from the Drobo.
+ *    required arguments:
+ *           sz   : length of buffer to be returned.
+ *                  if the ioctl indicates a residual amount
+ *           mcb  : some scsi control block thingum...
+ *                  pass transparently through to ioctl/SG
+ *           out  : choose direction of xfer.  out= to device.
+ *           debug : if 1,then print debugging output (lots of it.)
+ */
+
     char * buffer = NULL;
     long sz = 0 ;
-    int i;
-    char c;
     long out = 0;
     long  szwritten = 0;
     unsigned char * mcb = NULL;
@@ -273,17 +279,15 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     }
     if (!PyArg_ParseTuple(args, "ls#ll", &sz, &mcb, &mcblen, &out, &debug )){
         PyErr_SetString( PyExc_ValueError, 
-	  "requires 5 arguments: length, mcb, out-boolean, sensebuffer, debug" );
+	  "requires 5 arguments: length, mcb, out-boolean, debug" );
         return(NULL);
     }
 
-   if (debug) fprintf(stderr, "get_sub_page 2\n");
-
+    if (debug) fprintf(stderr, "get_sub_page 2\n");
 
     empty_tuple=PyTuple_New(0);
-    if (debug) fprintf(stderr, "get_sub_page 3\n");
 
-    if (debug) fprintf(stderr, "get_sub_page 4\n");
+    if (debug) fprintf(stderr, "get_sub_page 3\n");
 
     buffer = PyMem_Malloc(sz);
     if (buffer == NULL)  {
@@ -291,9 +295,12 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     }
     bzero(buffer,sz);
  
-    if (debug) fprintf(stderr, "get_sub_page 5\n");
+    if (debug) fprintf(stderr, "get_sub_page 4\n");
 
     szwritten = get_mode_page(drobo_fd, buffer, sz, mcb, mcblen, out, debug);
+
+    if (debug) fprintf(stderr, "get_sub_page 5\n");
+
     if (szwritten > 0)  {
          retval = PyString_FromStringAndSize(buffer, szwritten );
     } else {
@@ -306,6 +313,7 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
 
     return(retval);
 };
+
 
 PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
     char *file_name = NULL;
