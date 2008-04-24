@@ -108,6 +108,10 @@ elif cmd == 'info':
 elif cmd == "standby":
    d.Standby() 
    
+elif cmd == "diag":
+   f=d.dumpDiagnostics()
+   print "diagnostics in ", f
+
 elif cmd == "status":
    c=d.GetSubPageCapacity()
    pfull = 100 * ((c[1]+1.0)/c[2])
@@ -121,5 +125,5 @@ elif cmd == "time":
   print "Drobo says it is:", time.ctime(settings[0])
 
 else:
-   print "known commands: blink, standby, info"
+   print "known commands: blink, standby, info, status, diag"
    print "Unknown Command: ", cmd
