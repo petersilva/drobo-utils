@@ -96,7 +96,7 @@ class DroboGUI(QtGui.QMainWindow):
         for l in luninfo:
 	   luntooltip = luntooltip + "lun id: " + str(l[0]) + " used: " +  \
                    toGB(l[2]) + " total: " + toGB(l[1]) + \
-                   " scheme: " + l[3] + " type: " + str(l[5]) + "\n"
+                   " scheme: " + l[3] + " type: " + str(l[4]) + "\n"
 
         i=0
         while ( i < 4 ):

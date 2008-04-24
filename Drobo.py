@@ -1,4 +1,5 @@
 """
+
   This module is used to get configuration data 
   from a Data Robotics Inc. "Drobo" storage unit.
   
@@ -182,7 +183,7 @@ def partformat(n):
       print 'hoho! multiple partition types! Brave are we not?' 
 
 
-    return f[0]
+    return f
 
 
 def partscheme(n):
@@ -447,6 +448,7 @@ class Drobo:
       (0x01 <<5)|0x01, buflen, 0x00 )
 
     todev=0
+
     if DEBUG > 0:
         print "Page 0..."
 
@@ -461,6 +463,7 @@ class Drobo:
         cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
         i=i+1
 	diags=diags+cmdout
+
         if DEBUG > 0:
             print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
        
@@ -569,8 +572,7 @@ class Drobo:
         j=i*4
         if ( 'SUPPORTS_NEW_LUNINFO2' in self.features ):
            k=i*7
-           li.append( (l[j+2], l2[k+3], l[j+4], 
-                  partscheme(l2[k+4]), partformat(l2[k+5]), l2[k+6] ) )
+           li.append( (l[j+2], l2[k+3], l[j+4], partscheme(l2[k+4]), partformat(l2[k+5]) ) )
         else:
            li.append( (l[j+2], l[j+3], l[j+4]) )
         i=i+1
