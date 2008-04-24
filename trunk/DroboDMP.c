@@ -173,80 +173,41 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
 }
 
 PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
-    int sg_fd, k;
-    char * file_name = NULL;
     char * buffer = NULL;
-    long sz = 0 ;
+    long buflen;
     int i;
     char c;
-    long out = 0;
-    long  szwritten = 0;
     unsigned char * mcb = NULL;
     long mcblen;
-    char * sbpg;
-    long sbpglen;
-    PyObject *retval;
-    PyObject *empty_tuple;
     long debug =0;
 
     // parse arguments... 
     fprintf(stderr, "put_sub_page 1\n");
 
-    if (!PyArg_ParseTuple(args, "sls#ls#l", &file_name, &sz, &mcb, &mcblen, &out, &sbpg, &sbpglen, &debug )){
+    if (!PyArg_ParseTuple(args, "s#s#l", &mcb, &mcblen, &buffer, &buflen, &debug )){
         PyErr_SetString( PyExc_ValueError, 
-	  "requires 7 arguments: filename (/dev/sd?), length, mcb, out-boolean, sensebuffer" );
+	  "requires 3 arguments: mcb, sensebuffer, debug" );
         return(NULL);
     }
 
-   if (debug) fprintf(stderr, "put_sub_page 2\n");
-
-    /* N.B. An access mode of O_RDWR is required for some SCSI commands */
-    if ((sg_fd = open(file_name, O_RDWR)) < 0) {
-        PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
-        return(NULL);
-    }
-
-    empty_tuple=PyTuple_New(0);
-    if (debug) fprintf(stderr, "put_sub_page 3\n");
-
-    /* Just to be safe, check we have a new sg device by trying an ioctl */
-    if ((ioctl(sg_fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
-        PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
-        close(sg_fd);
-        return(NULL);
-    }
-    if (debug) fprintf(stderr, "put_sub_page 4\n");
-
-    if ( sbpglen == 0 ) {
-       buffer = PyMem_Malloc(sz);
-       if (buffer == NULL)  {
-          PyErr_SetString( PyExc_RuntimeError, "failed to allocate read buffer");
-       }
-       bzero(buffer,sz);
-    } else {
-       buffer=sbpg;
-       if (debug) {
+    if (debug) {
          fprintf( stderr, "\nSB DUMP START:" );
-         for (i=0; i < sbpglen; i++) {
+         for (i=0; i < buflen; i++) {
             if ((i%8)==0) fprintf(stderr, "\nSB[%3d] ", i );
             c= *((char*)(buffer+i));
             fprintf(stderr, " 0x%02x", c );
          };
          fprintf(stderr,"\nSB DUMP COMPLETE\n");
-       };
-    }
+    };
  
-    if (debug) fprintf(stderr, "put_sub_page 5\n");
-    put_mode_page(sg_fd, buffer, sbpglen, mcb, mcblen, out, debug);
+
+    if (debug) fprintf(stderr, "put_sub_page 2\n");
+
+    put_mode_page(drobo_fd, buffer, buflen, mcb, mcblen, 1, debug);
+
+    if (debug) fprintf(stderr, "put_sub_page 3\n");
   
-    close(sg_fd);
-    if (debug) fprintf(stderr, "put_sub_page 6\n");
-
-    if ((sz > 0 ) && ( sbpglen == 0 )) {
-          PyMem_Free(buffer);
-    }
-
-    return(retval);
+    return(Py_BuildValue("i", 0));
 };
 
 
