@@ -179,7 +179,8 @@ def partformat(n):
        f.append( 'FAT32' )
 
     if (len(f) != 1):
-      raise DroboException
+      print 'hoho! multiple partition types! Brave are we not?' 
+
 
     return f[0]
 
