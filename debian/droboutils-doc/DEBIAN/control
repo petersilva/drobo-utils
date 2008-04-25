@@ -1,9 +1,0 @@
-Package: droboutils-doc
-Source: droboutils
-Version: 0.1.1-1
-Architecture: all
-Maintainer: informavore <Peter.A.Silva@gmail.com>
-Installed-Size: 32
-Section: unknown
-Priority: extra
-Description: Documentation for droboutils
