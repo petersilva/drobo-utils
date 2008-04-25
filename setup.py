@@ -12,16 +12,9 @@ setup (name = 'Drobo-utils',
        ext_modules = [module1],
        py_modules=['Drobo','DroboGUI'],
        scripts=['drobom', 'droboview'],
-       classifiers=[
-          'Development Status :: 1 - Alpha',
-          'Environment :: Console',
-          'Environment :: Graphical User Environment',
-          'Intended Audience :: End Users/Desktop',
-          'Intended Audience :: Developers',
-          'Intended Audience :: System Administrators',
-          'License :: OSI Approved :: General Public License v3',
-          'Operating System :: Linux',
-          'Programming Language :: Python',
-          ],
+       data_files = [
+                    ('share/pixmaps',             ['Drobo-Front-0000.gif']),
+                    ]
+
       )
 

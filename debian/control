@@ -1,0 +1,23 @@
+Source: droboutils
+Section: unknown
+Priority: extra
+Maintainer: informavore <Peter.A.Silva@gmail.com>
+Build-Depends: debhelper (>= 5), python2.5-dev, python-qt4
+Standards-Version: 3.7.2
+
+Package: droboutils
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: manage Data Robotics storage units (drobos)
+ python gui, cli, and api providing the "Dashboard" functionality.
+ If you fire up droboview, it should look pretty familiar to those who 
+ have seen the dashboard on other operating systems.  Droboview is built 
+ on a little programmer interface which can be installed on the system 
+ and used by other applications as well.  For experienced Linux hands, 
+ there is a command line interface, drobom, which offers the same 
+ functionality as droboview.
+
+Package: droboutils-doc
+Architecture: all
+Description: Documentation for droboutils
+

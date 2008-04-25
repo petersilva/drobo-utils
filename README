@@ -220,9 +220,8 @@ ON LUNSIZES >= 2TB:
         -- gparted fails, and seems to have a 2 TB limit on devices.
            (bug #524948 reported to bugzilla.gnome.org) It's just the GUI, 
            as libparted is fine, and other tools based on it
-           still work. One can created a label with:
+           still work. 
 
-(assuming the disk is /dev/sdd)
 
 
 
