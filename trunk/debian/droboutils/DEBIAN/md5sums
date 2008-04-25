@@ -1,0 +1,13 @@
+f7ec600861a7fc9cee44196abe73d52e  usr/bin/drobom
+7882c3a544c4949498b7f95b40754228  usr/bin/droboview
+7ce48785aab8a3cb70c3a17d8b328270  usr/lib/python2.5/site-packages/Drobo.py
+6fcc3a6b326a3de51af78322fe79f87d  usr/lib/python2.5/site-packages/DroboGUI.py
+d01f4456742cd26ac0dbcc5802bc02d7  usr/lib/python2.5/site-packages/DroboDMP.so
+70bceb36a4b38fb10c4b40a055c1aca2  usr/lib/python2.5/site-packages/Drobo_utils-1.0.egg-info
+69a33a370980665deba772b89fabddd9  usr/share/pixmaps/Drobo-Front-0000.gif
+50c18b72d0c8f9d279e159fbf8d57a67  usr/share/doc/droboutils/README.gz
+c491687a4f5eac215c5b864fedba7f11  usr/share/doc/droboutils/TODO
+b12de79bb5214e761c845ebff9c2cad2  usr/share/doc/droboutils/README.Debian
+fcf91807e8b4dc96d83fbe2201ee97c7  usr/share/doc/droboutils/copyright
+920a44e76bb7095b98d2e9266cd0507c  usr/share/doc/droboutils/changelog.Debian.gz
+928a63945c9c085ad120349b53025f16  usr/share/pyshared-data/droboutils
