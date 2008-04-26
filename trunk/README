@@ -244,6 +244,13 @@ Getting a Snapshot:
 
    for commit access, you need a sourceforge user account.
 
+Building a debian package:
+
+   cd trunk
+   dpkg-buildpackage -rfakeroot
+   cd ..
+   su
+   dpkg -i droboutils_0.1.1-1_i386.deb
 
 Revision date: 2008/04/14
 
