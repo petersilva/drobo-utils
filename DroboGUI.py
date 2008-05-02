@@ -36,6 +36,28 @@ def runPartitioner():
    print "partitioner = ", partitioner
    subprocess.Popen( partitioner, shell=True)
 
+class DroboAbout(QtGui.QWidget):
+   def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.main = QtGui.QLabel("""
+  drobo-utils: software to manage a Drobo 
+  storage unit from Data Robotics 
+  International Corp.
+
+  http://drobo-utils.sourceforge.net
+
+  Copyright 2008 Peter Silva
+  ( Peter.A.Silva@gmail.com )
+        """ , self)
+        self.setMinimumSize(240, 240)
+        self.quit = QtGui.QPushButton('Quit',self)
+        self.quit.setCheckable(False)
+        self.quit.setMinimumWidth(200)
+        self.quit.move(30,200)
+        self.connect(self.quit, QtCore.SIGNAL('clicked()'), 
+                self.hide)
+ 
+
 
 class DroboGUI(QtGui.QMainWindow):
     """ GUI for a single Drobo, start one for each drobo.
@@ -117,7 +139,7 @@ class DroboGUI(QtGui.QMainWindow):
         self.__updateLEDs() # only update display...
 
         # try not to poll the device too often, so only every 'n' screen updates
-        if (self.updates % 30 == 0 ): # query device for new info...
+        if (self.updates % 5 == 0 ): # query device for new info...
 	    self.__updatewithQueryStatus()
 
 
@@ -283,7 +305,6 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.tab.addTab(self.Tools, "Tools")
 
-
     def __init__(self, d, parent=None):
         QtGui.QMainWindow.__init__(self)
         #QtGui.QWidget.__init__(self, parent)
@@ -304,7 +325,7 @@ class DroboGUI(QtGui.QMainWindow):
         #self.setGeometry(300, 100, 350, 260)
         self.setMinimumSize(240, 310)
         self.setWindowTitle('DroboView')
-        self.setWindowIcon(QtGui.QIcon('Drobo-Front-0000.gif'))
+        self.setWindowIcon(QtGui.QIcon(':Drobo-Front-0000.gif'))
 
         exit = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Exit', self)
         exit.setShortcut('Ctrl+Q')
@@ -319,9 +340,14 @@ class DroboGUI(QtGui.QMainWindow):
         parted.setShortcut('Ctrl+S')
         parted.setStatusTip('Start up gparted Space Manager')
         self.connect(parted, QtCore.SIGNAL('triggered()'), runPartitioner)
-
         tools = menubar.addMenu('&Tools')
         tools.addAction(parted)
+
+        about = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'About DroboView', self)
+        self.aboutdialog = DroboAbout()
+        help = menubar.addMenu('&Help')
+        help.addAction(about)
+        self.connect(about, QtCore.SIGNAL('triggered()'), self.aboutdialog.show)
 
         self.tab = QtGui.QTabWidget(self)
 	self.tab.setGeometry(QtCore.QRect(0,27,240,260))
