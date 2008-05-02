@@ -266,8 +266,8 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
          retval = PyString_FromStringAndSize(buffer, szwritten );
     } else {
          retval = NULL;
-         PyMem_Free(buffer);
     }
+    PyMem_Free(buffer);
 
     if (debug) fprintf(stderr, "get_sub_page 6\n");
 
