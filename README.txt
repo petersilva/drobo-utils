@@ -228,9 +228,11 @@ ON LUNSIZES >= 2TB:
 Caveats:
    droboview isn't suited to run continuously for long periods, 
    as it has a memory leak...  total foot print starts out at 32M
-   with a 14 MB resident set size, of which 10 MB are shared, so only 
+   with a 15 MB resident set size, of which 10 MB are shared, so only 
    about 4M of real memory consumed.   but the RSS grows at about 
    2MB/hour.
+
+   29m  11m S    1  2.9   9:44.50 droboview
 
    best to restart it daily, or use it when necessary, but not leave it
    on for days.

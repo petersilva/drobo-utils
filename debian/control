@@ -2,7 +2,7 @@ Source: droboutils
 Section: unknown
 Priority: extra
 Maintainer: informavore <Peter.A.Silva@gmail.com>
-Build-Depends: debhelper (>= 5), python2.5-dev, python-qt4
+Build-Depends: debhelper (>= 5), python2.5-dev, python-qt4, libsgutils1
 Standards-Version: 3.7.2
 
 Package: droboutils
