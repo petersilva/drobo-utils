@@ -70,8 +70,11 @@ LIVELIER GUI:
       right now, if the drobo is slow, the GUI makes it slower, and gets very slow too.
       should run as a daemon, async. from the GUI.
 
-Better Linux Integration:
-   -- should this be integrated with dbus somehow ? dunno...
+Re-design the whole darn thing.
+   -- there should be some sort of service integrated with dbus-hal
+   -- not sure that a GUI is needed at all. but if it is, it should be a DBUS client.
+   -- how does authentication work in DBUS?
+
 
    of interest:
    -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
