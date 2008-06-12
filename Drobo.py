@@ -271,12 +271,17 @@ class Drobo:
      """   
      self.char_dev_file = chardev  
      self.fd=0
+     
      self.fd=DroboDMP.openfd(chardev,0,DEBUG)
+
      self.features = []    
      self.transactionID=1
      
   def __del__(self):
-      if (self.fd >0):
+     if DEBUG >0:
+        print '__del__ '
+
+     if (self.fd >0):
            DroboDMP.closefd()
 
   def format(self,pscheme,fstype,maxlunsz,devsz):
@@ -326,6 +331,9 @@ class Drobo:
        second byte is the sub-page code.
        following two bytes have the length of the record (max: 65535)
     """
+    if DEBUG >0:
+       print 'getsubpage'
+
     mypack = '>BBH' + pack
     paklen=struct.calcsize(mypack)
 
@@ -360,6 +368,9 @@ class Drobo:
      returns nothing, look at the drobo to see if it worked.
      note: command is asynchronous, returns before operation is complete.
     """
+
+    if DEBUG >0:
+        print 'issuecommand...'
 
     modepageblock=struct.pack( ">BBBBBBBHB", 
          0xea, 0x10, 0x00, command, 0x00, self.transactionID, 0x01 <<5, 0x01, 0x00 )

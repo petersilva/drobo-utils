@@ -175,7 +175,7 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
 PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
     char * buffer = NULL;
     long buflen;
-    int i;
+    signed int i;
     char c;
     unsigned char * mcb = NULL;
     long mcblen;
@@ -278,22 +278,28 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
 
 PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
     char *file_name = NULL;
+    PyObject *retval;
     int readwrite;
     int k;
 
     if (!PyArg_ParseTuple(args, "sll", &file_name, &readwrite, &debug )){
+        if (debug) fprintf( stderr, "parsetuple broke\n" );
         PyErr_SetString( PyExc_ValueError, 
 	  "requires 3 arguments: filename, rwflag, debugflag.  rwflag=0 --> rdonly " );
-        return(NULL);
+        // following looks stupid, but without the temp variable, segaults on ubuntu 8.04, amd64
+        retval=Py_BuildValue("i", (signed int)-1);
+	return(retval);
     }
-    if (debug) fprintf( stderr, "openfd/open %s, \n", file_name );
+    if (debug) fprintf( stderr, "openfd/open %s, 0\n", file_name );
 
     if ((drobo_fd = open(file_name, readwrite?O_RDWR:O_RDONLY)) < 0) {
+        drobo_fd=-1;
         PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
+        if (debug) fprintf( stderr, "open broke\n" );
         return(NULL);
     }
 
-    if (debug) fprintf( stderr, "openfd/ioctl %s, \n", file_name );
+    if (debug) fprintf( stderr, "openfd/ioctl %s, 1\n", file_name );
 
     /* Just to be safe, check we have a new sg device by trying an ioctl */
     if ((ioctl(drobo_fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
@@ -301,10 +307,13 @@ PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
         close(drobo_fd);
         drobo_fd=-1;
         return(NULL);
+    } else {
+        if (debug) fprintf( stderr, "openfd/ioctl %s, worked...\n", file_name );
     }
-    if (debug) fprintf( stderr, "openfd/ioctl %s, worked...\n", file_name );
-
-   return(Py_BuildValue("i", drobo_fd));
+    // following looks stupid, but without the temp variable, segaults on ubuntu 8.04, amd64
+    retval=Py_BuildValue("i", (signed int)-1);
+    if (debug) fprintf(stderr, "\nback from buildvalue\n");
+    return(retval);
 }
 
 PyObject *drobodmp_closefd( PyObject* self, PyObject* args ) {
