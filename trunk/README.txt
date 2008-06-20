@@ -86,7 +86,7 @@ changing mode of build/scripts-2.5/droboview from 644 to 755
 alu%   
 
 It should create a build/lib<somthing> sub-directory.  It will also
-compile DroboDMP.c a put the result in a shared object object library 
+compile DroboDMP.c and put the result in a shared object object library 
 in that directory.  If all has gone well, you can kick the tires 
 by starting it up with: 
          
@@ -101,15 +101,15 @@ the following happens:
 very scary, but my drobo is in bad shape right now... you should just get []
 as a status, which means there is nothing wrong.
 
-To get all kinds of information on your drobo, try './drobom dump'
+To get all kinds of information on your drobo, try './drobom info'
 Once that is working, and assuming you have python-qt4 installed, try:
 
 	./droboview
 
 which should start a GUI for each drobo attached to your machine, that
 you have permission to access (depends on the setup, usually USB devices 
-on desktops are accessible to users, so you can see them.  Servers might be setup 
-haven't worked out how to install it correctly yet.
+on desktops are accessible to users, so you can see them.  Servers might be 
+setup differently, haven't worked out how to install it correctly yet.
 
 
 Setup Drobo with Linux:
