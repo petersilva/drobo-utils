@@ -85,9 +85,33 @@ changing mode of build/scripts-2.5/drobom from 644 to 755
 changing mode of build/scripts-2.5/droboview from 644 to 755
 alu%   
 
-It should create a build/lib<somthing> sub-directory.  It will also
+It should create a build/lib<something> sub-directory.  It will also
 compile DroboDMP.c and put the result in a shared object object library 
-in that directory.  If all has gone well, you can kick the tires 
+in that directory.   The normal package wants to find the libraries
+in system installed places.  If you want to test things without
+installing, then you can do either:
+
+Look in Drobo.py, and uncomment these lines:
+
+#m = re.compile("lib.*")
+#for l in os.listdir("build"):
+#    if m.match(l) :
+#        sys.path.insert(1, os.path.normpath("build/" + l ))
+
+This is fine for testing, but will only works if invoked
+from the directory containg the drobo-utils files.  Once
+installed using 'install' or a built package, these lines
+are not needed.
+
+Another way to enable testing without installing is to:
+
+C-ish shells:
+setenv PYTHONPATH `pwd`/build/lib.linux*
+
+Bournish shells:
+export PYTHONPATH=`pwd`/build/lib.linux*
+
+If all has gone well, you can kick the tires 
 by starting it up with: 
          
         ./drobom status 
