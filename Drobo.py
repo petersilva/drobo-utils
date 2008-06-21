@@ -442,11 +442,13 @@ class Drobo:
     self.__issueCommand(0x0d)
 
 
-  def GetDiagRecord(self,diagcode):
+  def GetDiagRecord(self,diagcode,decrypt=0):
     """ returns diagnostics as a string...
         diagcodes are either 4 or 7 for the two different Records available.
 
 	STATUS: works fine.
+
+        decryption reported to be XOR of 165, 0xa5... not added yet.
     """
     if DEBUG > 0:
       print "Dumping Diagnostics..."
