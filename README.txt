@@ -46,17 +46,35 @@ options:
   parted   for >= 2TB file systems, need GPT support.
            just use fdisk  for smaller stuff.
 
+To get a complete list, it is best to use a shell window to grep in the 
+Debian package control file (which defines what the dependencies are for the
+build system):
+
+peter@pepino% grep Depend debian/control
+Build-Depends: debhelper (>= 5), python2.5-dev, libc6-dev, libsgutils1-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, libsgutils1
+peter@pepino%      
+peter@pepino% grep Recommend debian/control
+Recommends: parted, gparted, kdesudo, gtksudo
+peter@pepino% 
+
 INSTALLING pre-requisites.:  
 On ubuntu, it would typically look like so:
 
-	open a shell window. they enter the following package installation commands:
+	open a shell window. Enter the following package installation commands:
 
-	% sudo aptitude install python-qt4 libsgutils1-dev libsgutils1 python-dev  
+        % sudo aptitude install python-qt4 libsgutils1 
+        % sudo aptitude install debhelper python2.5-dev, libc6-dev libsgutils1-dev 
 	% sudo aptitude install parted kdesudo
 
-On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' and
-some of the package names will change.
+If you have received a pre-built binary package,then you only need the first line.
+If you want to build from source, then you need the second line.  The third line
+just has useful optional tools.
 
+On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' and
+some of the package names will change.  A typical difference is that packages for developers
+have the -devel suffix on Redhat derived distributions, instead of the -dev favoured
+by debian derived ones.
 
 
 INSTALL:
@@ -98,7 +116,7 @@ Look in Drobo.py, and uncomment these lines:
 #    if m.match(l) :
 #        sys.path.insert(1, os.path.normpath("build/" + l ))
 
-This is fine for testing, but will only works if invoked
+This is fine for testing, but will only work if invoked
 from the directory containg the drobo-utils files.  Once
 installed using 'install' or a built package, these lines
 are not needed.
@@ -123,10 +141,15 @@ the following happens:
 /dev/sdd 100% full - ['Red alert', 'Bad disk', 'No redundancy']
 %
 very scary, but my drobo is in bad shape right now... you should just get []
-as a status, which means there is nothing wrong.
+as a status, which means there is nothing wrong.   If you get an error
+like it isn't detecting any drobos:
 
-To get all kinds of information on your drobo, try './drobom info'
-Once that is working, and assuming you have python-qt4 installed, try:
+No Drobo discovered, is one connected?
+
+Try to start up drobom from the root account. (sudo drobom..., or 
+sudo bash, or su - ) To get all kinds of information on your drobo, 
+try './drobom info' Once that is working, and assuming you have python-qt4 
+installed, try:
 
 	./droboview
 
@@ -232,7 +255,7 @@ root@alu:~# mount /dev/sdd1 /mnt
 
 NOTE:
 
-This is completely untested with multiple LUNS.  Best to make LUN
+drobo-utils is completely untested with multiple LUNS.  Best to make LUN
 large enough to span all your space.
 
 ON LUNSIZES >= 2TB:
@@ -241,7 +264,7 @@ ON LUNSIZES >= 2TB:
     	-- use GPT partitions, which aren´t supported by older fdisk
 	   versions.  Tools based on libparted work fine, mostly.
     
-        -- gparted fails, and seems to have a 2 TB limit on devices.
+        -- gparted fails, and seems to have a 1 TB limit on devices.
            (bug #524948 reported to bugzilla.gnome.org) It's just the GUI, 
            as libparted is fine, and other tools based on it
            still work. 
@@ -272,13 +295,15 @@ Getting a Snapshot:
 
 Building a debian package:
 
+   (assumes you have installed the Build dependencies...)
+
    cd trunk
    dpkg-buildpackage -rfakeroot
    cd ..
    su
    dpkg -i droboutils_0.1.1-1_i386.deb
 
-Revision date: 2008/04/14
+Revision date: 2008/06/21
 
 copyright:
 

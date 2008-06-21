@@ -2,12 +2,13 @@ Source: droboutils
 Section: unknown
 Priority: extra
 Maintainer: informavore <Peter.A.Silva@gmail.com>
-Build-Depends: debhelper (>= 5), python2.5-dev, python-qt4, libsgutils1, libc6-dev
+Build-Depends: debhelper (>= 5), python2.5-dev, libc6-dev, libsgutils1-dev
 Standards-Version: 3.7.2
 
 Package: droboutils
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: parted, gparted, kdesudo, gtksudo
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, libsgutils1
 Description: manage Data Robotics storage units (drobos)
  python gui, cli, and api providing the "Dashboard" functionality.
  If you fire up droboview, it should look pretty familiar to those who 
