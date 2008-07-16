@@ -30,6 +30,9 @@ import fcntl, struct, socket, array, commands, time
 import exceptions
 import os, sys, re
 
+#only for fw download...
+import urllib2
+
 DEBUG = 0
 #
 # FIXME: if installed with "python setup.py install" then this 
@@ -496,6 +499,85 @@ class Drobo:
     df.write(d)
     df.close()
     return dfname
+
+  def fetchLatestFirmware(self):
+    """
+       fetch firmware from web site. ... should be a .tdf file.
+       validate firmware from header...
+
+       go to fwsite
+       download index.txt
+       figure out which one to download.
+       download it.
+
+    """
+    fwsite="ftp://updates.drobo.com/"
+    fwi=self.GetSubPageFirmware()
+    fwv= str(fwi[0]) + '.' + str(fwi[1]) + '.' + str(fwi[2])
+    fwarch = fwi[6].lower()
+
+    print 'looking for firmware for:', fwarch, fwv
+    listing_file=urllib2.urlopen( fwsite + "index.txt")
+    list_of_firmware_string=listing_file.read().strip("\t\r")
+    list_of_firmware=list_of_firmware_string.split("|") 
+    i=1
+    while i < len(list_of_firmware):
+      key=list_of_firmware[i-1].split()[1]
+      value=list_of_firmware[i].split()[1]
+      #print key,value
+
+      k=key.split('/')
+      if k[2] == "firmware" and len(k) > 4: 
+        if k[3] == fwarch and k[4] == fwv:
+           print 'This Drobo should be running: ', value
+           print 'downloading...'
+           firmware_url=urllib2.urlopen( fwsite + value)
+           return firmware_url.read()
+      i=i+2
+ 
+    print 'no matching firmware found.'
+    return None
+
+  def upgradeFirmware(firmware):
+    """
+        given good firmware data, upload it to the Drobo...
+
+        unclear on where to put data which is to be written to Drobo.
+        how is write of the data itself done (not just cdb)
+
+       according to dpd.h:
+       (hdrlength, hdrVersion, magic, imageVersion, targetName, sequenceNum, bootFailureCount, imageFlashAddress, imageLength, imageCrc32, about ) = struct.unpack('LLLL16sLLLLL256s', raw[8])
+    """ 
+    print "Not Implemented Yet"
+    raise DroboException
+
+    # tried 32000 ... it only returned 5K, so try something small.
+    buflen=4096
+
+    modepageblock=struct.pack( ">BBBBBBBHB", 
+      0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, 
+      (0x01 <<5)|0x01, buflen, 0x00 )
+    
+    # ok fine, but how do I actually write the data?
+    todev=1
+
+    if DEBUG > 0:
+        print "Page 0..."
+
+    cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
+    diags=cmdout
+    i=0
+    while len(cmdout) == buflen:
+        modepageblock=struct.pack( ">BBBBBBBHB", 
+            0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, 0x01, 
+            buflen, 0x00 )
+
+        # ok fine, but how do I actually write the data?
+        cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
+        i=i+1
+
+    
+
 
   def GetCharDev(self):
      return self.char_dev_file
