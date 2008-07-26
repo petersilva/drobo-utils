@@ -33,6 +33,7 @@ import os, sys, re
 #only for fw download...
 import os.path
 import urllib2
+import zipfile,zlib
 
 DEBUG = 0
 #
@@ -546,9 +547,46 @@ class Drobo:
     print 'downloading done '
     return fwdata
 
+  def validateFirmware(self):
+    """
+       requires self.fwdata to be initialized before calling.
+       read in the header of the firmware from self.fwdata.
+
+       check the information in the header to confirm that it is a valid firmware image.
+
+       status:
+            works for length, and body CRC.  something wrong with header CRC.
+
+       according to dpd.h:
+       (hdrlength, hdrVersion, magic, imageVersion, targetName, sequenceNum, bootFailureCount, imageFlashAddress, imageLength, imageCrc32, about, hdrCrc32 ) = struct.unpack('LLLL16sLLLLL256sL', self.fwdata[0:304])
+    """
+    self.fwhdr = struct.unpack('>LLLL16sLLLLL256sL', self.fwdata[0:312])
+
+    if  len(self.fwdata) != ( self.fwhdr[0] + self.fwhdr[8] ) :
+	print 'header corrupt... Length does not validate.'
+	return 0
+
+    print '%d + %d = %d length validated. Good.' % ( self.fwhdr[0], self.fwhdr[8], len(self.fwdata) )
+
+    hdrcrc = zlib.crc32( self.fwdata[0:308] + self.fwdata[312:self.fwhdr[0]] )
+    print 'CRC from header: %d, calculated using python zlib crc32: %d ' % ( self.fwhdr[11], hdrcrc)
+    #print self.fwhdr
+    print 'yeah, the header CRCs do not match. For now they never do ... ignoring for now...'
+    bodycrc = zlib.crc32( self.fwdata[self.fwhdr[0]:] )
+    print 'CRC for body from header: %d, calculated: %d ' % ( self.fwhdr[9], bodycrc)
+    if self.fwhdr[9] != bodycrc :
+        print 'file corrupt, payload checksum wrong'
+        return 0
+    
+    print '32 bit Cyclic Redundancy Check for body OK!'
+    return 1 
+    
 
   def updateFirmware(self):
     """
+      put the best firmware in self.fwdata.
+            return 1 if successful, 0 if not.
+
       determine currently running firmware and most current from web site.
 
       check if the most current one has already been downloaded.
@@ -556,6 +594,7 @@ class Drobo:
 
       Compare the current running firmware against the appropriate file 
       in the local repository
+
     """
     (fwarch, fwversion, fwpath ) = self.PickLatestFirmware()
     if not os.path.exists(Drobo.localfwrepository) :
@@ -564,25 +603,42 @@ class Drobo:
     fwname = fwpath.split('/')
     localfw = Drobo.localfwrepository + '/' + fwarch + '_' + fwname[-1] 
     if not os.path.exists(localfw):
-       fwdata = self.downloadFirmware(fwpath)
-       f = open(localfw,'w+')
-       f.write(fwdata)
-       f.close()
-       print 'local copy written'
+       self.fwdata = self.downloadFirmware(fwpath)
+       good = self.validateFirmware()
+       if good:
+          f = open(localfw,'w+')
+          f.write(self.fwdata)
+          f.close()
+          print 'local copy written'
+       else:
+          print 'downloaded firmware did not validate, not kept...'
+          return 0
     else:
        print 'local copy already present'
+       f = open(localfw,'r')
+       self.fwdata = f.read()
+       good = self.validateFirmware()
+       f.close()
 
+    if good:
+      print 'correct fw available'
+      return 1
+ 
+    print 'no valid firmware found'
+    return 0
    
-  def upgradeFirmware(firmware):
+  def upgradeFirmware(self):
     """
         given good firmware data, upload it to the Drobo...
 
         unclear on where to put data which is to be written to Drobo.
         how is write of the data itself done (not just cdb)
 
-       according to dpd.h:
-       (hdrlength, hdrVersion, magic, imageVersion, targetName, sequenceNum, bootFailureCount, imageFlashAddress, imageLength, imageCrc32, about ) = struct.unpack('LLLL16sLLLLL256s', raw[8])
     """ 
+    if not self.updateFirmware():
+       print 'Could not obtain firmware'
+       return
+
     print "Not Implemented Yet"
     raise DroboException
 
