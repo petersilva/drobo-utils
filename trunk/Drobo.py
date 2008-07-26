@@ -560,25 +560,31 @@ class Drobo:
        according to dpd.h:
        (hdrlength, hdrVersion, magic, imageVersion, targetName, sequenceNum, bootFailureCount, imageFlashAddress, imageLength, imageCrc32, about, hdrCrc32 ) = struct.unpack('LLLL16sLLLLL256sL', self.fwdata[0:304])
     """
-    self.fwhdr = struct.unpack('>LLLL16sLLLLL256sL', self.fwdata[0:312])
+    self.fwhdr = struct.unpack('>LL4sL16sLLLLL256sL', self.fwdata[0:312])
 
     if  len(self.fwdata) != ( self.fwhdr[0] + self.fwhdr[8] ) :
 	print 'header corrupt... Length does not validate.'
 	return 0
 
+    print self.fwhdr
+
+    if  self.fwhdr[2] != 'TDIH' :
+        print 'bad Magic, not a valid firmware'
+        return 0
+
+    print 'Magic number validated. Good.'
     print '%d + %d = %d length validated. Good.' % ( self.fwhdr[0], self.fwhdr[8], len(self.fwdata) )
 
     hdrcrc = zlib.crc32( self.fwdata[0:308] + self.fwdata[312:self.fwhdr[0]] )
     print 'CRC from header: %d, calculated using python zlib crc32: %d ' % ( self.fwhdr[11], hdrcrc)
-    #print self.fwhdr
-    print 'yeah, the header CRCs do not match. For now they never do ... ignoring for now...'
+    print 'yeah, the header CRCs do not match. For now they never do ... ignoring it.'
     bodycrc = zlib.crc32( self.fwdata[self.fwhdr[0]:] )
     print 'CRC for body from header: %d, calculated: %d ' % ( self.fwhdr[9], bodycrc)
     if self.fwhdr[9] != bodycrc :
         print 'file corrupt, payload checksum wrong'
         return 0
     
-    print '32 bit Cyclic Redundancy Check for body OK!'
+    print '32 bit Cyclic Redundancy Check correct. Good.'
     return 1 
     
 
