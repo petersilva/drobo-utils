@@ -102,16 +102,19 @@ cmd=sys.argv[1]
 if cmd == "blink":
    d.Blink() 
    
+elif cmd == "diag":
+   f=d.dumpDiagnostics()
+   print "diagnostics in ", f
+
+elif cmd == 'fwcheck':
+   d.updateFirmware()
+
 elif cmd == 'info':
    info(d)
 
 elif cmd == "standby":
    d.Standby() 
    
-elif cmd == "diag":
-   f=d.dumpDiagnostics()
-   print "diagnostics in ", f
-
 elif cmd == "status":
    c=d.GetSubPageCapacity()
    pfull = 100 * ((c[1]+1.0)/c[2])

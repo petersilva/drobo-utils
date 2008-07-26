@@ -31,6 +31,7 @@ import exceptions
 import os, sys, re
 
 #only for fw download...
+import os.path
 import urllib2
 
 DEBUG = 0
@@ -500,7 +501,11 @@ class Drobo:
     df.close()
     return dfname
 
-  def fetchLatestFirmware(self):
+
+  fwsite="ftp://updates.drobo.com/"
+  localfwrepository= os.path.expanduser("~") + "/.drobo-utils"
+
+  def PickLatestFirmware(self):
     """
        fetch firmware from web site. ... should be a .tdf file.
        validate firmware from header...
@@ -508,16 +513,14 @@ class Drobo:
        go to fwsite
        download index.txt
        figure out which one to download.
-       download it.
-
+       return arch and version of firmware running, and the download file name.
     """
-    fwsite="ftp://updates.drobo.com/"
     fwi=self.GetSubPageFirmware()
     fwv= str(fwi[0]) + '.' + str(fwi[1]) + '.' + str(fwi[2])
     fwarch = fwi[6].lower()
 
     print 'looking for firmware for:', fwarch, fwv
-    listing_file=urllib2.urlopen( fwsite + "index.txt")
+    listing_file=urllib2.urlopen( Drobo.fwsite + "index.txt")
     list_of_firmware_string=listing_file.read().strip("\t\r")
     list_of_firmware=list_of_firmware_string.split("|") 
     i=1
@@ -530,14 +533,46 @@ class Drobo:
       if k[2] == "firmware" and len(k) > 4: 
         if k[3] == fwarch and k[4] == fwv:
            print 'This Drobo should be running: ', value
-           print 'downloading...'
-           firmware_url=urllib2.urlopen( fwsite + value)
-           return firmware_url.read()
+           return (fwarch, fwv, value)
       i=i+2
  
     print 'no matching firmware found.'
     return None
 
+  def downloadFirmware( self, fwname ):
+    print 'downloading firmware ', fwname, '...'
+    firmware_url=urllib2.urlopen( Drobo.fwsite + fwname )
+    fwdata = firmware_url.read()
+    print 'downloading done '
+    return fwdata
+
+
+  def updateFirmware(self):
+    """
+      determine currently running firmware and most current from web site.
+
+      check if the most current one has already been downloaded.
+      if not, then download it into a local repository.
+
+      Compare the current running firmware against the appropriate file 
+      in the local repository
+    """
+    (fwarch, fwversion, fwpath ) = self.PickLatestFirmware()
+    if not os.path.exists(Drobo.localfwrepository) :
+         os.mkdir(Drobo.localfwrepository)
+
+    fwname = fwpath.split('/')
+    localfw = Drobo.localfwrepository + '/' + fwarch + '_' + fwname[-1] 
+    if not os.path.exists(localfw):
+       fwdata = self.downloadFirmware(fwpath)
+       f = open(localfw,'w+')
+       f.write(fwdata)
+       f.close()
+       print 'local copy written'
+    else:
+       print 'local copy already present'
+
+   
   def upgradeFirmware(firmware):
     """
         given good firmware data, upload it to the Drobo...
