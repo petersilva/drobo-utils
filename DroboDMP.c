@@ -84,7 +84,7 @@ signed int put_mode_page(int sg_fd, void *page_struct, int size,
     /* these are set by the ioctl... initializing just in case. */
     io_hdr.sb_len_wr=0;   
     io_hdr.resid=0;
-    io_hdr.status=99;  
+    io_hdr.status=0;  
 
     i=ioctl(sg_fd, SG_IO, &io_hdr);
     if (i < 0) {
@@ -94,8 +94,8 @@ signed int put_mode_page(int sg_fd, void *page_struct, int size,
     }
 
     if (debug) fprintf(stderr, 
-        "\nread.. size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
-          size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
+        "\nwrite... ioctl returned: %d, size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
+          i, size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
 
     /* SG_INFO_DIRECT_IO       0x2     -- direct IO requested and performed */
     if ((io_hdr.status != 0) && (io_hdr.status != 2)) {
@@ -106,7 +106,7 @@ signed int put_mode_page(int sg_fd, void *page_struct, int size,
         size -= io_hdr.resid   ;
       }
     }
-
+    if (debug) fprintf(stderr,"\nput_mode_page ... wrote=%d\n", size );
     return(size);
 }
 
@@ -173,6 +173,16 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
 }
 
 PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
+
+/*  Perform ioctl to retrieve a sub-page from the Drobo.
+ *    required arguments:
+ *           mcb  : some scsi control block thingum...
+ *                  pass transparently through to ioctl/SG
+ *           buffer : data to write...
+ *           debug : if 1,then print debugging output (lots of it.)
+ */
+
+
     char * buffer = NULL;
     long buflen;
     signed int i;
@@ -180,9 +190,10 @@ PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
     unsigned char * mcb = NULL;
     long mcblen;
     long debug =0;
+    long written = 0;
 
     // parse arguments... 
-    fprintf(stderr, "put_sub_page 1\n");
+    if (debug) fprintf(stderr, "put_sub_page 1\n");
 
     if (!PyArg_ParseTuple(args, "s#s#l", &mcb, &mcblen, &buffer, &buflen, &debug )){
         PyErr_SetString( PyExc_ValueError, 
@@ -191,6 +202,7 @@ PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
     }
 
     if (debug) {
+         fprintf( stderr, "\n put_sub_page mcblen=%d, buflen=%d \n", mcblen, buflen );
          fprintf( stderr, "\nSB DUMP START:" );
          for (i=0; i < buflen; i++) {
             if ((i%8)==0) fprintf(stderr, "\nSB[%3d] ", i );
@@ -203,11 +215,11 @@ PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
 
     if (debug) fprintf(stderr, "put_sub_page 2\n");
 
-    put_mode_page(drobo_fd, buffer, buflen, mcb, mcblen, 1, debug);
+    written = put_mode_page(drobo_fd, buffer, buflen, mcb, mcblen, 1, debug);
 
     if (debug) fprintf(stderr, "put_sub_page 3\n");
   
-    return(Py_BuildValue("i", 0));
+    return(Py_BuildValue("i", written));
 };
 
 
@@ -326,7 +338,7 @@ PyObject *drobodmp_closefd( PyObject* self, PyObject* args ) {
 static PyMethodDef DroboDMPMethods[] = {
     { "get_sub_page", drobodmp_get_sub_page, METH_VARARGS|METH_KEYWORDS, 
                   "retrieve a Drobo Management Protocol formatted scsi control block" },
-    { "put_sub_page", drobodmp_get_sub_page, METH_VARARGS|METH_KEYWORDS, 
+    { "put_sub_page", drobodmp_put_sub_page, METH_VARARGS|METH_KEYWORDS, 
                   "set a Drobo Management Protocol formatted scsi control block" },
     { "openfd", drobodmp_openfd, METH_VARARGS|METH_KEYWORDS, 
                   "open drobo file descriptor" },

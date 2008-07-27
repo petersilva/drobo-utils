@@ -109,6 +109,10 @@ elif cmd == "diag":
 elif cmd == 'fwcheck':
    d.updateFirmware()
 
+elif cmd == 'fwupgrade':
+   d.updateFirmwareRepository()
+   d.writeFirmware()
+
 elif cmd == 'info':
    info(d)
 

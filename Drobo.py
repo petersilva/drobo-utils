@@ -411,7 +411,7 @@ class Drobo:
 
     todev=1
     print "sblen=", sblen
-    cmdout = DroboDMP.put_sub_page( sblen, modepageblock, todev, sensebuffer, DEBUG )
+    cmdout = DroboDMP.get_sub_page( sblen, modepageblock, todev, sensebuffer, DEBUG )
     diags=cmdout
     i=0
 
@@ -506,6 +506,16 @@ class Drobo:
   fwsite="ftp://updates.drobo.com/"
   localfwrepository= os.path.expanduser("~") + "/.drobo-utils"
 
+  def PickFirmware(self,name):
+    """
+       read in a given firmware from disk.
+    """
+    f = open(name,'r')
+    self.fwdata = f.read()
+    good = self.validateFirmware()
+    f.close()
+    return good
+
   def PickLatestFirmware(self):
     """
        fetch firmware from web site. ... should be a .tdf file.
@@ -588,7 +598,7 @@ class Drobo:
     return 1 
     
 
-  def updateFirmware(self):
+  def updateFirmwareRepository(self):
     """
       put the best firmware in self.fwdata.
             return 1 if successful, 0 if not.
@@ -620,11 +630,8 @@ class Drobo:
           print 'downloaded firmware did not validate, not kept...'
           return 0
     else:
-       print 'local copy already present'
-       f = open(localfw,'r')
-       self.fwdata = f.read()
-       good = self.validateFirmware()
-       f.close()
+       print 'local copy already present:', localfw
+       good = self.PickFirmware(localfw)
 
     if good:
       print 'correct fw available'
@@ -633,7 +640,7 @@ class Drobo:
     print 'no valid firmware found'
     return 0
    
-  def upgradeFirmware(self):
+  def writeFirmware(self):
     """
         given good firmware data, upload it to the Drobo...
 
@@ -641,12 +648,6 @@ class Drobo:
         how is write of the data itself done (not just cdb)
 
     """ 
-    if not self.updateFirmware():
-       print 'Could not obtain firmware'
-       return
-
-    print "Not Implemented Yet"
-    raise DroboException
 
     # tried 32000 ... it only returned 5K, so try something small.
     buflen=4096
@@ -655,26 +656,39 @@ class Drobo:
       0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, 
       (0x01 <<5)|0x01, buflen, 0x00 )
     
-    # ok fine, but how do I actually write the data?
-    todev=1
-
     if DEBUG > 0:
         print "Page 0..."
 
-    cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
-    diags=cmdout
     i=0
-    while len(cmdout) == buflen:
+    j=i+buflen 
+    buffer = self.fwdata[i:j]
+    print 'writeFirmware: i=%d, start=%d, len=%d buffer length= %d\n' % ( i, self.fwhdr[0], \
+		len(self.fwdata), len(buffer) )
+    written = DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
+
+    while (written == buflen) and ( i < len(self.fwdata)) :
+
+        if ( i + buflen ) > len(self.fwdata) :  # writing the last record.
+        	buflen= len(self.fwdata) - i
+
         modepageblock=struct.pack( ">BBBBBBBHB", 
             0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, 0x01, 
             buflen, 0x00 )
+        j=i+buflen
+        written = DroboDMP.put_sub_page( modepageblock, self.fwdata[i:j], DEBUG )
+        i=j
 
-        # ok fine, but how do I actually write the data?
-        cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
-        i=i+1
-
+    print 'writeFirmware Done.  i=%d, len=%d' % ( i, len(self.fwdata) )
+    self.__transactionNext()
     
+    paklen=1 
+    modepageblock=struct.pack( ">BBBBBBBHB",
+         0xea, 0x10, 0x80, 0x71, 0, self.transactionID, 0x01 << 5 , paklen, 0 )
 
+    status = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
+    print 'Drobo thinks write status is: ', status
+
+        
 
   def GetCharDev(self):
      return self.char_dev_file
