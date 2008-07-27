@@ -661,6 +661,8 @@ class Drobo:
 
     i=0
     j=i+buflen 
+    moretocome=0x01
+
     buffer = self.fwdata[i:j]
     print 'writeFirmware: i=%d, start=%d, len=%d buffer length= %d\n' % ( i, self.fwhdr[0], \
 		len(self.fwdata), len(buffer) )
@@ -670,9 +672,10 @@ class Drobo:
 
         if ( i + buflen ) > len(self.fwdata) :  # writing the last record.
         	buflen= len(self.fwdata) - i
+                moretocome=0
 
         modepageblock=struct.pack( ">BBBBBBBHB", 
-            0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, 0x01, 
+            0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, moretocome, 
             buflen, 0x00 )
         j=i+buflen
         written = DroboDMP.put_sub_page( modepageblock, self.fwdata[i:j], DEBUG )
