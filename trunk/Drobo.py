@@ -650,7 +650,7 @@ class Drobo:
     """ 
 
     # tried 32000 ... it only returned 5K, so try something small.
-    buflen=4096
+    buflen=32768
 
     modepageblock=struct.pack( ">BBBBBBBHB", 
       0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, 
@@ -677,6 +677,7 @@ class Drobo:
         j=i+buflen
         written = DroboDMP.put_sub_page( modepageblock, self.fwdata[i:j], DEBUG )
         i=j
+        print 'wrote ',written, ' bytes... total:', j
 
     print 'writeFirmware Done.  i=%d, len=%d' % ( i, len(self.fwdata) )
     self.__transactionNext()
@@ -685,8 +686,9 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB",
          0xea, 0x10, 0x80, 0x71, 0, self.transactionID, 0x01 << 5 , paklen, 0 )
 
-    status = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
-    print 'Drobo thinks write status is: ', status
+    cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
+    status = struct.unpack( '>B', cmdout )
+    print 'Drobo thinks write status is: ', status[0]
 
         
 
