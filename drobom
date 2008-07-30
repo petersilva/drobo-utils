@@ -107,11 +107,11 @@ elif cmd == "diag":
    print "diagnostics in ", f
 
 elif cmd == 'fwcheck':
-   d.updateFirmware()
+   d.PickLatestFirmware()
 
 elif cmd == 'fwupgrade':
-   d.updateFirmwareRepository()
-   d.writeFirmware()
+   if d.updateFirmwareRepository():
+     d.writeFirmware()
 
 elif cmd == 'info':
    info(d)
@@ -132,5 +132,5 @@ elif cmd == "time":
   print "Drobo says it is:", time.ctime(settings[0])
 
 else:
-   print "known commands: blink, standby, info, status, diag"
+   print "known commands: blink, standby, info, status, diag, fwcheck, fwupgrade"
    print "Unknown Command: ", cmd
