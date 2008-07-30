@@ -24,6 +24,15 @@ COMPONENTS:
                 only platform specific stuff is in here...
   setup.py --   python version of a Makefile
 
+
+Getting a Snapshot:
+
+   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
+
+   For commit access, you need a sourceforge user account.
+
+ 
+
 REQUIREMENTS:
 
 drobo-utils was developed on pre-release version of Kubuntu Hardy Heron.
@@ -270,8 +279,73 @@ ON LUNSIZES >= 2TB:
            still work. 
 
 
+Firmware manipulation:
+   The line mode interface has two commands to deal with firmware,
+   fwcheck will tell you if an upgrade is required.
+   fwupgrade will do the work.  It takes a few minutes, and prints 
+   a status you you can see how it is progressing.  have patience.
 
+   Before you start, please any file systems using the Drobo so
+   that one is free to re-start it once the firmware is loaded.
 
+root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom fwupgrade
+
+   validateFirmware start...
+Magic number validated. Good.
+484 + 2937552 = 2938036 length validated. Good.
+CRC from header: 4260378881, calculated using python zlib crc32: 398201869
+yeah, the header CRCs do not match. For now they never do ... ignoring it.
+CRC for body from header: 1852877921, calculated: 1852877921
+32 bit Cyclic Redundancy Check correct. Good.
+validateFirmware successful...
+writeFirmware: i=484, start=484, last=2938036 fw length= 488
+
+wrote  32768  bytes... total: 33252
+wrote  32768  bytes... total: 66020
+	.
+	.
+	.
+wrote  32768  bytes... total: 2720228
+wrote  32768  bytes... total: 2752996
+wrote  32768  bytes... total: 2785764
+wrote  32768  bytes... total: 2818532
+wrote  32768  bytes... total: 2851300
+wrote  32768  bytes... total: 2884068
+wrote  32768  bytes... total: 2916836
+wrote  21200  bytes... total: 2938036
+writeFirmware Done.  i=2938036, len=2938036
+root@pepino:/home/peter/drobo/drobo-utils/trunk# 
+
+   when it's done, you can check if it worked using:
+
+   root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom status
+   /dev/sdf 00% full - ['New firmware installed']
+
+   If the status is like that, then do:
+
+   root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom standby
+
+   lights will flash etc... wait until Drobo goes dark.
+   Wait another five seconds, then un-plug the USB / connector.
+   
+   Plug it back in, and wait 10 seconds.
+   it should start up with the latest firmware available for your drobo.
+   
+
+   The drobom commands, like DRI's dashboard, will only permit you
+   to get the latest and greatest firmware and upgrade.  if you
+   don't mind using python, you can also load arbitrary firmware
+   files like so:
+
+   #!/usr/bin/python
+   import Drobo
+   l=Drobo.Drobo("/dev/sdf")
+   if l.PickFirmware("/home/peter/.drobo-utils/v1.10.tdf"):
+      l.writeFirmware()
+   else:
+      print 'failed to validate firmware'
+
+   
 Caveats:
    droboview isn't suited to run continuously for long periods, 
    as it has a memory leak...  total foot print starts out at 32M
@@ -284,14 +358,9 @@ Caveats:
    best to restart it daily, or use it when necessary, but not leave it
    on for days.
 
-   sadly, firmware update isn´t in there yet.
-
-Getting a Snapshot:
-
-   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
+   firmware upgrade works in line mode only for now.
 
 
-   for commit access, you need a sourceforge user account.
 
 Building a debian package:
 
@@ -303,7 +372,27 @@ Building a debian package:
    su
    dpkg -i droboutils_0.1.1-1_i386.deb
 
-Revision date: 2008/06/21
+Firmware Compatibility:
+  If your Drobo has firmware version:
+   1.0.3 - not tried yet. probably ok to upgrade firmware
+           you really want to do that, 
+           does not support ext3, used ntfs for a few months.
+            
+   1.1.0 - forget the GUI, library not compatible enough.
+           drobom 'info' gives an error message.
+           drobom status works ok.
+           can use to upgrade firmware.
+
+         - lots of error messages, best to upgrade ASAP.
+
+         - firmware prior to hear deals badly with ext3.
+         - really need at least 1.1.1 to use Linux.
+
+   1.1.1 - works without issues.
+   1.1.2 - works without issues.
+
+
+Revision date: 2008/07/29
 
 copyright:
 
