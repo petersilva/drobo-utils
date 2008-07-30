@@ -399,19 +399,17 @@ class Drobo:
 
      STATUS: not tested yet. may eat your children
     """
-    print "not yet implemented"
-    return  # comment out to work on this routine...
-    #now=time.time()
+    now=time.time()
     now=0
-    sensebuffer=struct.pack( ">BBHLH32s" , 0x3a, 0x05, 0x2a, now, 0 ,"Hi There" )
-    sblen=len(sensebuffer)
+    buffer=struct.pack( ">BBHLH32s" , 0x3a, 0x05, 0x2a, now, 0 ,"Hi There" )
+    sblen=len(buffer)
 
     # mode select CDB. 
     modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0, 0, 0, 0, 0, sblen, 0)
 
     todev=1
     print "sblen=", sblen
-    cmdout = DroboDMP.get_sub_page( sblen, modepageblock, todev, sensebuffer, DEBUG )
+    cmdout = DroboDMP.put_sub_page( buffer, modepageblock, DEBUG )
     diags=cmdout
     i=0
 
@@ -503,12 +501,19 @@ class Drobo:
     return dfname
 
 
+  #
+  # constants for use with firmware operations
+  #
+
   fwsite="ftp://updates.drobo.com/"
   localfwrepository= os.path.expanduser("~") + "/.drobo-utils"
 
   def PickFirmware(self,name):
     """
        read in a given firmware from disk.
+
+       sets self.fwdata
+
     """
     f = open(name,'r')
     self.fwdata = f.read()
@@ -520,11 +525,30 @@ class Drobo:
     """
        fetch firmware from web site. ... should be a .tdf file.
        validate firmware from header...
+ 
+       sets self.fwdata
 
        go to fwsite
        download index.txt
        figure out which one to download.
        return arch and version of firmware running, and the download file name.
+
+       tdz support.  zip file containing two .tdf's.  one for rev1, another for rev2.
+       SCSI INQUIRY is supposed to respond with 'VERSION' 1.0 or 2.0 to tell which to use.
+
+     trying to understand how to send an INQUIRY:
+     SCSI version 2 protocol  INQUIRY...
+     protocol : T10/1236-D Revision 20
+
+     byte:  0 - descriptor code.                0x12 -- INQUIRY
+            1 - 00 peripheral dev. type code    0x0, 4, 5, 7, e .. 
+            2 - reserved
+            3 - reserved.
+            4-27   target descriptor parameters.
+                 0 - target descriptor type code: 0x04 - Identification.
+                 :wq
+
+            28-31  dev. type params.
     """
     fwi=self.GetSubPageFirmware()
     fwv= str(fwi[0]) + '.' + str(fwi[1]) + '.' + str(fwi[2])
@@ -547,10 +571,15 @@ class Drobo:
            return (fwarch, fwv, value)
       i=i+2
  
-    print 'no matching firmware found.'
-    return None
+    print 'no matching firmware found, must be the latest and greatest!'
+    return ( '','','' )
 
   def downloadFirmware( self, fwname ):
+    """
+      download given fw file from network repository.
+
+      STATUS: works.
+    """
     print 'downloading firmware ', fwname, '...'
     firmware_url=urllib2.urlopen( Drobo.fwsite + fwname )
     fwdata = firmware_url.read()
@@ -569,14 +598,19 @@ class Drobo:
 
        according to dpd.h:
        (hdrlength, hdrVersion, magic, imageVersion, targetName, sequenceNum, bootFailureCount, imageFlashAddress, imageLength, imageCrc32, about, hdrCrc32 ) = struct.unpack('LLLL16sLLLLL256sL', self.fwdata[0:304])
+
+       STATUS: working, except do not understand header CRC's yet so ignoring those for now.
+
     """
+    print 'validateFirmware start...'
     self.fwhdr = struct.unpack('>LL4sL16sLLLLL256sL', self.fwdata[0:312])
 
     if  len(self.fwdata) != ( self.fwhdr[0] + self.fwhdr[8] ) :
 	print 'header corrupt... Length does not validate.'
 	return 0
 
-    print self.fwhdr
+    print 'header+body lengths validated.  Good.'
+    #print self.fwhdr
 
     if  self.fwhdr[2] != 'TDIH' :
         print 'bad Magic, not a valid firmware'
@@ -595,6 +629,7 @@ class Drobo:
         return 0
     
     print '32 bit Cyclic Redundancy Check correct. Good.'
+    print 'validateFirmware successful...'
     return 1 
     
 
@@ -611,8 +646,13 @@ class Drobo:
       Compare the current running firmware against the appropriate file 
       in the local repository
 
+      STATUS: working...
+
     """
     (fwarch, fwversion, fwpath ) = self.PickLatestFirmware()
+    if fwarch == '' : # already at latest version...
+        return 0
+
     if not os.path.exists(Drobo.localfwrepository) :
          os.mkdir(Drobo.localfwrepository)
 
@@ -640,33 +680,35 @@ class Drobo:
     print 'no valid firmware found'
     return 0
    
+
   def writeFirmware(self):
     """
         given good firmware data, upload it to the Drobo...
 
-        unclear on where to put data which is to be written to Drobo.
-        how is write of the data itself done (not just cdb)
+	1_README_*.txt from the resource kit is followed here.
+
+        STATUS: worked once, must be safe now :-)
 
     """ 
 
-    # tried 32000 ... it only returned 5K, so try something small.
-    buflen=32768
+    buffer = struct.pack( ">L" , len(self.fwdata)) + self.fwdata[0:self.fwhdr[0]]
 
     modepageblock=struct.pack( ">BBBBBBBHB", 
-      0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, 
-      (0x01 <<5)|0x01, buflen, 0x00 )
+      0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, (0x01<<5)|0x01, len(buffer), 0x00 )
     
-    if DEBUG > 0:
-        print "Page 0..."
+    written = DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
 
-    i=0
+    if DEBUG > 0:
+      print "Page 0..."
+
+    buflen=32768
+    written=buflen
+    i=self.fwhdr[0]
     j=i+buflen 
     moretocome=0x01
 
-    buffer = self.fwdata[i:j]
-    print 'writeFirmware: i=%d, start=%d, len=%d buffer length= %d\n' % ( i, self.fwhdr[0], \
-		len(self.fwdata), len(buffer) )
-    written = DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
+    print 'writeFirmware: i=%d, start=%d, last=%d fw length= %d\n' % \
+      ( i, self.fwhdr[0], len(self.fwdata), len(buffer) )
 
     while (written == buflen) and ( i < len(self.fwdata)) :
 
@@ -677,12 +719,15 @@ class Drobo:
         modepageblock=struct.pack( ">BBBBBBBHB", 
             0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, moretocome, 
             buflen, 0x00 )
+
         j=i+buflen
         written = DroboDMP.put_sub_page( modepageblock, self.fwdata[i:j], DEBUG )
         i=j
+
         print 'wrote ',written, ' bytes... total:', j
 
     print 'writeFirmware Done.  i=%d, len=%d' % ( i, len(self.fwdata) )
+
     self.__transactionNext()
     
     paklen=1 
@@ -691,9 +736,12 @@ class Drobo:
 
     cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
     status = struct.unpack( '>B', cmdout )
-    print 'Drobo thinks write status is: ', status[0]
+
+    if DEBUG > 0 : 
+      print 'Drobo thinks write status is: ', status[0]
 
         
+
 
   def GetCharDev(self):
      return self.char_dev_file
@@ -867,8 +915,11 @@ class Drobo:
         other cases where there bit shfts are claimed have ended unhappily... 
         hmm...
      """
-     o = self.__getsubpage(0x07, 'BB5BBB' )
-     return ( o[0], o[1], o[4] >>7 )
+     try: # insert try/except for compatibility with firmware <= 1.1.0  
+         o = self.__getsubpage(0x07, 'BB5BBB' )
+         return ( o[0], o[1], o[4] >>7 )
+     except:
+         return ( 0,0,0 )
 
 
 

@@ -203,17 +203,8 @@ PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
 
     if (debug) {
          fprintf( stderr, "\n put_sub_page mcblen=%d, buflen=%d \n", mcblen, buflen );
-         fprintf( stderr, "\nSB DUMP START:" );
-         for (i=0; i < buflen; i++) {
-            if ((i%8)==0) fprintf(stderr, "\nSB[%3d] ", i );
-            c= *((char*)(buffer+i));
-            fprintf(stderr, " 0x%02x", c );
-         };
-         fprintf(stderr,"\nSB DUMP COMPLETE\n");
+         fprintf(stderr, "put_sub_page 2\n");
     };
- 
-
-    if (debug) fprintf(stderr, "put_sub_page 2\n");
 
     written = put_mode_page(drobo_fd, buffer, buflen, mcb, mcblen, 1, debug);
 
