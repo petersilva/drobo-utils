@@ -67,7 +67,8 @@ def info(d):
 
   print '---------------------------------------------------------'
 
-
+def update(pct):
+  print "write is %2d%% done." % ( pct )
 
 # Mainline...
 
@@ -111,7 +112,7 @@ elif cmd == 'fwcheck':
 
 elif cmd == 'fwupgrade':
    if d.updateFirmwareRepository():
-     d.writeFirmware()
+     d.writeFirmware(update)
 
 elif cmd == 'info':
    info(d)

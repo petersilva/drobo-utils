@@ -521,6 +521,23 @@ class Drobo:
     f.close()
     return good
 
+  def inquire(self):
+    """ 
+         issue a standard SCSI INQUIRY command
+
+       STATUS: incomplete, untested, willeatyourchildren
+    """
+    pack = 'BBBBBBBB8s16s4s20sBB8HH'
+    mypack = '>BBH' + pack
+    paklen=struct.calcsize(mypack)
+
+    modepageblock=struct.pack( ">BBBBBBBHB", 0x5a, 0, 0x3a, 0x12 , 0, 0, 0, paklen, 0 )
+
+    cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
+
+
+
+    
   def PickLatestFirmware(self):
     """
        fetch firmware from web site. ... should be a .tdf file.
@@ -532,6 +549,9 @@ class Drobo:
        download index.txt
        figure out which one to download.
        return arch and version of firmware running, and the download file name.
+
+     status: supports version 1 drobo tdf files.
+             does not support .tdz files (yet.)
 
        tdz support.  zip file containing two .tdf's.  one for rev1, another for rev2.
        SCSI INQUIRY is supposed to respond with 'VERSION' 1.0 or 2.0 to tell which to use.
@@ -681,7 +701,7 @@ class Drobo:
     return 0
    
 
-  def writeFirmware(self):
+  def writeFirmware(self,function):
     """
         given good firmware data, upload it to the Drobo...
 
@@ -691,7 +711,8 @@ class Drobo:
 
     """ 
 
-    buffer = struct.pack( ">L" , len(self.fwdata)) + self.fwdata[0:self.fwhdr[0]]
+    totallength = len(self.fwdata)
+    buffer = struct.pack( ">L" , totallength ) + self.fwdata[0:self.fwhdr[0]]
 
     modepageblock=struct.pack( ">BBBBBBBHB", 
       0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, (0x01<<5)|0x01, len(buffer), 0x00 )
@@ -708,12 +729,12 @@ class Drobo:
     moretocome=0x01
 
     print 'writeFirmware: i=%d, start=%d, last=%d fw length= %d\n' % \
-      ( i, self.fwhdr[0], len(self.fwdata), len(buffer) )
+      ( i, self.fwhdr[0], totallength, len(buffer) )
 
     while (written == buflen) and ( i < len(self.fwdata)) :
 
-        if ( i + buflen ) > len(self.fwdata) :  # writing the last record.
-        	buflen= len(self.fwdata) - i
+        if ( i + buflen ) > totallength :  # writing the last record.
+        	buflen= totallength - i
                 moretocome=0
 
         modepageblock=struct.pack( ">BBBBBBBHB", 
@@ -724,9 +745,10 @@ class Drobo:
         written = DroboDMP.put_sub_page( modepageblock, self.fwdata[i:j], DEBUG )
         i=j
 
-        print 'wrote ',written, ' bytes... total:', j
+        function(i*100/totallength)
+        print 'wrote ',written, ' bytes.  Cumulative: ',  i, ' of', totallength
 
-    print 'writeFirmware Done.  i=%d, len=%d' % ( i, len(self.fwdata) )
+    print 'writeFirmware Done.  i=%d, len=%d' % ( i, totallength )
 
     self.__transactionNext()
     
