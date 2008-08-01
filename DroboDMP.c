@@ -148,6 +148,7 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
     io_hdr.status=99;  
 
     i=ioctl(sg_fd, SG_IO, &io_hdr);
+    //sg_chk_n_print3( "get_mode_page", &io_hdr, sg_fd);
     if (i < 0) {
         perror("Drobo get_mode_page SG_IO ioctl error");
         close(sg_fd);
@@ -263,17 +264,17 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
 
     szwritten = get_mode_page(drobo_fd, buffer, sz, mcb, mcblen, out, debug);
 
-    if (debug) fprintf(stderr, "get_sub_page 5\n");
+    if (debug) fprintf(stderr, "get_sub_page 5 szwritten=%d\n", szwritten);
 
     if (szwritten > 0)  {
          retval = PyString_FromStringAndSize(buffer, szwritten );
     } else {
-         retval = NULL;
+         PyMem_Free(buffer);
+ 	 Py_INCREF(Py_None);
+         return Py_None;
     }
-    PyMem_Free(buffer);
 
     if (debug) fprintf(stderr, "get_sub_page 6\n");
-
 
     return(retval);
 };
