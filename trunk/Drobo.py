@@ -523,18 +523,35 @@ class Drobo:
 
   def inquire(self):
     """ 
-         issue a standard SCSI INQUIRY command
+     issue a standard SCSI INQUIRY command, return standard response as tuple.
 
-       STATUS: incomplete, untested, willeatyourchildren
+     STATUS: works.
+
+     trying to understand how to send an INQUIRY:
+     SCSI version 2 protocol  INQUIRY...
+     protocol : T10/1236-D Revision 20
+
+     byte:  0 - descriptor code.                0x12 -- INQUIRY
+            1 - 00 peripheral dev. type code    0x0, 4, 5, 7, e .. 
+            2 - reserved
+            3 - reserved.
+            4-27   target descriptor parameters.
+                 0 - target descriptor type code: 0x04 - Identification.
+
+            28-31  dev. type params.
+
     """
     pack = 'BBBBBBBB8s16s4s20sBB8HH'
-    mypack = '>BBH' + pack
+    mypack = '>' + pack
     paklen=struct.calcsize(mypack)
 
-    modepageblock=struct.pack( ">BBBBBBBHB", 0x5a, 0, 0x3a, 0x12 , 0, 0, 0, paklen, 0 )
+    modepageblock=struct.pack( "BBBBBB", 0x12 , 0, 0, 0, paklen, 0 )
 
     cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
-
+    if ( len(cmdout) == paklen ):
+      return struct.unpack(mypack, cmdout)
+    else:
+      raise DroboException
 
 
     
@@ -556,25 +573,14 @@ class Drobo:
        tdz support.  zip file containing two .tdf's.  one for rev1, another for rev2.
        SCSI INQUIRY is supposed to respond with 'VERSION' 1.0 or 2.0 to tell which to use.
 
-     trying to understand how to send an INQUIRY:
-     SCSI version 2 protocol  INQUIRY...
-     protocol : T10/1236-D Revision 20
-
-     byte:  0 - descriptor code.                0x12 -- INQUIRY
-            1 - 00 peripheral dev. type code    0x0, 4, 5, 7, e .. 
-            2 - reserved
-            3 - reserved.
-            4-27   target descriptor parameters.
-                 0 - target descriptor type code: 0x04 - Identification.
-                 :wq
-
-            28-31  dev. type params.
     """
+    inqw=self.inquire()
+    hwlevel=inqw[10] 
     fwi=self.GetSubPageFirmware()
     fwv= str(fwi[0]) + '.' + str(fwi[1]) + '.' + str(fwi[2])
     fwarch = fwi[6].lower()
 
-    print 'looking for firmware for:', fwarch, fwv
+    print 'looking for firmware for:', fwarch, fwv, 'hw version:', hwlevel
     listing_file=urllib2.urlopen( Drobo.fwsite + "index.txt")
     list_of_firmware_string=listing_file.read().strip("\t\r")
     list_of_firmware=list_of_firmware_string.split("|") 
@@ -585,14 +591,14 @@ class Drobo:
       #print key,value
 
       k=key.split('/')
-      if k[2] == "firmware" and len(k) > 4: 
+      if k[1][-1] == hwlevel[0] and k[2] == "firmware" and len(k) > 4: 
         if k[3] == fwarch and k[4] == fwv:
            print 'This Drobo should be running: ', value
-           return (fwarch, fwv, value)
+           return (fwarch, fwv, hwlevel, value)
       i=i+2
  
     print 'no matching firmware found, must be the latest and greatest!'
-    return ( '','','' )
+    return ( '','','','' )
 
   def downloadFirmware( self, fwname ):
     """
@@ -601,8 +607,22 @@ class Drobo:
       STATUS: works.
     """
     print 'downloading firmware ', fwname, '...'
+    fwdata=None
     firmware_url=urllib2.urlopen( Drobo.fwsite + fwname )
-    fwdata = firmware_url.read()
+    if ( fwname[-1] == 'z' ): # data is zipped...
+       filedata= firmware_url.read()
+       localfw = localfwrepository + fwname
+       f = open(localfw,'w+')
+       f.write(self.fwdata)
+       f.close()
+       print 'local copy written'
+       z=zipfile.ZipFile(localfw,'r')
+       for f in z.namelist():
+           print 'firmware for hw rev ', f[-5] , ' this drobo is rev ', hwlevel[0]
+	   if f[-5] == hwlevel[0]:
+              fwdata = z.read(f) 
+    else: # old file...
+       fwdata = firmware_url.read()
     print 'downloading done '
     return fwdata
 
@@ -669,7 +689,7 @@ class Drobo:
       STATUS: working...
 
     """
-    (fwarch, fwversion, fwpath ) = self.PickLatestFirmware()
+    (fwarch, fwversion, hwlevel, fwpath ) = self.PickLatestFirmware()
     if fwarch == '' : # already at latest version...
         return 0
 
@@ -677,7 +697,7 @@ class Drobo:
          os.mkdir(Drobo.localfwrepository)
 
     fwname = fwpath.split('/')
-    localfw = Drobo.localfwrepository + '/' + fwarch + '_' + fwname[-1] 
+    localfw = Drobo.localfwrepository + '/' + fwarch + '_' + hwlevel + '_' + fwname[-1] 
     if not os.path.exists(localfw):
        self.fwdata = self.downloadFirmware(fwpath)
        good = self.validateFirmware()
@@ -707,7 +727,10 @@ class Drobo:
 
 	1_README_*.txt from the resource kit is followed here.
 
-        STATUS: worked once, must be safe now :-)
+        function -- a callback that accepts a single argument, an integer in the range 0-100.
+           indicates % done.  the function is called after each write in the loop.
+
+        STATUS: works.
 
     """ 
 
