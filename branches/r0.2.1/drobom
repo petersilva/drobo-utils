@@ -1,0 +1,140 @@
+#!/usr/bin/python
+
+
+import sys
+import Drobo
+import time
+
+def info(d):
+  print '---------------------------------------------------------'
+  print 'Info about Drobo ' + d.char_dev_file
+  print '---------------------------------------------------------'
+  print
+  
+  config=d.GetSubPageConfig()
+  print 'query config result: '
+  print config
+  print 'max lun size is: ', config[2]
+  print
+  
+  c=d.GetSubPageCapacity()
+  print 'query capacity result:'
+  print c
+  print 'Physical space... used: ',  c[1] , ' free: ' , c[0],  ' Total: ', c[2]
+  print
+  
+  protocol=d.GetSubPageProtocol()
+  print 'query protocol version result: '
+  print protocol 
+  print
+  
+  settings=d.GetSubPageSettings()
+  print 'query settings result:' 
+  print settings
+  print 'Drobo time is', time.ctime(settings[0])
+
+  #print 'drobo says it is now: ', time.ctime(settings[0]), ' GMT offset:', str(settings[1])
+  print
+  
+  slotinfo=d.GetSubPageSlotInfo()
+  print 'query slotinfo result:  number of slots:'
+  print slotinfo[0]
+  print slotinfo[1]
+  print slotinfo[2]
+  print slotinfo[3]
+  print
+  
+  firmware=d.GetSubPageFirmware()
+  print 'query firmware result:' 
+  print firmware
+  print 'drobo says firmware revision: ', str(firmware[0]), '.', str(firmware[1]), '(', str(firmware[2]), ') was built: ', firmware[5]
+  print
+  
+  status=d.GetSubPageStatus()
+  print 'query status result:' 
+  print status
+  print
+  
+  options=d.GetSubPageOptions()
+  print 'query options result:'
+  print options
+  print
+  
+  luninfo=d.GetSubPageLUNs()
+  print 'query luninfo result:'
+  print luninfo
+  print
+
+  print '---------------------------------------------------------'
+
+def update(pct):
+  print "write is %2d%% done." % ( pct )
+
+# Mainline...
+
+
+if len(sys.argv) > 2:
+  try:
+     d =Drobo.Drobo( sys.argv[2] )
+
+  except:
+     print "Second argument is supposed to be a character device file. (e.g. /dev/sdd)"
+     sys.exit()
+
+else:
+  l=Drobo.DiscoverLUNs()
+  if len(l) > 1:
+     print "More than one Drobo connected, please pick one: " + str(l) 
+     sys.exit()
+  elif len(l) < 1:
+     print "No Drobo discovered, is one connected?"
+     sys.exit()
+  else:
+     d = Drobo.Drobo( l[0] )
+
+#assert d is a valid drobo object...
+
+if len(sys.argv) == 1:
+   print "Usage: drobom <command> [ <device> ] \n\ncommand is one of: \n\tblink\tidentify the drobo by making the lights blink\n\tstandby\tshutdown drobo (umount first!)\n\tstatus\thow is the Drobo doing\n\tinfo\tprint all available information on a Drobo\n\nDevice\tis the raw character device of a drobo. If not given, will search.\n"
+   sys.exit()
+
+cmd=sys.argv[1]
+
+if cmd == "blink":
+   d.Blink() 
+   
+elif cmd == "diag":
+   f=d.dumpDiagnostics()
+   print "diagnostics in ", f
+
+elif cmd == 'fwcheck':
+   d.PickLatestFirmware()
+
+elif cmd == 'fwupgrade':
+   if d.updateFirmwareRepository():
+     d.writeFirmware(update)
+
+elif cmd == 'info':
+   info(d)
+
+elif cmd == "standby":
+   d.Standby() 
+   
+elif cmd == "status":
+   c=d.GetSubPageCapacity()
+   if c[2] > 0 :
+      pfull = 100 * ((c[1]+1.0)/c[2])
+      print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
+   else:
+      print "firmware too old to report capacity properly..."
+
+elif cmd == "sync": # sync does not work, only here to ease development...
+  d.Sync()          # may eat small children.
+
+elif cmd == "time":
+  settings=d.GetSubPageSettings()
+  print "Drobo says it is:", time.ctime(settings[0])
+
+else:
+   print "known commands: blink, standby, info, status, diag, fwcheck, fwupgrade"
+   print "Unknown Command: ", cmd
