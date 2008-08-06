@@ -374,29 +374,34 @@ Building a debian package:
 
 Firmware Compatibility:
   If your Drobo has firmware version:
-   1.0.3 - not tried yet. probably ok to upgrade firmware
-           you really want to do that, 
-           does not support ext3, used ntfs for a few months.
+
+   NOTE: really need at least 1.1.1 to use Linux & ext3.
+         just use the tools to upgrade your firmware ASAP.
+
+   1.01  - very old... bad idea to install this, need to write
+           a script to get out, because it isn't in the revision
+           table.
+           not much works except firmware upgrade.
+
+   1.0.2 - works ok in CLI And GUI to view, and upgrade firmware.
+
+   1.0.3 - GUI and CLI work OK, can upgrade firmware.
+           Used ntfs3g for a few months under ubuntu7.10 Linux.
             
-   1.1.0 - forget the GUI, library not compatible enough.
-           drobom 'info' gives an error message.
-           drobom status works ok.
-           can use to upgrade firmware.
+   1.1.0 - dashboard works no issues, but no drobo ext3 support.
+         - from this point, you don't seem to need to unplug the USB
+           connector to complete the upgrade.
 
-         - lots of error messages, best to upgrade ASAP.
-
-         - firmware prior to hear deals badly with ext3.
-         - really need at least 1.1.1 to use Linux.
+         - firmware prior to here deals badly with ext3.
 
    1.1.1 - works without issues.
    1.1.2 - works without issues.
 
 
-Revision date: 2008/07/29
+Revision date: 2008/08/05
 
 copyright:
 
 Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
 Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 named COPYING in the root of the source directory tree.
-Installation:
