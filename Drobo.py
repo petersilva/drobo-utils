@@ -399,17 +399,19 @@ class Drobo:
 
      STATUS: not tested yet. may eat your children
     """
-    now=time.time()
-    now=0
-    buffer=struct.pack( ">BBHLH32s" , 0x3a, 0x05, 0x2a, now, 0 ,"Hi There" )
+    now=int(time.time())
+    #buffer=struct.pack( ">BBHLB32s" , 0x3a, 0x05, 0x29, now, 0 ,"Hi There" )
+    buffer=struct.pack( ">LB32s" , now, 0 ,"Hi There" )
     sblen=len(buffer)
 
     # mode select CDB. 
-    modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0, 0, 0, 0, 0, sblen, 0)
+    #modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0, 0x05, 0, 0, 0, sblen, 0)
+    modepageblock=struct.pack( ">BBBBBBBHB", 
+      0xea, 0x10, 0x00, 0x55, 0x01, self.transactionID, 0, len(buffer), 0x00 )
 
     todev=1
-    print "sblen=", sblen
-    cmdout = DroboDMP.put_sub_page( buffer, modepageblock, DEBUG )
+    print "sblen=%x"  % ( sblen )
+    cmdout = DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
     diags=cmdout
     i=0
 
