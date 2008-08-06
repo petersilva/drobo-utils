@@ -122,11 +122,14 @@ elif cmd == "standby":
    
 elif cmd == "status":
    c=d.GetSubPageCapacity()
-   pfull = 100 * ((c[1]+1.0)/c[2])
-   print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
+   if c[2] > 0 :
+      pfull = 100 * ((c[1]+1.0)/c[2])
+      print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
+   else:
+      print "firmware too old to report capacity properly..."
 
-elif cmd == "sync":
-  d.Sync()
+elif cmd == "sync": # sync does not work, only here to ease development...
+  d.Sync()          # may eat small children.
 
 elif cmd == "time":
   settings=d.GetSubPageSettings()

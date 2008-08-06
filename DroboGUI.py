@@ -117,8 +117,9 @@ class DroboGUI(QtGui.QMainWindow):
         luntooltip="luns, count: " + str(len(luninfo)) + "\n"
         for l in luninfo:
 	   luntooltip = luntooltip + "lun id: " + str(l[0]) + " used: " +  \
-                   toGB(l[2]) + " total: " + toGB(l[1]) + \
-                   " scheme: " + l[3] + " type: " + str(l[4]) + "\n"
+                   toGB(l[2]) + " total: " + toGB(l[1]) 
+           if ( 'SUPPORTS_NEW_LUNINFO2' in self.drobo.features ):
+                   lintooltip = luntooltip + " scheme: " + l[3] + " type: " + str(l[4]) + "\n"
 
         i=0
         while ( i < 4 ):
@@ -127,7 +128,8 @@ class DroboGUI(QtGui.QMainWindow):
 	  i=i+1
 
         c=self.drobo.GetSubPageCapacity()
-        self.Device.fullbar.setValue( c[1]*100/c[2] )
+        if c[2] > 0:
+           self.Device.fullbar.setValue( c[1]*100/c[2] )
         self.Device.fullbar.setToolTip( 
 	    "used: " + toGB(c[1]) + ' free: ' + toGB(c[0]) + ' Total: ' + toGB(c[2]) + ' GB, update# ' + str(self.updates) )
 	#print self.statusmsg
@@ -238,6 +240,26 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.tab.addTab(self.Format, "Format")
   
+    def upgrade(self):
+        if self.drobo.updateFirmwareRepository():
+             self.drobo.writeFirmware( self.Tools.progress.setValue )
+        self.Tools.comment.setText( "Written! Reboot Drobo to activate.")
+
+    def checkup(self):
+        (fwarch, fwversion, hwlevel, fwpath ) = self.drobo.PickLatestFirmware()
+        print "checkup: this Drobo is a %s hw rev: %s, and needs: %s" % ( fwarch, hwlevel, fwversion )
+        if fwpath != '' :
+            self.Tools.Updatebutton.setText( "Upgrade" )
+            self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), 
+                self.upgrade)
+            self.Tools.comment.setText( "Press 'Upgrade' upgrade to %s" % ( fwversion ))
+        else:
+            self.Tools.comment.setText( "No update available!" )
+     
+        
+    def __diags(self):
+        fname = self.drobo.dumpDiagnostics()
+        self.Tools.comment.setText( fname )
 
     def __initToolTab(self):
 
@@ -279,10 +301,12 @@ class DroboGUI(QtGui.QMainWindow):
         Renamebutton.move(x,y)
         
         x=x+w+s
-        Updatebutton = QtGui.QPushButton('Update', self.Tools)
-        Updatebutton.setStyleSheet( "QWidget { color: gray }" )
-        Updatebutton.setCheckable(False)
-        Updatebutton.move(x,y)
+        self.Tools.Updatebutton = QtGui.QPushButton('Update', self.Tools)
+        self.Tools.Updatebutton.move(x,y)
+
+        self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), 
+                self.checkup)
+
 
         x=xo
         y=y+h+s
@@ -297,13 +321,24 @@ class DroboGUI(QtGui.QMainWindow):
         Diagbutton.move(x,y)
 
         self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), 
-                self.drobo.dumpDiagnostics)
+                self.__diags)
 
         # next button...
         x=xo
         y=y+h+s
 
+        self.Tools.progress = QtGui.QProgressBar(self.Tools)
+        self.Tools.progress.setGeometry(x, y, 180, 25)
+        self.Tools.progress.setValue( 0 )
+
+        x=xo
+        y=y+h+s
+
+        self.Tools.comment = QtGui.QLabel("Press 'Update' to look for updates", self.Tools)
+        self.Tools.comment.move(x,y)
+
         self.tab.addTab(self.Tools, "Tools")
+
 
     def __init__(self, d, parent=None):
         QtGui.QMainWindow.__init__(self)
