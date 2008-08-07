@@ -462,8 +462,7 @@ class Drobo:
     buflen=4096
 
     modepageblock=struct.pack( ">BBBBBBBHB", 
-      0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 
-      (0x01 <<5)|0x01, buflen, 0x00 )
+      0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, (0x01 <<5)|0x01, buflen, 0x00 )
 
     todev=0
 
@@ -475,8 +474,7 @@ class Drobo:
     i=0
     while len(cmdout) == buflen:
         modepageblock=struct.pack( ">BBBBBBBHB", 
-            0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 0x01, 
-            buflen, 0x00 )
+            0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 0x01, buflen, 0x00 )
 
         cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
         i=i+1
@@ -517,10 +515,22 @@ class Drobo:
        sets self.fwdata
 
     """
-    f = open(name,'r')
-    self.fwdata = f.read()
+    print 'name = %s, %s' % ( name, name[-1] )
+    if ( name[-1] == 'z' ): # data is zipped...
+       inqw=self.inquire()
+       hwlevel=inqw[10] 
+       z=zipfile.ZipFile(name,'r')
+       for f in z.namelist():
+           print f , ' ? '
+           print 'firmware for hw rev ', f[-5] , ' this drobo is rev ', hwlevel[0]
+	   if f[-5] == hwlevel[0]:
+              self.fwdata = z.read(f) 
+    else: # old file...
+       f = open(name,'r')
+       self.fwdata = f.read()
+       f.close()
+
     good = self.validateFirmware()
-    f.close()
     return good
 
   def inquire(self):
@@ -609,7 +619,7 @@ class Drobo:
       STATUS: works.
     """
     print 'downloading firmware ', fwname, '...'
-    fwdata=None
+    self.fwdata=None
     firmware_url=urllib2.urlopen( Drobo.fwsite + fwname )
     if ( fwname[-1] == 'z' ): # data is zipped...
        filedata= firmware_url.read()
@@ -617,12 +627,9 @@ class Drobo:
        f = open(localfw,'w+')
        f.write(self.fwdata)
        f.close()
+       self.fwdata=None
        print 'local copy written'
-       z=zipfile.ZipFile(localfw,'r')
-       for f in z.namelist():
-           print 'firmware for hw rev ', f[-5] , ' this drobo is rev ', hwlevel[0]
-	   if f[-5] == hwlevel[0]:
-              fwdata = z.read(f) 
+       self.PickFirmware(localfw)
     else: # old file...
        fwdata = firmware_url.read()
     print 'downloading done '
