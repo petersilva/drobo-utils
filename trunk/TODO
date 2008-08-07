@@ -1,12 +1,8 @@
 
+update screenshot on sf.net
+
 PACKAGING:
 	-- tar file?
-
-FIRMWARE UPGRADE:
-   -- where do I get firmware from?
-   -- how to test without bricking my Drobo?
-   -- how do I resuscitate if I brick it?
-
 
 SYNC
    -- mode select ...
@@ -25,7 +21,7 @@ SYNC
       is obviously wrong, so treating it as a single byte.  apparently hard coded in
       firmware as of 1.1.1. (source: drobo/rsharpe)
 
-Remember, everything is in network byte order (well, almost J
+      Remember, everything is in network byte order (well, almost J
 
 MULTIPLE LUN support:
   ON multiple Drobos with a single LUN:
