@@ -400,8 +400,8 @@ class Drobo:
      STATUS: not tested yet. may eat your children
     """
     now=int(time.time())
-    #buffer=struct.pack( ">BBHLB32s" , 0x3a, 0x05, 0x29, now, 0 ,"Hi There" )
-    buffer=struct.pack( ">LB32s" , now, 0 ,"Hi There" )
+    #buffer=struct.pack( ">BBHLH32s" , 0x3a, 0x05, 0x29, now, 0 ,"Hi There" )
+    buffer=struct.pack( ">BBHLH32s" , 122, 0x05, 38, now, 0 ,"Hi There" )
     sblen=len(buffer)
 
     # mode select CDB. 
@@ -899,8 +899,9 @@ class Drobo:
 
         STATUS: works, no issues.
      """
-     ( utc, offset, name ) = self.__getsubpage(0x05, 'LB32s' )
+     ( utc, offset, name ) = self.__getsubpage(0x05, 'LH32s' )
      name=name.strip(" \0")
+     offset=8 # offset is screwed up returned by Drobo, just set it to what they claim it should be.
      return ( utc, offset, name )
 
   def GetSubPageProtocol(self):
