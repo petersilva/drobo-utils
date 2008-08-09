@@ -49,7 +49,7 @@
 static int drobo_fd = -1;
 static int debug = 0;
 
-signed int put_mode_page(int sg_fd, void *page_struct, int size, 
+signed int put_mode_page(int sg_fd, void *data, int size, 
     void*mcb, int mcblen, int out, long debug)
 /* return the number of bytes placed in the sense buffer */
 {
@@ -69,6 +69,14 @@ signed int put_mode_page(int sg_fd, void *page_struct, int size,
          fprintf(stderr, " 0x%02x", c );
       };
       fprintf(stderr,"\nCDB DUMP COMPLETE\n");
+
+      fprintf( stderr, "\nDATA DUMP START:" );
+      for (i=0; i < size; i++) {
+         if ((i%8)==0) fprintf(stderr, "\nDATA[%3d] ", i );
+         c= *((char*)(data+i));
+         fprintf(stderr, " 0x%02x", c );
+      };
+      fprintf(stderr,"\nDATA DUMP COMPLETE\n");
     };
 
     io_hdr.interface_id = 'S';
@@ -76,7 +84,7 @@ signed int put_mode_page(int sg_fd, void *page_struct, int size,
     io_hdr.cmd_len = mcblen;
     io_hdr.mx_sb_len = sizeof(sense_buffer);
     io_hdr.dxfer_len = size;
-    io_hdr.dxferp = page_struct;
+    io_hdr.dxferp = data;
     io_hdr.cmdp = mcb;
     io_hdr.sbp = sense_buffer;
     io_hdr.timeout = 20000;     /* 20000 millisecs == 20 seconds */
