@@ -397,17 +397,20 @@ class Drobo:
   def Sync(self):
     """  Set the Drobo's current time to the host's time.
 
-     STATUS: not tested yet. may eat your children
+     STATUS: works, maybe...
+        DRI claims Drobos are all in California time.  afaict, it ignores TZ completely.
+        I feed it UTC, and when I read the time, normal routines convert to local time.
+        so it looks perfect.  but diagnostics might not agree.
     """
     now=int(time.time())
-    #buffer=struct.pack( ">BBHLH32s" , 0x3a, 0x05, 0x29, now, 0 ,"Hi There" )
-    buffer=struct.pack( ">BBHLH32s" , 122, 0x05, 38, now, 0 ,"Hi There" )
+    payload="LH32s"
+    payloadlen=struct.calcsize(payload)
+   
+    buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, 38, now, 0 ,"Hi There" )
     sblen=len(buffer)
 
     # mode select CDB. 
-    #modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0, 0x05, 0, 0, 0, sblen, 0)
-    modepageblock=struct.pack( ">BBBBBBBHB", 
-      0xea, 0x10, 0x00, 0x55, 0x01, self.transactionID, 0, len(buffer), 0x00 )
+    modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, 0x05, 0, 0, 0, sblen, 0)
 
     todev=1
     print "sblen=%x"  % ( sblen )
@@ -553,8 +556,7 @@ class Drobo:
             28-31  dev. type params.
 
     """
-    pack = 'BBBBBBBB8s16s4s20sBB8HH'
-    mypack = '>' + pack
+    mypack = '>BBBBBBBB8s16s4s20sBB8HH'
     paklen=struct.calcsize(mypack)
 
     modepageblock=struct.pack( "BBBBBB", 0x12 , 0, 0, 0, paklen, 0 )
@@ -897,7 +899,17 @@ class Drobo:
      """
         returns: ( currentUTCtime, UTCoffset, DroboName )
 
-        STATUS: works, no issues.
+        STATUS: works with... 
+        ERRATA:
+		-- dpd.h and other sources say offset is two bytes.
+                -- DMP Spec says it is only one byte.
+		-- other sources say it is always set to 'California Time'... 8.
+		-- California time is UTC - 8... +8 would be China.
+		-- structures returned are supposed to be in network byte order (MSB)
+                   when two byte value read in network byte order, result is 2048.
+                   they stuff it in LSB order, so the 8 ended up in the higher order byte.
+		-- so I just claim it says 8 and shut up.
+
      """
      ( utc, offset, name ) = self.__getsubpage(0x05, 'LH32s' )
      name=name.strip(" \0")
