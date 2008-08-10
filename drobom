@@ -113,6 +113,7 @@ elif cmd == 'fwcheck':
 elif cmd == 'fwupgrade':
    if d.updateFirmwareRepository():
      d.writeFirmware(update)
+     d.Sync()
 
 elif cmd == 'info':
    info(d)
@@ -128,13 +129,14 @@ elif cmd == "status":
    else:
       print "firmware too old to report capacity properly..."
 
-elif cmd == "sync": # sync does not work, only here to ease development...
-  d.Sync()          # may eat small children.
+elif cmd == "settime": 
+  d.Sync()          
 
 elif cmd == "time":
   settings=d.GetSubPageSettings()
   print "Drobo says it is:", time.ctime(settings[0])
 
 else:
-   print "known commands: blink, standby, info, status, diag, fwcheck, fwupgrade"
-   print "Unknown Command: ", cmd
+   print "known commands: blink, diag, fwcheck, fwupgrade, help, info, standby, status, settime"
+   if cmd != "help":
+     print "Unknown Command: ", cmd

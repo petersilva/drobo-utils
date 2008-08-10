@@ -246,6 +246,7 @@ class DroboGUI(QtGui.QMainWindow):
         self.Tools.comment.setText( "Written! Reboot Drobo to activate.")
 
     def checkup(self):
+        self.drobo.Sync() # convenient side effect:  make the host and drobo clocks agree...
         (fwarch, fwversion, hwlevel, fwpath ) = self.drobo.PickLatestFirmware()
         print "checkup: this Drobo is a %s hw rev: %s, and needs: %s" % ( fwarch, hwlevel, fwversion )
         if fwpath != '' :
@@ -258,6 +259,7 @@ class DroboGUI(QtGui.QMainWindow):
      
         
     def __diags(self):
+        self.drobo.Sync() # convenient side effect  make the host and drobo clocks agree...
         fname = self.drobo.dumpDiagnostics()
         self.Tools.comment.setText( fname )
 
