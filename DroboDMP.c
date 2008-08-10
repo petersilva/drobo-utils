@@ -53,7 +53,7 @@ signed int put_mode_page(int sg_fd, void *data, int size,
     void*mcb, int mcblen, int out, long debug)
 /* return the number of bytes placed in the sense buffer */
 {
-    unsigned char sense_buffer[32];
+    unsigned char sense_buffer[128];
     sg_io_hdr_t io_hdr;
     int i;
     unsigned char c;
@@ -64,7 +64,7 @@ signed int put_mode_page(int sg_fd, void *data, int size,
     if (debug) {
       fprintf( stderr, "\nCDB DUMP START:" );
       for (i=0; i < mcblen; i++) {
-         if ((i%8)==0) fprintf(stderr, "\nCDB[%3d] ", i );
+         if ((i%8)==0) fprintf(stderr, "\nCDB[%03x] ", i );
          c= *((char*)(mcb+i));
          fprintf(stderr, " 0x%02x", c );
       };
@@ -72,7 +72,7 @@ signed int put_mode_page(int sg_fd, void *data, int size,
 
       fprintf( stderr, "\nDATA DUMP START:" );
       for (i=0; i < size; i++) {
-         if ((i%8)==0) fprintf(stderr, "\nDATA[%3d] ", i );
+         if ((i%8)==0) fprintf(stderr, "\nDATA[%03x] ", i );
          c= *((char*)(data+i));
          fprintf(stderr, " 0x%02x", c );
       };
@@ -102,7 +102,7 @@ signed int put_mode_page(int sg_fd, void *data, int size,
     }
 
     if (debug) fprintf(stderr, 
-        "\nwrite... ioctl returned: %d, size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
+        "\nwrite... ioctl returned: %x, size=%x, io_hdr: status=%x, sb_len_wr=%x, resid=%x, \n", 
           i, size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
 
     /* SG_INFO_DIRECT_IO       0x2     -- direct IO requested and performed */
@@ -114,7 +114,7 @@ signed int put_mode_page(int sg_fd, void *data, int size,
         size -= io_hdr.resid   ;
       }
     }
-    if (debug) fprintf(stderr,"\nput_mode_page ... wrote=%d\n", size );
+    if (debug) fprintf(stderr,"\nput_mode_page ... wrote=%x\n", size );
     return(size);
 }
 
@@ -133,7 +133,7 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
     if (debug) {
       fprintf( stderr, "\nCDB DUMP START:" );
       for (i=0; i < mcblen; i++) {
-         if ((i%8)==0) fprintf(stderr, "\nCDB[%3d] ", i );
+         if ((i%8)==0) fprintf(stderr, "\nCDB[%03x] ", i );
          c= *((char*)(mcb+i));
          fprintf(stderr, " 0x%02x", c );
       };
@@ -164,12 +164,12 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
     }
 
     if (debug) fprintf(stderr, 
-        "\nread.. size=%d, io_hdr: status=%d, sb_len_wr=%d, resid=%d, \n", 
+        "\nread.. size=%x, io_hdr: status=%x, sb_len_wr=%x, resid=%x, \n", 
           size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
 
     /* SG_INFO_DIRECT_IO       0x2     -- direct IO requested and performed */
     if ((io_hdr.status != 0) && (io_hdr.status != 2)) {
-       fprintf( stderr, "oh no! io_hdr status is: %d\n",  io_hdr.status );
+       fprintf( stderr, "oh no! io_hdr status is: %x\n",  io_hdr.status );
        return(-1);
     } else {
       if (io_hdr.resid > 0) {
