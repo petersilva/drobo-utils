@@ -1,0 +1,36 @@
+
+Hi Data Robotics!
+
+Here are a bunch of wishes people have for firmware improvements.
+
+relay out progress report:
+        when there is a status "relay out in progress" would be very helpful to get a "% complete" number reportable somehow.  Dashboard or other tools can figure out when it will be complete.  Alternatively, drobo could do all the work, and just report relay out start and predicted end times.
+--psilva
+
+
+cpu utilisation report:
+	Drobo often gets slow/busy. It would be nice to have a means of reporting how busy it is.
+--psilva
+
+
+"hardware" encryption:
+	a scsi command that accepts a key from the host, used to encrypt/decrypt on the fly
+   transparently to the host OS.  --psilva
+
+
+"Release disk" command:
+        Sometimes, one wants to remove a disk from drobo, even though it is working fine, for use
+elsewhere.  Currently, the way to do that is to remove the disk, and then there is an interval when there is no redundancy, until the relay out process is complete.   It would be useful to be able to ask the Drobo to perform the disk relay out process while the disk is still present, so window of lack of redundancy is 0.
+        A scsi command to ask Drobo to start the relayout to free up a specified disk for removal.
+At the end of the process, the disk freed should be powered down, and a flashing green LED should
+indicate that it is ready for removal.  --psilva
+
+
+"allocate/deallocate" block:
+        a scsi command to allow for host based instructions about which blocks contain real data and which are free (for which relay out processing is not needed.)  - Jkrahn
+
+
+"SCSI compliance":
+Even a cheap USB-key storage has proper SCSI support. Some of the existing mode-page data should be moved to SCSI VPD pages, and the diagnostic logs should be transferred by the log-transfer mechanism built in to the SCSI protocol. -- jkrahn
+
+
