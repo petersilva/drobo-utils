@@ -1,27 +1,7 @@
 
-update screenshot on sf.net
+in no particular order:
 
-PACKAGING:
-	-- tar file?
-
-SYNC
-   -- mode select ...
-      It is a ModeSelect using the SystemInfo page.
-
-      Send the following:
-
-      Standard 4-byte subpage header, followed by:
-
-            uint32  currentTime; ///< Current time (in # of seconds since Jan 1, 1970)
-
-            int16   GMTOffset;   ///< GMT offset
-            char    name[32];  /// -unused, but best to set ...
-
-      the systemInfo read page is hard coded to return 2048 as the time zone, which
-      is obviously wrong, so treating it as a single byte.  apparently hard coded in
-      firmware as of 1.1.1. (source: drobo/rsharpe)
-
-      Remember, everything is in network byte order (well, almost J
+STANDARD menu entries for droboview...
 
 MULTIPLE LUN support:
   ON multiple Drobos with a single LUN:
@@ -36,8 +16,6 @@ MULTIPLE LUN support:
 
         cannot test this configuration.  anyone want to send me a couple
         of terabytes?
-
-
 
 
 FORMAT
@@ -76,7 +54,10 @@ Re-design the whole darn thing.
    -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
 
 
-Revision date: 2008/04/12
+use ctypes to replace the C stub...
+
+
+Revision date: 2008/08/10
 
 copyright:
 

@@ -5,6 +5,22 @@ import sys
 import Drobo
 import time
 
+def usage():
+   print "\nUsage: drobom <command> [ <device> ] \n"
+   print "command is one of: "
+   print "\tblink\tidentify the drobo by making the lights blink"
+   print "\tdiag\tdump diagnostics file into /tmp directory"
+   print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
+   print "\tfwupgrade\tupgrade the firmware to the latest and greatest, recommended by DRI"
+   print "\thelp\tprint this text"
+   print "\tinfo\tprint all available information on a Drobo"
+   print "\tstandby\tshutdown drobo (umount first!)"
+   print "\tstatus\treport how is the Drobo doing"
+   print "\tsettime\tsync Drobo's clock to UTC"
+   print "\nDevice\tis the raw character device of a drobo. If not given, will search."
+
+
+
 def info(d):
   print '---------------------------------------------------------'
   print 'Info about Drobo ' + d.char_dev_file
@@ -95,7 +111,7 @@ else:
 #assert d is a valid drobo object...
 
 if len(sys.argv) == 1:
-   print "Usage: drobom <command> [ <device> ] \n\ncommand is one of: \n\tblink\tidentify the drobo by making the lights blink\n\tstandby\tshutdown drobo (umount first!)\n\tstatus\thow is the Drobo doing\n\tinfo\tprint all available information on a Drobo\n\nDevice\tis the raw character device of a drobo. If not given, will search.\n"
+   usage()
    sys.exit()
 
 cmd=sys.argv[1]
@@ -137,6 +153,7 @@ elif cmd == "time":
   print "Drobo says it is:", time.ctime(settings[0])
 
 else:
-   print "known commands: blink, diag, fwcheck, fwupgrade, help, info, standby, status, settime"
+   usage()
    if cmd != "help":
+     usage()
      print "Unknown Command: ", cmd

@@ -1,0 +1,18 @@
+
+  -- added ability to set time on Drobo.
+
+0.2.2 Released August 2008
+  -- firmware uploads work with .tdz as well
+  -- tested with older firmwares, contains a few fixes to improve compatibility.
+     works well enought upgrade old firmwares.
+
+0.2.1 Released July 2008
+      uploaded to drobospace & sourceforge.
+  -- firmware upload works for .tdf's 
+     
+0.1.1 Initial version uploaded  april 2008
+       to drobospace.com and sf.net
+  -- confirmed to work with firmware 1.1.1
+  -- shows status, disk slots filled, model, etc..
+  -- shows fw version loaded.
+  -- blink & standby commands work.
