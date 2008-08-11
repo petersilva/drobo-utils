@@ -1,3 +1,0 @@
-python:Versions=2.5
-python:Depends=python-central (>= 0.6.1), python2.5, python (>= 2.5), python (<< 2.6)
-shlibs:Depends=libc6 (>= 2.4)
