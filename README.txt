@@ -85,6 +85,12 @@ some of the package names will change.  A typical difference is that packages fo
 have the -devel suffix on Redhat derived distributions, instead of the -dev favoured
 by debian derived ones.
 
+here is an exmple from fedora 7 (courtesy of help4death on the google group):
+% yum install PyQt4
+% yum install python-devel
+% yum install libsgutils.so.1
+% yum install sg3_utils-devel 
+
 
 INSTALL:
 Assuming you have all of the above parts, you should be able to just do:
@@ -157,7 +163,11 @@ No Drobo discovered, is one connected?
 
 Try to start up drobom from the root account. (sudo drobom..., or 
 sudo bash, or su - ) To get all kinds of information on your drobo, 
-try './drobom info' Once that is working, and assuming you have python-qt4 
+try './drobom info.'  You can then invoke it with no arguments at all 
+which will cause it to print out a list of the commands available 
+through the command line interface.
+
+Once the command line stuff that is working, and assuming you have python-qt4 
 installed, try:
 
 	./droboview
@@ -262,10 +272,15 @@ root@alu:~# mount /dev/sdd1 /mnt
 
 -------------------
 
-NOTE:
+NOTES:
 
 drobo-utils is completely untested with multiple LUNS.  Best to make LUN
-large enough to span all your space.
+large enough to span all your space.  starting up droboview will probably 
+spawn a GUI for each LUN, so you may end up seeing double...
+
+Probably not a good idea to run two GUI's for a single drobo.  the GUI
+polls continuously for changes to the device, and that might interfere
+if you try to, say, upgrade the firmware, with the other GUI.
 
 ON LUNSIZES >= 2TB:
  -- On older distributions, there are a couple of gotchas related to 
@@ -277,6 +292,9 @@ ON LUNSIZES >= 2TB:
            (bug #524948 reported to bugzilla.gnome.org) It's just the GUI, 
            as libparted is fine, and other tools based on it
            still work. 
+  -- on linux kernel < 2.6.24 supposedly, the USB layer won't let one address 
+     LUNs/offsets > 2 TB.  For example, Ubuntu hardy (8.04) released in Spring 
+     2008 has a 2.6.24, and so is OK.  I've never been able to test this problem. 
 
 
 Firmware manipulation:
@@ -358,7 +376,6 @@ Caveats:
    best to restart it daily, or use it when necessary, but not leave it
    on for days.
 
-   firmware upgrade works in line mode only for now.
 
 
 
@@ -371,6 +388,9 @@ Building a debian package:
    cd ..
    su
    dpkg -i droboutils_0.1.1-1_i386.deb
+
+   (Doesn't work on amd64... no clue why... help welcome...)
+
 
 Firmware Compatibility:
   If your Drobo has firmware version:
@@ -386,19 +406,21 @@ Firmware Compatibility:
    1.0.2 - works ok in CLI And GUI to view, and upgrade firmware.
 
    1.0.3 - GUI and CLI work OK, can upgrade firmware.
-           Used ntfs3g for a few months under ubuntu7.10 Linux.
+           Used ntfs3g for a few months under ubuntu 7.10 Linux.
+           Used 2 TB LUN, with 1.5 TB of physical space available.
             
-   1.1.0 - dashboard works no issues, but no drobo ext3 support.
+   1.1.0 - dashboard works no issues.
          - from this point, you don't seem to need to unplug the USB
            connector to complete the upgrade.
 
          - firmware prior to here deals badly with ext3.
 
    1.1.1 - works without issues.
+
    1.1.2 - works without issues.
 
 
-Revision date: 2008/08/05
+Revision date: 2008/08/10
 
 copyright:
 

@@ -411,12 +411,7 @@ class Drobo:
 
     # mode select CDB. 
     modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, 0x05, 0, 0, 0, sblen, 0)
-
-    todev=1
-    print "sblen=%x"  % ( sblen )
-    cmdout = DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
-    diags=cmdout
-    i=0
+    DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
 
   def Blink(self):
     """ asks the Drobo nicely to blink it's lights. aka. Identification 
