@@ -86,6 +86,9 @@ have the -devel suffix on Redhat derived distributions, instead of the -dev favo
 by debian derived ones.
 
 here is an exmple from fedora 7 (courtesy of help4death on the google group):
+
+% yum install python
+% yum install sg3_utils
 % yum install PyQt4
 % yum install python-devel
 % yum install libsgutils.so.1
