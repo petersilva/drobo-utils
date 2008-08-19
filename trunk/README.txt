@@ -298,6 +298,10 @@ ON LUNSIZES >= 2TB:
   -- on linux kernel < 2.6.24 supposedly, the USB layer won't let one address 
      LUNs/offsets > 2 TB.  For example, Ubuntu hardy (8.04) released in Spring 
      2008 has a 2.6.24, and so is OK.  I've never been able to test this problem. 
+  -- ext3 with 4K blocks is supposed to allow file system capacity of 8 TiB.
+     4K blocks seem to be assigned by default. So I think a good max. 
+     It would be fun to set the LunSIZE to 8 TiB and test it out...
+
 
 
 Firmware manipulation:
