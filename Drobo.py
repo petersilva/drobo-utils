@@ -405,13 +405,29 @@ class Drobo:
     now=int(time.time())
     payload="LH32s"
     payloadlen=struct.calcsize(payload)
-   
-    buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, 38, now, 0 ,"Hi There" )
+    buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, payloadlen, now, 0 ,"Hi There" )
     sblen=len(buffer)
 
     # mode select CDB. 
     modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, 0x05, 0, 0, 0, sblen, 0)
     DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
+
+
+  def SetLunSize(self,tb):
+    """
+       SetLunSize - to 'tb' terabytes
+    """
+    buffer=struct.pack( ">L", tb )
+    sblen=len(buffer)
+
+    # mode select CDB. 
+    modepageblock=struct.pack( ">BBBBBBBHB", 
+      0xea, 0x10, 0x80, 0x0f, 0, self.transactionID, (0x01 <<5)|0x01, sblen, 0x00 )
+
+    DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
+    self.__transactionNext()
+
+
 
   def Blink(self):
     """ asks the Drobo nicely to blink it's lights. aka. Identification 
