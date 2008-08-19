@@ -6,7 +6,7 @@ import Drobo
 import time
 
 def usage():
-   print "\nUsage: drobom <command> [ <device> ] \n"
+   print "\nUsage: drobom <command> [ <device> ] [ arguments... ] \n"
    print "command is one of: "
    print "\tblink\tidentify the drobo by making the lights blink"
    print "\tdiag\tdump diagnostics file into /tmp directory"
@@ -14,9 +14,14 @@ def usage():
    print "\tfwupgrade\tupgrade the firmware to the latest and greatest, recommended by DRI"
    print "\thelp\tprint this text"
    print "\tinfo\tprint all available information on a Drobo"
+   print "\tsettime\tsync Drobo's clock to UTC"
+   print "\tsetlunsize\tSet the size of LUNS on device. Arguments:"
+   print "\t\t<device>\tto set the lunsize on"
+   print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
+   print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you really mean it"
+   print "\t\tNote: After execution, Drobo reboots, wait a few minutes before accessing again"
    print "\tstandby\tshutdown drobo (umount first!)"
    print "\tstatus\treport how is the Drobo doing"
-   print "\tsettime\tsync Drobo's clock to UTC"
    print "\nDevice\tis the raw character device of a drobo. If not given, will search."
 
 
@@ -91,7 +96,7 @@ def update(pct):
 
 if len(sys.argv) > 2:
   try:
-     d =Drobo.Drobo( sys.argv[2] )
+     d=Drobo.Drobo( sys.argv[2] )
 
   except:
      print "Second argument is supposed to be a character device file. (e.g. /dev/sdd)"
@@ -134,6 +139,24 @@ elif cmd == 'fwupgrade':
 elif cmd == 'info':
    info(d)
 
+elif cmd == "setlunsize": 
+   print sys.argv[3], sys.argv[4]
+   lunsize=int(sys.argv[3])
+
+   if lunsize > 16 or lunsize < 1:
+        print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
+        sys.exit()
+
+   if sys.argv[4] == 'PleaseEraseMyData':
+        print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
+        d.setlunsize(lunsize)
+        print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
+   else:
+        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+
+elif cmd == "settime": 
+  d.Sync()          
+
 elif cmd == "standby":
    d.Standby() 
    
@@ -144,9 +167,6 @@ elif cmd == "status":
       print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
    else:
       print "firmware too old to report capacity properly..."
-
-elif cmd == "settime": 
-  d.Sync()          
 
 elif cmd == "time":
   settings=d.GetSubPageSettings()
