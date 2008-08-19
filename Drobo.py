@@ -179,8 +179,10 @@ def partformat(n):
        f.append( 'NO FORMAT' )
     if ( n & 0x04 ):
        f.append( 'HFS' )
-    if ( n & 0x80 ):
+    if ( n & 0x80 ): # on Peter's...
        f.append( 'EXT3' )
+    #if ( n & 0x08 ): # on Matthew Mastracci's
+    #   f.append( 'EXT3' )
     if ( n & 0xFF ) == 0:
        f.append( 'FAT32' )
 
@@ -281,7 +283,8 @@ class Drobo:
 
      self.features = []    
      self.transactionID=1
-     
+     self.relaystart=0
+ 
   def __del__(self):
      if DEBUG >0:
         print '__del__ '
@@ -428,7 +431,6 @@ class Drobo:
 
     DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
     self.__transactionNext()
-
 
 
   def Blink(self):
