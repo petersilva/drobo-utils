@@ -415,7 +415,9 @@ class Drobo:
 
   def SetLunSize(self,tb):
     """
-       SetLunSize - to 'tb' terabytes
+       SetLunSize - Sets the maximum LUN size to 'tb' terabytes
+
+       status:  worked once :-)
     """
     buffer=struct.pack( ">L", tb )
     sblen=len(buffer)
@@ -858,7 +860,12 @@ class Drobo:
       N.B. must run getSubPageFirmware before the first time you
          calling this routine, or it will fail by returning the empty set.
 
+
       STATUS: works, with ERRATA:
+
+         report from matthew mastracci that this doesn't work for him... should be +6,
+         and the value for ext3 should be 0.0x8, and not 0x80...
+         haven't understood it yet...
 
       question: is it correct to mix 'used capacity' from luninfo, with 
       total capacity from luninfo2?
@@ -966,7 +973,9 @@ class Drobo:
      """
      return unitstatus
 
-     STATUS: works a bit, Errata
+     STATUS: works a bit, 
+        relayoutcount stuff completely untested...
+      Errata: 
       spec says a single byte.
       dmp.h says two longs:  (Status, RelayOutCount)
       Drobo always returns 0 for second Long.
@@ -976,6 +985,23 @@ class Drobo:
 
      ss=self.__getsubpage(0x09, 'LL' )
      s=unitstatus(ss[0])
+
+     if ss[1] > 0 : # relay out in progress
+        if self.relaystart == 0:
+           self.relaystart=time.time()
+           self.relayinitialcount=ss[1]
+        else: 
+           now=time.time()
+           runningtime=now - self.relaystart
+           pctdone= ((self.relayinitialcount - ss[1])*1.0)/self.relayinitialcount
+           pctleft= 1 - pctdone
+           rate= pctdone / runningtime # pct/second...
+           timeleft = pctleft*rate*60  # timeleft in minutes...
+           s.append( '%d m. left' % timeleft )
+     else:
+        if self.relaystart > 0:
+           self.relaystart == 0
+
      return s
 
   def GetSubPageOptions(self): 

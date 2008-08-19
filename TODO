@@ -1,6 +1,13 @@
 
 in no particular order:
 
+Testing standard....
+	-- format with 1TB LUNS.
+	-- build FS.
+	-- install oldest fw.
+	-- format FAT32.
+	-- roll forward from there.
+
 STANDARD menu entries for droboview...
 
 MULTIPLE LUN support:
@@ -23,9 +30,7 @@ FORMAT
         -- labels for max lun size slider... which is strange... shouldn't that
            be in the format thing? seems kind a dangerous to do without formatting.
         -- slider not updated from drobo, so number is always 2.
-   -- awaiting hints from drobo.com about how to 'do' stuff...
-		format, set lun size.
-      maybe it's already there... dunno...
+   -- 
 
 Better STATUS progress reporting:
    -- some sort of indicator of how long 'relay out' will be in progress.

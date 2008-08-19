@@ -48,6 +48,8 @@ class DroboAbout(QtGui.QWidget):
 
   Copyright 2008 Peter Silva
   ( Peter.A.Silva@gmail.com )
+
+  license: General Public License (GPL) v3
         """ , self)
         self.setMinimumSize(240, 240)
         self.quit = QtGui.QPushButton('Quit',self)
