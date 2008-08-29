@@ -279,7 +279,7 @@ class DroboGUI(QtGui.QMainWindow):
         #
         # Set the tool colors to grey, to indicate non-functional...
         #
-        Standbybutton = QtGui.QPushButton('Standby', self.Tools)
+        Standbybutton = QtGui.QPushButton('Shutdown', self.Tools)
         Standbybutton.setCheckable(False)
         Standbybutton.move(x,y)
 
