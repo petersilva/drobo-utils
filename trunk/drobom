@@ -143,6 +143,9 @@ elif cmd == "setlunsize":
    print sys.argv[3], sys.argv[4]
    lunsize=int(sys.argv[3])
 
+   print 'broken for now, I refuse to work'
+   sys.exit()
+
    if lunsize > 16 or lunsize < 1:
         print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
         sys.exit()

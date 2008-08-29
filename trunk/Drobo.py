@@ -420,7 +420,7 @@ class Drobo:
     """
        SetLunSize - Sets the maximum LUN size to 'tb' terabytes
 
-       status:  worked once :-)
+       status:  Broken!  always sets LUNSIZE to 16TB
     """
     buffer=struct.pack( ">L", tb )
     sblen=len(buffer)
