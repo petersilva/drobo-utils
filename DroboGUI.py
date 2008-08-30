@@ -18,6 +18,19 @@ def toGB(num):
   g = num*1.0/(1000*1000*1000)
   return "%6.1f" % g
 
+def toTiB(num):
+  """
+  convert input number to computerish Terabytes.... (ok... TibiBytes blech...)
+
+  STATUS: works bizarrely...
+  bug in python 2.5? - a number which is 2 TB -1, + any number < 5000 ends up smaller than 2TiB.  so I just add 5000 to get the correct answer. did a manual binary search, and even 4096 doesn't work...
+  """
+  num=num+5000
+  #print num, num/1024, num/(1024*1024), num/(1024*1024*1024)
+  g = (num)/(1024*1024*1024*1024)
+  return int(g)
+ 
+
 def setDiskLabel(model,capacity): 
     if (capacity == ''):
       label = model
@@ -129,10 +142,15 @@ class DroboGUI(QtGui.QMainWindow):
           self.Device.slot[i][0].setToolTip(luntooltip)
 	  i=i+1
 
+        c=self.drobo.GetSubPageConfig()
+        self.Format.lunsize =  toTiB(c[2])
+        self.Format.lunszlcd.display(self.Format.lunsize)
+        self.Format.horizontalSlider.setValue( self.Format.lunsize )
+
         c=self.drobo.GetSubPageCapacity()
         if c[2] > 0:
            self.Device.fullbar.setValue( c[1]*100/c[2] )
-        self.Device.fullbar.setToolTip( 
+           self.Device.fullbar.setToolTip( 
 	    "used: " + toGB(c[1]) + ' free: ' + toGB(c[0]) + ' Total: ' + toGB(c[2]) + ' GB, update# ' + str(self.updates) )
 	#print self.statusmsg
         #self.__StatusBar_space()
@@ -186,63 +204,124 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.tab.addTab(self.Device, "Device")
 
+    def ReallyFormatLUN(self):
+
+       print 'Really formating...'
+       self.Format.disconnect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+                self.ReallyFormatLUN)
+       if self.Format.fstype == 'none': # changing LUN size
+            #self.Format.lunsize
+            self.Format.Formatbutton.setText('LUN RESIZE, watch it reboot, WAIT!')
+       else:
+            self.Format.Formatbutton.setText('Format in progress, WAIT!')
+            self.drobo.format('gpt',self.Format.fstype)
+
+       # reset to initial state...
+       self.Format.ext3.setChecked(0)
+       self.Format.ntfs.setChecked(0)
+       self.Format.msdos.setChecked(0)
+       self.Format.Formatbutton.setText('Format (Erases All Data!) disabled')
+       self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+                self.FormatLUN)
+
+    def FormatLUN(self):
+       print 'Clicked format...'
+       if self.Format.ntfs.isChecked():
+            fstype='ntfs'
+       elif self.Format.msdos.isChecked():
+            fstype='FAT32'
+       elif self.Format.ext3.isChecked():
+            fstype='ext3'
+       else:
+            fstype='none'
+       self.Format.Formatbutton.setText( "Last Chance, Format %s ?" % fstype)
+       self.Format.fstype=fstype
+       self.Format.disconnect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+                self.FormatLUN)
+       self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+                self.ReallyFormatLUN)
 
 
     def __initFormatTab(self):
 
 	self.Format = QtGui.QWidget()
         self.Format.setObjectName("Format")
-        self.Format.setStyleSheet( "QWidget { color: gray }" )
         xo=20
         w=160
         h=16
         s=10
 
         x=10
-        y=30
+        y=20
         self.Format.header = QtGui.QLabel("WARNING: Format erases whole Drobo", self.Format)
         self.Format.header.setStyleSheet( "QWidget { color: red }" )
         self.Format.header.move(x,y)
 
         x=xo
         y=y+h+s
-        self.Format.lunsztitle = QtGui.QLabel("Maximum LUN size on Drobo", self.Format)
+        self.Format.lunsztitle = QtGui.QLabel("Maximum LUN size:", self.Format)
         self.Format.lunsztitle.move(x,y)
 
+        self.Format.lunszlcd = QtGui.QLCDNumber(2, self.Format)
+
+        x=x+120
+        self.Format.lunszlcd.move(x,y)
+
+ 
+        x=xo
         y=y+h+s
+
         self.Format.horizontalSlider = QtGui.QSlider(self.Format)
         self.Format.horizontalSlider.setGeometry(QtCore.QRect(x,y,w,h))
         self.Format.horizontalSlider.setMaximum(16)
+        self.Format.horizontalSlider.setMinimum(1)
         self.Format.horizontalSlider.setSingleStep(2)
         self.Format.horizontalSlider.setPageStep(9)
-        self.Format.horizontalSlider.setProperty("value",QtCore.QVariant(2))
         self.Format.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.Format.horizontalSlider.setTickPosition(QtGui.QSlider.TicksBelow)
-        self.Format.horizontalSlider.setTickInterval(2)
+        self.Format.horizontalSlider.setTickInterval(1)
         self.Format.horizontalSlider.setObjectName("horizontalSlider")
+
+        self.Format.horizontalSlider.setProperty("value",QtCore.QVariant(2))
+        c=self.drobo.GetSubPageConfig()
+        self.Format.lunsize =  toTiB(c[2])
+        self.Format.lunszlcd.display( self.Format.lunsize )
+        self.Format.horizontalSlider.setValue( self.Format.lunsize )
+        self.Format.connect(self.Format.horizontalSlider, QtCore.SIGNAL('valueChanged(int)'),
+                self.Format.lunszlcd.display)
 
         y=y+h+s
         self.Format.ext3 = QtGui.QRadioButton("Ext3 ", self.Format)
+        self.Format.ext3.setStyleSheet( "QWidget { color: gray }" )
         self.Format.ext3.move(x,y)
 
         y=y+h+s
         self.Format.msdos = QtGui.QRadioButton("FAT32 (MS-DOS)", self.Format)
+        self.Format.msdos.setStyleSheet( "QWidget { color: gray }" )
         self.Format.msdos.move(x,y)
 
         y=y+h+s
         self.Format.ntfs = QtGui.QRadioButton("NTFS", self.Format)
+        self.Format.ntfs.setStyleSheet( "QWidget { color: gray }" )
         self.Format.ntfs.move(x,y)
 
         y=y+h+s
 
-        x=x+20
-        Formatbutton = QtGui.QPushButton('Format', self.Format)
-        Formatbutton.setCheckable(False)
-        Formatbutton.move(x,y)
+        self.Format.Formatbutton = QtGui.QPushButton('Format (Erases All Data!) disabled', self.Format)
+        self.Format.Formatbutton.setStyleSheet( "QWidget { color: gray }" )
+        self.Format.Formatbutton.move(x,y)
 
         self.tab.addTab(self.Format, "Format")
+
+        self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+                self.FormatLUN)
+
+
   
     def upgrade(self):
+        self.disconnect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.upgrade)
+        self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
+
         if self.drobo.updateFirmwareRepository():
              self.drobo.writeFirmware( self.Tools.progress.setValue )
         self.Tools.comment.setText( "Written! Reboot Drobo to activate.")
@@ -253,6 +332,7 @@ class DroboGUI(QtGui.QMainWindow):
         print "checkup: this Drobo is a %s hw rev: %s, and needs: %s" % ( fwarch, hwlevel, fwversion )
         if fwpath != '' :
             self.Tools.Updatebutton.setText( "Upgrade" )
+            self.disconnect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
             self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), 
                 self.upgrade)
             self.Tools.comment.setText( "Press 'Upgrade' upgrade to %s" % ( fwversion ))
@@ -308,8 +388,7 @@ class DroboGUI(QtGui.QMainWindow):
         self.Tools.Updatebutton = QtGui.QPushButton('Update', self.Tools)
         self.Tools.Updatebutton.move(x,y)
 
-        self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), 
-                self.checkup)
+        self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
 
 
         x=xo
@@ -403,10 +482,5 @@ class DroboGUI(QtGui.QMainWindow):
         self.updateTimer.setInterval(1000)
         self.updateTimer.start()
 
-
-        # figure out which ever graphical sudo is available...
-        gsudo = commands.getoutput("which gtksudo")
-        if ( gsudo == "" ):
-           gsudo = commands.getoutput("which kdesudo")
-        partitioner= gsudo + " gparted"
+        partitioner= " gparted"
 

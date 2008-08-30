@@ -294,6 +294,8 @@ PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
     int readwrite;
     int k;
 
+    if (debug) fprintf( stderr, "openfd/open %s, 0\n", file_name );
+
     if (!PyArg_ParseTuple(args, "sll", &file_name, &readwrite, &debug )){
         if (debug) fprintf( stderr, "parsetuple broke\n" );
         PyErr_SetString( PyExc_ValueError, 
