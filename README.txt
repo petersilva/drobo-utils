@@ -214,7 +214,7 @@ below takes a while, just have a little patience, it´ll be fine.
 
 From the Doboshare forums, building a file system:
 
-mke2fs –j –i 262144 –L Drobo01 -m 0 –O sparse_super,^resize_inode  /dev/sdd1
+mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode  /dev/sdd1
 
 (If you want an ntfs file system, then mkntfs -f -L Drobo01 /dev/sdd1 
 ought to work too... )
