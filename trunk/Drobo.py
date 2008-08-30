@@ -189,7 +189,6 @@ def partformat(n):
     if (len(f) != 1):
       print 'hoho! multiple partition types! Brave are we not?' 
 
-
     return f
 
 
@@ -292,7 +291,7 @@ class Drobo:
      if (self.fd >0):
            DroboDMP.closefd()
 
-  def format(self,pscheme,fstype,maxlunsz,devsz):
+  def format(self,pscheme='gpt',fstype='ext3'):
      """ return a shell script giving the code to commands required to 
      
      pscheme is one of: mbr, apt, gpt,  
@@ -318,10 +317,21 @@ class Drobo:
             mke2fs -j ... /dev/sd??
 
      """    
-     print "Not Implemented Yet"
-     raise DroboException
 
-     
+     print ' parted %s mklabel gpt ' % self.char_dev_file
+     print ' parted %s mkpart ext2 0 100% ' % self.char_dev_file
+     print ' parted %s print ' % self.char_dev_file
+
+     if fstype == 'ext3': 
+         print ' mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1 ' % self.char_dev_file
+     elif fstype == 'ntfs':
+         print 'mkntfs -f -L Drobo01  %s1' % self.char_dev_file
+     elif fstype == 'FAT32':
+         print 'mkdosfs -F 32 -S 4096 -n Drobo01 %s1' % self.char_dev_file
+     else:
+         print 'unsupported  partition type %s, sorry...' % fstype
+
+ 
 
   def __getsubpage(self,sub_page,pack): 
     """ Retrieve Sub page from drobo char device.
@@ -422,6 +432,7 @@ class Drobo:
 
        status:  Broken!  always sets LUNSIZE to 16TB
     """
+    print 'set lunsize to %d TiB' % tb
     buffer=struct.pack( ">L", tb )
     sblen=len(buffer)
 
