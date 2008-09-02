@@ -284,13 +284,13 @@ class DroboGUI(QtGui.QMainWindow):
 
 
     def __initFormatTab(self):
-      """
-       known issues:
-        -- formats only using GPT labels... should be mbr for FAT32.
-        -- should refuse to set lunsize > 2 TB for FAT32.
-        -- should refuse to set lunsize > 8 TB for ext3.
+        """
+          known issues:
+           -- formats only using GPT labels... should be mbr for FAT32.
+           -- should refuse to set lunsize > 2 TB for FAT32.
+           -- should refuse to set lunsize > 8 TB for ext3.
 
-      """
+        """
 
 	self.Format = QtGui.QWidget()
         self.Format.setObjectName("Format")
