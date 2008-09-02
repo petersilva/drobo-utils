@@ -1,6 +1,12 @@
 
-  -- added ability to set lunsize on Drobo.
+  -- added ability to format Drobo
+  -- bugfix for firmware:
+        -- CRC32 on 32bit intel. (use signed, instead of unsigned.)
+        -- fixed header CRC not validating.
   -- added ability to set time on Drobo.
+  -- added simulation mode to Drobo.py, development aid.
+  -- some work done towards lunsize setting, but incomplete.
+  -- some work towards indicating relay out progress, not tested...
 
 0.2.2 Released August 2008
   -- firmware uploads work with .tdz as well

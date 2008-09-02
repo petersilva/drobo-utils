@@ -177,14 +177,21 @@ installed, try:
 
 which should start a GUI for each drobo attached to your machine, that
 you have permission to access (depends on the setup, usually USB devices 
-on desktops are accessible to users, so you can see them.  Servers might be 
-setup differently, haven't worked out how to install it correctly yet.
+on desktops are accessible to users, so you can see them.  
 
 
 Setup Drobo with Linux:
 
-There is no functionality in the UI´s or API to partition or build
-file systems on the Drobo.  Just use the system tools...
+One can use the Format tab of the GUI to partition the device
+and create a single file system for a given LUN.  
+
+NOTE:  mke2fs takes a very long time to run, on the order of ten minutes 
+per Terabyte. the display format button just turns red while the format
+is in progress,and you have to wait until it finishes.  Have not
+determined a method to monitor progress yet.  other file systems are
+much more quickly created, so less of an issue.
+
+I actually prefer to use the system tools, as described below:
 
 Drobos with firmware 1.1.1 or later work fine under linux with ext3.
 You can, of course set up an NTFS or HPS+ or FAT32 if you really want,
@@ -200,7 +207,7 @@ WARNING: ASK YOURSELF, before you start: ARE YOU SURE?
 WARNING: AFTER THE SECOND LINE, YOU ARE TOAST.
 WARNING: BEST TO BACKUP YOUR DATA BEFOREHAND...
 
-Here is what you have to type:
+if you didn't use the GUI, Here is what you have to type:
 parted -i /dev/sdd 
 mklabel gpt
 mkpart ext2 0 100%
@@ -382,7 +389,6 @@ Caveats:
 
    best to restart it daily, or use it when necessary, but not leave it
    on for days.
-
 
 
 

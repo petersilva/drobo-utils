@@ -35,12 +35,24 @@ import os.path
 import urllib2
 import zipfile,zlib
 
+#only for simulation mode...
+import random
+
+# This isn't entirely simulation mode.  It is to aid development
+# when no drobo is available.  you can format random disks, including 
+# non-drobos.  So do not activate unless you read what the code does first.
+SIMULATE = 0
+
+# set to 1 to increase verbosity of library functions.
+# too verbose for most uses.
 DEBUG = 0
+
+
 #
 # FIXME: if installed with "python setup.py install" then this 
 # insert is not needed.  This is to be able to test it before 
 # installation. best to remove this once installed.
-#  this might be considered a security issue as it is...
+# this might be considered a security issue as it is...
 #
 # on kubuntu hardy:
 #sys.path.insert(1, os.path.normpath('build/lib.linux-i686-2.5') )
@@ -278,7 +290,8 @@ class Drobo:
      self.char_dev_file = chardev  
      self.fd=0
      
-     self.fd=DroboDMP.openfd(chardev,0,DEBUG)
+     if SIMULATE == 0:
+        self.fd=DroboDMP.openfd(chardev,0,DEBUG)
 
      self.features = []    
      self.transactionID=1
@@ -291,10 +304,14 @@ class Drobo:
      if (self.fd >0):
            DroboDMP.closefd()
 
-  def format(self,pscheme='gpt',fstype='ext3'):
+  def format_script(self,pscheme='gpt',fstype='ext3'):
      """ return a shell script giving the code to commands required to 
+     format the single LUN represented by a given drobo...
      
      pscheme is one of: mbr, apt, gpt,  
+          gpt - >= 2 TB, linux or windows...
+          mbr <= 2 TB good for FAT32
+
      fstype is one of:  fat32, ext3, ntfs (HPS+ is not supported on linux)
      sizes in terabytes
 
@@ -318,20 +335,42 @@ class Drobo:
 
      """    
 
-     print ' parted %s mklabel gpt ' % self.char_dev_file
-     print ' parted %s mkpart ext2 0 100% ' % self.char_dev_file
-     print ' parted %s print ' % self.char_dev_file
+     format_script='/tmp/fmtscript'
+     fd=open(format_script, 'w')
+     fd.write( "#!/bin/sh\n" )
+     fd.write( "parted %s mklabel gpt\n" % self.char_dev_file )
+     fd.write( "parted %s mkpart ext2 0 100%%\n" % self.char_dev_file )
+     # there is a bit of a race condition creating the partition special file.
+     # the print here gives a little time before starting the mkfs, to ensure
+     # file is there...
+     fd.write( "parted %s print\n" % self.char_dev_file )
+     fd.write( "sleep 5\n" )
 
      if fstype == 'ext3': 
-         print ' mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1 ' % self.char_dev_file
+         # -m 0 -- Drobo takes care of complaining when near the size limit.
+         #         little point in complaining early, pretending you have less space.
+         # ^resize_inode -- Drobo makes the file system much bigger than the actual space
+         #       available ( >= 2TB ) , so it doesn't make sense to allow space for future
+         #       inode expansion beyond that.  only makes sense in LVM, that's why this
+         #       option is 'off' (the '^' at the beginning.)
+         # sparse_super -- there are lots too many superblock copies made by default.
+         #       safe enough with fewer.
+         fd.write( 'mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1\n' % self.char_dev_file )
+         #fd.write( 'mke2fs -j -L Drobo01 -m 0 %s1\n' % self.char_dev_file )
      elif fstype == 'ntfs':
-         print 'mkntfs -f -L Drobo01  %s1' % self.char_dev_file
+         fd.write( 'mkntfs -f -L Drobo01  %s1\n' % self.char_dev_file )
      elif fstype == 'FAT32':
-         print 'mkdosfs -F 32 -S 4096 -n Drobo01 %s1' % self.char_dev_file
+         fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % self.char_dev_file )
      else:
          print 'unsupported  partition type %s, sorry...' % fstype
+     fd.close()
+     os.chmod(format_script,0700)
 
- 
+     #if SIMULATE !=0:
+     return format_script 
+     #fmt_process = subprocess.Popen( format_script, close_fds=True )
+     #pid, sts = os.waitpid(fmt_process.pid, 0)
+     
 
   def __getsubpage(self,sub_page,pack): 
     """ Retrieve Sub page from drobo char device.
@@ -351,6 +390,9 @@ class Drobo:
     """
     if DEBUG >0:
        print 'getsubpage'
+
+    if SIMULATE:
+       return ()
 
     mypack = '>BBH' + pack
     paklen=struct.calcsize(mypack)
@@ -389,6 +431,10 @@ class Drobo:
 
     if DEBUG >0:
         print 'issuecommand...'
+
+    if SIMULATE:
+        self.__transactionNext()
+        return
 
     modepageblock=struct.pack( ">BBBBBBBHB", 
          0xea, 0x10, 0x00, command, 0x00, self.transactionID, 0x01 <<5, 0x01, 0x00 )
@@ -433,6 +479,7 @@ class Drobo:
        status:  Broken!  always sets LUNSIZE to 16TB
     """
     print 'set lunsize to %d TiB' % tb
+
     buffer=struct.pack( ">L", tb )
     sblen=len(buffer)
 
@@ -674,13 +721,13 @@ class Drobo:
             works for length, and body CRC.  something wrong with header CRC.
 
        according to dpd.h:
-       (hdrlength, hdrVersion, magic, imageVersion, targetName, sequenceNum, bootFailureCount, imageFlashAddress, imageLength, imageCrc32, about, hdrCrc32 ) = struct.unpack('LLLL16sLLLLL256sL', self.fwdata[0:304])
+       (hdrlength, hdrVersion, magic, imageVersion, targetName, sequenceNum, bootFailureCount, imageFlashAddress, imageLength, imageCrc32, about, hdrCrc32 ) = struct.unpack('llll16slllll256sl', self.fwdata[0:304])
 
        STATUS: working, except do not understand header CRC's yet so ignoring those for now.
 
     """
     print 'validateFirmware start...'
-    self.fwhdr = struct.unpack('>LL4sL16sLLLLL256sL', self.fwdata[0:312])
+    self.fwhdr = struct.unpack('>ll4sl16slllll256sl', self.fwdata[0:312])
 
     if  len(self.fwdata) != ( self.fwhdr[0] + self.fwhdr[8] ) :
 	print 'header corrupt... Length does not validate.'
@@ -696,9 +743,12 @@ class Drobo:
     print 'Magic number validated. Good.'
     print '%d + %d = %d length validated. Good.' % ( self.fwhdr[0], self.fwhdr[8], len(self.fwdata) )
 
-    hdrcrc = zlib.crc32( self.fwdata[0:308] + self.fwdata[312:self.fwhdr[0]] )
+    blank = struct.pack('l',0)
+    hdrcrc = zlib.crc32( self.fwdata[0:308] + blank + self.fwdata[312:self.fwhdr[0]] )
     print 'CRC from header: %d, calculated using python zlib crc32: %d ' % ( self.fwhdr[11], hdrcrc)
-    print 'yeah, the header CRCs do not match. For now they never do ... ignoring it.'
+    if self.fwhdr[11] != hdrcrc :
+        print 'file corrupt, header checksum wrong'
+        return 0
     bodycrc = zlib.crc32( self.fwdata[self.fwhdr[0]:] )
     print 'CRC for body from header: %d, calculated: %d ' % ( self.fwhdr[9], bodycrc)
     if self.fwhdr[9] != bodycrc :
@@ -832,12 +882,21 @@ class Drobo:
      """ returns: ( MaxNumberOfSlots, MaxNumLUNS, MaxLunSize )
      """ 
      # SlotCount, Reserved, MaxLuns, MaxLunSz, Reserved, unused, unused 
+
+     if SIMULATE:
+	return (4, 16, 2199023250944)
+
      result=self.__getsubpage( 0x01, 'BBBQBHH'  )
      return ( result[0], result[2], result[3]*512 )
 
   def GetSubPageCapacity(self):
      """ returns: ( Free, Used, Virtual, Unprotected ) 
      """
+     if SIMULATE:
+        capacity = 495452160000
+        used = random.randint(0,capacity)
+	return (capacity-used, used, capacity, 125184245760)
+
      return self.__getsubpage(0x02, 'QQQQ' )
 
   def GetSubPageSlotInfo(self):
@@ -848,6 +907,9 @@ class Drobo:
               returns one colour if one colour is constant, set of
               colours if there is flashing going on.
      """
+     if SIMULATE:
+       return ( (0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), (1, 750156374016, 0, 'green', 'WDC WD7500AAKS-00RBA0', 'WDC WD7500AAKS-0'), (2, 0, 0, ledstatus(random.randint(0,6)), '', ''), (3, 0, 0, 'gray', '', ''))
+
      slotrec='HBQQB32s16sL'
      r = self.__getsubpage( 0x03, 'B' + slotrec+slotrec+slotrec+slotrec )
 
@@ -905,6 +967,9 @@ class Drobo:
       8 x H-length, B-LunID, Q-TotalCapacity, B-PartScheme, B-PartCount, B-Format, 5B-rsvd 
      
      """
+     if SIMULATE:
+       return [(0, 2199023251456, 5092651008, 'GPT', ['EXT3'])]
+
      lp="HBQQ"
      l = self.__getsubpage( 0x04, 'B'+lp+lp+lp+lp+lp+lp+lp+lp )
 
@@ -942,6 +1007,9 @@ class Drobo:
 		-- so I just claim it says 8 and shut up.
 
      """
+     if SIMULATE:
+        return (1220112079, 8, 'TRUSTED DATA')
+
      ( utc, offset, name ) = self.__getsubpage(0x05, 'LH32s' )
      name=name.strip(" \0")
      offset=8 # offset is screwed up returned by Drobo, just set it to what they claim it should be.
@@ -957,6 +1025,9 @@ class Drobo:
             at 1.1.1 the additional byte leads to resid > 0 in the C call, 
             so matches docs. 
      """
+     if SIMULATE:
+         return (0, 10)
+
      return self.__getsubpage( 0x06, 'BB' )
 
   def GetSubPageFirmware(self):
@@ -976,6 +1047,9 @@ class Drobo:
             I shortened Extra for that.
 	    byte 0x80 is supposed to be feature flags, found it a 0x73...
      """
+     if SIMULATE:
+        return (1, 201, 12942, 12, 6, 'May 13 2008,15:29:32', 'ArmMarvell', '1.1.2', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', 'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', 'FAT32_FORMAT_VOLNAME', 'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2'])
+
      raw=self.__getsubpage(0x08, 'BBHBB32s16s16s240s' )
      result = struct.unpack('>112sL32sH90s', raw[8])
      self.features = unitfeatures(result[1])
@@ -995,6 +1069,8 @@ class Drobo:
       when I remove a disk, I get [ 'No Redundancy', 'Relay out in progress'],
       but when I format, it stays empty...
      """
+     if SIMULATE:
+         return unitstatus(random.randint(0,16535))       
 
      ss=self.__getsubpage(0x09, 'LL' )
      s=unitstatus(ss[0])
@@ -1032,6 +1108,9 @@ class Drobo:
         other cases where there bit shfts are claimed have ended unhappily... 
         hmm...
      """
+     if SIMULATE:
+        return (1, 0, 0)
+
      try: # insert try/except for compatibility with firmware <= 1.1.0  
          o = self.__getsubpage(0x07, 'BB5BBB' )
          return ( o[0], o[1], o[4] >>7 )
@@ -1045,6 +1124,8 @@ def DiscoverLUNs():
 	returns a list of character device files 
               samples: ( "/dev/sdc", "/dev/sdd" )
     """
+    if SIMULATE:
+       return [ "/dev/sdb" ]
 
     devdir="/dev"
     devices=[]
