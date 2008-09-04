@@ -20,7 +20,7 @@ def usage():
    print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
    print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you really mean it"
    print "\t\tNote: After execution, Drobo reboots, wait a few minutes before accessing again"
-   print "\tstandby\tshutdown drobo (umount first!)"
+   print "\tshutdown\tshutdown drobo (DRI calls this 'standby' ... umount first!)"
    print "\tstatus\treport how is the Drobo doing"
    print "\nDevice\tis the raw character device of a drobo. If not given, will search."
 
@@ -143,16 +143,13 @@ elif cmd == "setlunsize":
    print sys.argv[3], sys.argv[4]
    lunsize=int(sys.argv[3])
 
-   print 'broken for now, I refuse to work'
-   sys.exit()
-
    if lunsize > 16 or lunsize < 1:
         print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
         sys.exit()
 
    if sys.argv[4] == 'PleaseEraseMyData':
         print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
-        d.setlunsize(lunsize)
+        d.SetLunSize(lunsize)
         print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
    else:
         print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
@@ -160,7 +157,7 @@ elif cmd == "setlunsize":
 elif cmd == "settime": 
   d.Sync()          
 
-elif cmd == "standby":
+elif cmd == "shutdown":
    d.Standby() 
    
 elif cmd == "status":

@@ -102,10 +102,10 @@ class DroboGUI(QtGui.QMainWindow):
     def __updateLEDs(self):
         """ update LEDS (implement flashing.)
         """
-        if (self.Format.inProgress and self.Format.fstype == 'ext3'):
-           if  self.fmt_process.poll() == None:
-              line=self.fmt_process.stdout.readline()
-              print 'format progress:',line
+        #if (self.Format.inProgress and self.Format.fstype == 'ext3'):
+        #   if  self.fmt_process.poll() == None:
+        #      line=self.fmt_process.stdout.readline()
+        #      print 'format progress:',line
 
         self.updates = self.updates + 1 
         i=0
@@ -124,7 +124,12 @@ class DroboGUI(QtGui.QMainWindow):
     def __updatewithQueryStatus(self):
         """ query device to update information
         """
-        fwv=self.drobo.GetSubPageFirmware()
+        try:
+           fwv=self.drobo.GetSubPageFirmware()
+        except:
+           self.statusBar().showMessage( 'bad poll: %d.. need to restart' % self.updates )
+           return
+
         settings=self.drobo.GetSubPageSettings()
         self.Device.id.setText(  self.drobo.GetCharDev() + ' firmware: ' + fwv[7] )
 
@@ -161,21 +166,16 @@ class DroboGUI(QtGui.QMainWindow):
         self.statusBar().showMessage( self.statusmsg )
         self.statusmsg = 'Status: ' + str(self.drobo.GetSubPageStatus()) + ' update: ' + str(self.updates)
 
-        if self.Format.inProgress:
-           if  self.fmt_process.poll() == None:
-               print 'hoho'
-               #line=self.fmt_process.stdout.readline()
-               #print 'format progress:',line
-           else:
+        if self.Format.inProgress and ( self.fmt_process.poll() != None) :
                # reset to normal state...
                print 'it took: %d updates to run' % (self.updates - self.Format.startupdate )
                self.Format.inProgress=0
                normal = self.Tools.Updatebutton.palette().color( QtGui.QPalette.Button )
-               self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, normal )
+               self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, QtCore.Qt.blue )
                self.Format.ext3.setChecked(0)
                self.Format.ntfs.setChecked(0)
                self.Format.msdos.setChecked(0)
-               self.Format.Formatbutton.setText('Format (Erases All Data!)          ')
+               self.Format.Formatbutton.setText('Format Done!')
                self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
                        self.FormatLUN)
 
@@ -232,14 +232,15 @@ class DroboGUI(QtGui.QMainWindow):
        self.Format.disconnect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
                 self.ReallyFormatLUN)
        if self.Format.fstype == 'none': # changing LUN size
-            self.Format.Formatbutton.setText('LUN RESIZE, watch it reboot, WAIT!')
+            self.Format.Formatbutton.setText('Done. WAIT 5 min. restart dashboard!')
+            self.drobo.SetLunSize(self.Format.lunszlcd.value())
        else:
             self.Format.Formatbutton.setText('Format in progress, WAIT!')
-            format_script = self.drobo.format_script('gpt',self.Format.fstype)
+            format_script = self.drobo.format_script(self.Format.fstype)
             self.Format.startupdate = self.updates
             self.Format.inProgress = 1;
-            self.fmt_process = subprocess.Popen( format_script, bufsize=0, stdout=subprocess.PIPE )
-            #self.fmt_process.communicate()
+            #self.fmt_process = subprocess.Popen( format_script, bufsize=0, stdout=subprocess.PIPE )
+            self.fmt_process = subprocess.Popen( format_script )
             p = self.Format.Formatbutton.palette()
             p.setColor( QtGui.QPalette.Button, QtCore.Qt.red )
 
@@ -256,7 +257,14 @@ class DroboGUI(QtGui.QMainWindow):
             fstype='ext3'
        else:
             fstype='none'
-       self.Format.Formatbutton.setText( "Last Chance, Format %s ?" % fstype)
+            self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, QtCore.Qt.yellow )
+            self.Format.Formatbutton.setText( \
+                  "Last Chance, Resize to %d TiB" % self.Format.lunszlcd.value() )
+
+       if fstype != 'none':
+          self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, QtCore.Qt.yellow )
+          self.Format.Formatbutton.setText( "Last Chance, Format %s ?" % fstype)
+
        self.Format.fstype=fstype
        self.Format.disconnect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
                 self.FormatLUN)

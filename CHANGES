@@ -1,5 +1,6 @@
 
   -- added ability to format Drobo
+  -- added ability to set lun sizes
   -- bugfix for firmware:
         -- CRC32 on 32bit intel. (use signed, instead of unsigned.)
         -- fixed header CRC not validating.
