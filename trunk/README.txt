@@ -390,6 +390,8 @@ Caveats:
    best to restart it daily, or use it when necessary, but not leave it
    on for days.
 
+   After you resize luns, droboview gets confused, you need to exit and
+   restart.
 
 
 Building a debian package:
