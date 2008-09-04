@@ -304,7 +304,7 @@ class Drobo:
      if (self.fd >0):
            DroboDMP.closefd()
 
-  def format_script(self,pscheme='gpt',fstype='ext3'):
+  def format_script(self,fstype='ext3'):
      """ return a shell script giving the code to commands required to 
      format the single LUN represented by a given drobo...
      
@@ -338,13 +338,17 @@ class Drobo:
      format_script='/tmp/fmtscript'
      fd=open(format_script, 'w')
      fd.write( "#!/bin/sh\n" )
-     fd.write( "parted %s mklabel gpt\n" % self.char_dev_file )
-     fd.write( "parted %s mkpart ext2 0 100%%\n" % self.char_dev_file )
+
+     if fstype == 'FAT32':
+         ptype='mbr'
+     else:
+         ptype='gpt' 
+
+     fd.write( "parted %s mklabel %s\n" % (self.char_dev_file, ptype) )
+
      # there is a bit of a race condition creating the partition special file.
-     # the print here gives a little time before starting the mkfs, to ensure
+     # the parted print gives a little time before starting the mkfs, to ensure
      # file is there...
-     fd.write( "parted %s print\n" % self.char_dev_file )
-     fd.write( "sleep 5\n" )
 
      if fstype == 'ext3': 
          # -m 0 -- Drobo takes care of complaining when near the size limit.
@@ -355,11 +359,16 @@ class Drobo:
          #       option is 'off' (the '^' at the beginning.)
          # sparse_super -- there are lots too many superblock copies made by default.
          #       safe enough with fewer.
+         fd.write( "parted %s mkpart ext2 0 100%%\n" % self.char_dev_file )
+         fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
          fd.write( 'mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1\n' % self.char_dev_file )
-         #fd.write( 'mke2fs -j -L Drobo01 -m 0 %s1\n' % self.char_dev_file )
      elif fstype == 'ntfs':
+         fd.write( "parted %s mkpart ntfs 0 100%%\n" % self.char_dev_file )
+         fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
          fd.write( 'mkntfs -f -L Drobo01  %s1\n' % self.char_dev_file )
      elif fstype == 'FAT32':
+         fd.write( "parted %s mkpart fat32 0 100%%\n" % self.char_dev_file )
+         fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
          fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % self.char_dev_file )
      else:
          print 'unsupported  partition type %s, sorry...' % fstype
@@ -480,12 +489,12 @@ class Drobo:
     """
     print 'set lunsize to %d TiB' % tb
 
-    buffer=struct.pack( ">L", tb )
+    buffer=struct.pack( ">l", tb )
     sblen=len(buffer)
 
     # mode select CDB. 
     modepageblock=struct.pack( ">BBBBBBBHB", 
-      0xea, 0x10, 0x80, 0x0f, 0, self.transactionID, (0x01 <<5)|0x01, sblen, 0x00 )
+      0xea, 0x10, 0x0, 0x0f, 0, self.transactionID, (0x01 <<5)|0x01, sblen, 0x00 )
 
     DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
     self.__transactionNext()
