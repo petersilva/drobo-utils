@@ -136,8 +136,11 @@ Look in Drobo.py, and uncomment these lines:
 
 This is fine for testing, but will only work if invoked
 from the directory containg the drobo-utils files.  Once
-installed using 'install' or a built package, these lines
-are not needed.
+installed using 'install'...
+
+	python setup.py install
+
+or a built package, these lines are not needed.
 
 Another way to enable testing without installing is to:
 
