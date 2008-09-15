@@ -1,120 +1,67 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
-# Sample debian/rules that uses debhelper.
-#
-# This file was originally written by Joey Hess and Craig Small.
-# As a special exception, when this file is copied by dh-make into a
-# dh-make output file, you may use that output file without restriction.
-# This special exception was added by Craig Small in version 0.37 of dh-make.
-#
-# Modified to make a template file for a multi-binary package with separated
-# build-arch and build-indep targets  by Bill Allombert 2001
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# This has to be exported to make some magic below work.
-export DH_OPTIONS
+PKGNAME := drobo-utils
+PYVERS=$(shell pyversions -vs)
 
-
-
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-	# Add here commands to configure the package.
-
-	touch configure-stamp
-
-
-#Architecture 
-build: build-arch build-indep
-
-build-arch: build-arch-stamp
-build-arch-stamp: configure-stamp 
-
-	# Add here commands to compile the arch part of the package.
-	#$(MAKE) 
+build: build-stamp
+build-stamp: $(PYVERS:%=build-python%-stamp)
 	touch $@
 
-build-indep: build-indep-stamp
-build-indep-stamp: configure-stamp 
-
-	# Add here commands to compile the indep part of the package.
-	#$(MAKE) doc
+build-python%-stamp:
+	python$* setup.py build
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-arch-stamp build-indep-stamp configure-stamp
+	rm -f *-stamp
 
-	# Add here commands to clean up after the build process.
-	-$(MAKE) clean
+	[ ! -d build ] || rm -rf build
+
+	python setup.py clean
+
+	find . -name "*\.pyc" -delete
 
 	dh_clean 
 
-install: install-indep install-arch
-install-indep:
+install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k -i 
-	dh_installdirs -i
+	dh_prep
+	dh_installdirs
 
-	# Add here commands to install the indep part of the package into
-	# debian/<package>-doc.
-	#INSTALLDOC#
+	for py in $(PYVERS); do \
+		python$$py setup.py install_lib -d $(CURDIR)/debian/$(PKGNAME)/usr/lib/python$$py/site-packages; \
+	done
+	python setup.py install_data -d $(CURDIR)/debian/$(PKGNAME)/usr/share/$(PKGNAME)
+	python setup.py install_scripts -d $(CURDIR)/debian/$(PKGNAME)/usr/sbin
+	for s in $(CURDIR)/debian/$(PKGNAME)/usr/sbin/*; do \
+	    sed -i '1s,#!.*python.*,#!/usr/bin/python,' $$s; \
+	done
 
-	dh_install -i
+binary-indep: build install
 
-install-arch:
-	dh_testdir
-	dh_testroot
-	dh_clean -k -s 
-	dh_installdirs -s
-
-	# Add here commands to install the arch part of the package into 
-	# debian/tmp.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/droboutils install
-
-	dh_install -s
-# Must not depend on anything. This is to be called by
-# binary-arch/binary-indep
-# in another 'make' thread.
-binary-common:
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs 
 	dh_installdocs
 	dh_installexamples
-#	dh_installmenu
-#	dh_installdebconf	
-#	dh_installlogrotate	
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-	dh_pycentral
-#	dh_installinit
-#	dh_installcron
-#	dh_installinfo
-	dh_installman
-	dh_link
+	dh_pysupport
 	dh_strip
-	dh_compress 
+	dh_installman
+	dh_compress 		-X.py
 	dh_fixperms
-#	dh_perl
-	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
-# Build architecture independant packages using the common target.
-binary-indep: build-indep install-indep
-	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
-
-# Build architecture dependant packages using the common target.
-binary-arch: build-arch install-arch
-	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
 
 binary: binary-arch binary-indep
+
 .PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure
