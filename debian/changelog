@@ -1,6 +1,6 @@
-droboutils (0.3.0-1) unstable; urgency=low
+drobo-utils (0.3.0-1) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release. (Closes: #498720: ITP: drobo-utils -- manage data
+    robotics storage units (drobos))
 
- -- informavore <Peter.A.Silva@gmail.com>  Thu, 24 Apr 2008 23:33:33 -0400
-
+ -- Chris AtLee <chris@atlee.ca>  Fri, 12 Sep 2008 11:31:43 -0400

@@ -1,24 +1,16 @@
-This package was debianized by informavore <Peter.A.Silva@gmail.com> on
-Thu, 24 Apr 2008 23:33:33 -0400.
+This package was debianized by Chris AtLee <chris@atlee.ca> on
+Fri Sep 12 11:14:15 EDT 2008
 
-It was downloaded from <url://example.com>
+It was downloaded from http://drobo-utils.sourceforge.net
 
-Upstream Author(s): 
+Upstream Author: 
+    Peter A Silva <Peter.A.Silva@gmail.com>
 
-    <put author's name and email here>
-    <likewise for another author>
-
-Copyright: 
-
-    <Copyright (C) YYYY Name OfAuthor>
-    <likewise for another author>
+Copyright:
+    Copyright (C) 2008 Peter A Silva
 
 License:
-
-    <Put the license of the package here indented by 4 spaces>
+    GPLv3
 
 The Debian packaging is (C) 2008, informavore <Peter.A.Silva@gmail.com> and
 is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
-
-# Please also look if there are files or directories which have a
-# different copyright/license attached and list them here.
