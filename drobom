@@ -101,7 +101,6 @@ if len(sys.argv) == 1:
 
 cmd=sys.argv[1]
 
-print 'len sys.arg is:', len(sys.argv)
 if len(sys.argv) > 2:
   try:
      d=Drobo.Drobo( sys.argv[2] )
