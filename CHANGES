@@ -1,4 +1,9 @@
 
+  -- fixes for firmware validation:
+       -- header CRC on 32bit was broken on 64bit.
+       -- 32 vs. 64 bit kludge needed.
+
+0.3.0
   -- added ability to format Drobo
   -- added ability to set lun sizes
   -- bugfix for firmware:
