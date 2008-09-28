@@ -65,6 +65,7 @@ DEBUG = 0
 #        sys.path.insert(1, os.path.normpath("build/" + l ))
 
 
+
 import DroboDMP
 
 class DroboException(exceptions.Exception):
@@ -732,7 +733,9 @@ class Drobo:
        according to dpd.h:
        (hdrlength, hdrVersion, magic, imageVersion, targetName, sequenceNum, bootFailureCount, imageFlashAddress, imageLength, imageCrc32, about, hdrCrc32 ) = struct.unpack('llll16slllll256sl', self.fwdata[0:304])
 
-       STATUS: working, except do not understand header CRC's yet so ignoring those for now.
+       & 0xffffffffL is a kludge to work around CRC32 returning different values on 32 vs. 64 bit platforms.
+       can remove once py3k arrives.  (see: http://bugs.python.org/issue1202)
+       STATUS: working.
 
     """
     print 'validateFirmware start...'
@@ -752,20 +755,27 @@ class Drobo:
     print 'Magic number validated. Good.'
     print '%d + %d = %d length validated. Good.' % ( self.fwhdr[0], self.fwhdr[8], len(self.fwdata) )
 
-    blank = struct.pack('l',0)
-    hdrcrc = zlib.crc32( self.fwdata[0:308] + blank + self.fwdata[312:self.fwhdr[0]] )
-    print 'CRC from header: %d, calculated using python zlib crc32: %d ' % ( self.fwhdr[11], hdrcrc)
-    if self.fwhdr[11] != hdrcrc :
+    # http://bugs.python.org/issue1202
+    # doesn't work on 64 bit, only on 32bit... weird...
+    blank = struct.pack('i',0)
+    hdrcrc = zlib.crc32( self.fwdata[0:308] + blank + self.fwdata[312:self.fwhdr[0]] ) & 0xffffffffL
+    r = self.fwhdr[11] & 0xffffffffL
+
+    print 'CRC from header: %d, calculated using python zlib crc32: %d ' % ( r, hdrcrc)
+    if r != hdrcrc :
         print 'file corrupt, header checksum wrong'
         return 0
-    bodycrc = zlib.crc32( self.fwdata[self.fwhdr[0]:] )
-    print 'CRC for body from header: %d, calculated: %d ' % ( self.fwhdr[9], bodycrc)
-    if self.fwhdr[9] != bodycrc :
+    bodycrc = zlib.crc32( self.fwdata[self.fwhdr[0]:] ) & 0xffffffffL
+    q = self.fwhdr[9] & 0xffffffffL
+ 
+    print 'CRC for body from header: %d, calculated: %d ' % ( q, bodycrc)
+    if q != bodycrc :
         print 'file corrupt, payload checksum wrong'
         return 0
     
     print '32 bit Cyclic Redundancy Check correct. Good.'
     print 'validateFirmware successful...'
+
     return 1 
     
 
