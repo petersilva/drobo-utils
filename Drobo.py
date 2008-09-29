@@ -665,7 +665,7 @@ class Drobo:
        return arch and version of firmware running, and the download file name.
 
      status: supports version 1 drobo tdf files.
-             does not support .tdz files (yet.)
+             does not agree with windows & mac dashboard, thinks 'series1' refers to hw revision,
 
        tdz support.  zip file containing two .tdf's.  one for rev1, another for rev2.
        SCSI INQUIRY is supposed to respond with 'VERSION' 1.0 or 2.0 to tell which to use.
@@ -685,13 +685,22 @@ class Drobo:
     while i < len(list_of_firmware):
       key=list_of_firmware[i-1].split()[1]
       value=list_of_firmware[i].split()[1]
-      #print key,value
 
       k=key.split('/')
-      if k[1][-1] == hwlevel[0] and k[2] == "firmware" and len(k) > 4: 
-        if k[3] == fwarch and k[4] == fwv:
-           print 'This Drobo should be running: ', value
-           return (fwarch, fwv, hwlevel, value)
+      
+      # profits oblige...
+      if k[2] == "licensed" : 
+        k = k[0:2] + k[3:]
+   
+      # these If's are now nested for ease of debugging, insert a print to taste...
+      # the algorithm is wrong wrt, other platforms...
+      if k[2] == "firmware" :
+        if k[3] == fwarch :
+          if k[4] == fwv:
+            if k[1][-1] == hwlevel[0] :
+              if len(k) > 4: 
+                print 'This Drobo should be running: ', value
+                return (fwarch, fwv, hwlevel, value)
       i=i+2
  
     print 'no matching firmware found, must be the latest and greatest!'
