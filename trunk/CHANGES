@@ -1,4 +1,8 @@
 
+  -- OK I know checking for firmware updates doesn't work
+     right now, but I need to find out why.  code seems correct.
+     there is a bugfix for getting rid of the 'licensed' part.
+
   -- fixes for firmware validation:
        -- header CRC on 32bit was broken on 64bit.
        -- 32 vs. 64 bit kludge needed.
