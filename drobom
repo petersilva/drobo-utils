@@ -12,6 +12,8 @@ def usage():
    print "\tblink\tidentify the drobo by making the lights blink"
    print "\tdiag\tdump diagnostics file into /tmp directory"
    print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
+   print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
+   print "\t\t<fwimage>\tthe firmware file to load."
    print "\tfwupgrade\tupgrade the firmware to the latest and greatest, recommended by DRI"
    print "\thelp\tprint this text"
    print "\tinfo\tprint all available information on a Drobo"
@@ -141,6 +143,11 @@ elif cmd == "diag":
 elif cmd == 'fwcheck':
    d.PickLatestFirmware()
 
+elif cmd == 'fwload':
+   if d.PickFirmware(sys.argv[3]):
+     d.writeFirmware(update)
+     d.Sync()
+
 elif cmd == 'fwupgrade':
    if d.updateFirmwareRepository():
      d.writeFirmware(update)
@@ -177,7 +184,7 @@ elif cmd == "status":
       pfull = 100 * ((c[1]+1.0)/c[2])
       print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
    else:
-      print "firmware too old to report capacity properly..."
+      print "firmware too old to report capacity properly... or the drobo is empty..."
 
 elif cmd == "time":
   settings=d.GetSubPageSettings()
