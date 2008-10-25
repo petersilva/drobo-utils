@@ -1,11 +1,6 @@
 
 #include <stdio.h>
 
-/* this works for firmware
- *  1.03 --> 1.1* key= 0xa5
- *  in > 1.2.1 key= 0x2d -- reported to work for Brad Guillory. doesn't for me.
- */
-
 int main(int argc, char *argv[]) {
 
   int ch, x, key;
