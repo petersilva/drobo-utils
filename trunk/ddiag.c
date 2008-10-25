@@ -2,9 +2,12 @@
 #include <stdio.h>
 
 /* this works for firmware
- *  1.03 --> 1.1*
- *  in 1.2.1 they changed the encryption...
+ *  1.03 --> 1.1* key= 0xa5
+ *  in > 1.2.1 key= 0x2d -- reported to work for Brad Guillory. doesn't for me.
  */
+
+static key=0xa5;
+
 int main(int argc, char *argv[]) {
 
   int ch, x;
@@ -12,7 +15,7 @@ int main(int argc, char *argv[]) {
 
    ch = getc( input );
    while( ch != EOF ) {
-     x = ch^0xa5;
+     x = ch^key;
      printf( "%c", x );
      ch = getc( input );
    }     
