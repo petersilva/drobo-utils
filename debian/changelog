@@ -1,6 +1,5 @@
-drobo-utils (0.3.0-1) unstable; urgency=low
+drobo-utils (0.3.2-1) unstable; urgency=high
 
-  * Initial release. (Closes: #498720: ITP: drobo-utils -- manage data
-    robotics storage units (drobos))
+  * bugfixes for firmware detection & upgrade.
 
- -- Chris AtLee <chris@atlee.ca>  Fri, 12 Sep 2008 11:31:43 -0400
+ -- Peter Silva <Peter.A.Silva@gmail.com>  Fri, 12 Sep 2008 11:31:43 -0400

@@ -682,6 +682,7 @@ class Drobo:
     list_of_firmware_string=listing_file.read().strip("\t\r")
     list_of_firmware=list_of_firmware_string.split("|") 
     i=1
+    p = re.compile('\[(.*)\]')
     while i < len(list_of_firmware):
       key=list_of_firmware[i-1].split()[1]
       value=list_of_firmware[i].split()[1]
@@ -691,13 +692,19 @@ class Drobo:
       # profits oblige...
       if k[2] == "licensed" : 
         k = k[0:2] + k[3:]
+        #print k
    
       # these If's are now nested for ease of debugging, insert a print to taste...
       # the algorithm is wrong wrt, other platforms...
       if k[2] == "firmware" :
+        #print '    match firmware'
         if k[3] == fwarch :
+          #print '    match k[3] = ', fwarch
+          #if we are on a line that lists the fwversion in [] fixup k[4]
+          m=p.search(list_of_firmware[i-1])
+          if m :
+              k[4]=m.group(1);
           if k[4] == fwv:
-            if k[1][-1] == hwlevel[0] :
               if len(k) > 4: 
                 print 'This Drobo should be running: ', value
                 return (fwarch, fwv, hwlevel, value)
@@ -706,7 +713,7 @@ class Drobo:
     print 'no matching firmware found, must be the latest and greatest!'
     return ( '','','','' )
 
-  def downloadFirmware( self, fwname ):
+  def downloadFirmware( self, fwname, localfw ):
     """
       download given fw file from network repository.
 
@@ -716,10 +723,9 @@ class Drobo:
     self.fwdata=None
     firmware_url=urllib2.urlopen( Drobo.fwsite + fwname )
     if ( fwname[-1] == 'z' ): # data is zipped...
-       filedata= firmware_url.read()
-       localfw = localfwrepository + fwname
+       filedata = firmware_url.read()
        f = open(localfw,'w+')
-       f.write(self.fwdata)
+       f.write(filedata)
        f.close()
        self.fwdata=None
        print 'local copy written'
@@ -727,7 +733,7 @@ class Drobo:
     else: # old file...
        fwdata = firmware_url.read()
     print 'downloading done '
-    return fwdata
+    return self.fwdata
 
   def validateFirmware(self):
     """
@@ -814,7 +820,7 @@ class Drobo:
     fwname = fwpath.split('/')
     localfw = Drobo.localfwrepository + '/' + fwarch + '_' + hwlevel + '_' + fwname[-1] 
     if not os.path.exists(localfw):
-       self.fwdata = self.downloadFirmware(fwpath)
+       self.fwdata = self.downloadFirmware(fwpath,localfw)
        good = self.validateFirmware()
        if good:
           f = open(localfw,'w+')

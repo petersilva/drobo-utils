@@ -1,3 +1,12 @@
+0.3.2
+
+  -- for v1, still don't understand index.txt file.
+  -- after testing, some more fixes, v2 downloads now work.
+  -- fixes received from Brad Guillory for v2/tdz firmware downloading.
+     they don't do any harm afaict, don't have a v2 to test with.
+  -- added fwload directive to drobom.
+
+0.3.1
 
   -- OK I know checking for firmware updates doesn't work
      right now, but I need to find out why.  code seems correct.
