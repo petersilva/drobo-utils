@@ -6,14 +6,13 @@
  *  in > 1.2.1 key= 0x2d -- reported to work for Brad Guillory. doesn't for me.
  */
 
-static key=0xa5;
-
 int main(int argc, char *argv[]) {
 
-  int ch, x;
+  int ch, x, key;
   FILE *input = fopen( argv[1], "r" );             
 
    ch = getc( input );
+   key = ch ^ 0x2d ;
    while( ch != EOF ) {
      x = ch^key;
      printf( "%c", x );
