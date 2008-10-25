@@ -25,13 +25,6 @@ MULTIPLE LUN support:
         of terabytes?
 
 
-FORMAT
-   -- dialog for formatting.
-        -- labels for max lun size slider... which is strange... shouldn't that
-           be in the format thing? seems kind a dangerous to do without formatting.
-        -- slider not updated from drobo, so number is always 2.
-   -- 
-
 Better STATUS progress reporting:
    -- some sort of indicator of how long 'relay out' will be in progress.
    -- when it is busy, it should say so... like when I emptied an
