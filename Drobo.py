@@ -601,7 +601,7 @@ class Drobo:
        sets self.fwdata
 
     """
-    print 'name = %s, %s' % ( name, name[-1] )
+    print 'Reading Firmware from = %s' % name
     if ( name[-1] == 'z' ): # data is zipped...
        inqw=self.inquire()
        hwlevel=inqw[10] 
@@ -663,12 +663,11 @@ class Drobo:
        download index.txt
        figure out which one to download.
        return arch and version of firmware running, and the download file name.
-
-     status: supports version 1 drobo tdf files.
-             does not agree with windows & mac dashboard, thinks 'series1' refers to hw revision,
-
-       tdz support.  zip file containing two .tdf's.  one for rev1, another for rev2.
        SCSI INQUIRY is supposed to respond with 'VERSION' 1.0 or 2.0 to tell which to use.
+       tdz support: zip file containing two .tdf's.  one for rev1, another for rev2.
+
+     status: works 
+
 
     """
     inqw=self.inquire()
@@ -716,22 +715,24 @@ class Drobo:
   def downloadFirmware( self, fwname, localfw ):
     """
       download given fw file from network repository.
+      load self.fwdata with the data from it
 
       STATUS: works.
     """
     print 'downloading firmware ', fwname, '...'
     self.fwdata=None
     firmware_url=urllib2.urlopen( Drobo.fwsite + fwname )
+    filedata = firmware_url.read()
+    f = open(localfw,'w+')
+    f.write(filedata)
+    f.close()
+    print 'local copy written'
+
     if ( fwname[-1] == 'z' ): # data is zipped...
-       filedata = firmware_url.read()
-       f = open(localfw,'w+')
-       f.write(filedata)
-       f.close()
-       self.fwdata=None
-       print 'local copy written'
        self.PickFirmware(localfw)
-    else: # old file...
-       fwdata = firmware_url.read()
+    else: 
+       self.fwdata=filedata
+
     print 'downloading done '
     return self.fwdata
 
@@ -819,16 +820,13 @@ class Drobo:
 
     fwname = fwpath.split('/')
     localfw = Drobo.localfwrepository + '/' + fwarch + '_' + hwlevel + '_' + fwname[-1] 
+    print 'looking for: %s' % localfw
     if not os.path.exists(localfw):
+       print 'not present, fetching from drobo.com'
        self.fwdata = self.downloadFirmware(fwpath,localfw)
        good = self.validateFirmware()
-       if good:
-          f = open(localfw,'w+')
-          f.write(self.fwdata)
-          f.close()
-          print 'local copy written'
-       else:
-          print 'downloaded firmware did not validate, not kept...'
+       if not good:
+          print 'downloaded firmware did not validate.' 
           return 0
     else:
        print 'local copy already present:', localfw
