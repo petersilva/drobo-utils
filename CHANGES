@@ -1,3 +1,5 @@
+  -- fixed all the firmware info parsing issues.
+  -- firmware load issues should all be gone.
   -- Brad's fix for ddiag.c, done properly this time (my bad!)
 
 0.3.2
