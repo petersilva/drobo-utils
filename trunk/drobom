@@ -109,7 +109,10 @@ if len(sys.argv) > 2:
      d=Drobo.Drobo( sys.argv[2] )
 
   except:
-     print "Second argument is supposed to be a character device file. (e.g. /dev/sdd)"
+     print "failed to open %s as a drobo" % sys.argv[2] 
+     if getuid() != 0:
+         print"I see you are not root... probably just permissions .. try again as root."
+
      sys.exit()
 
 else:
