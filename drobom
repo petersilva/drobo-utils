@@ -104,6 +104,10 @@ if len(sys.argv) == 1:
 
 cmd=sys.argv[1]
 
+if cmd in ("help", "--help", "-h"):
+  usage()
+  sys.exit()
+
 if len(sys.argv) > 2:
   try:
      d=Drobo.Drobo( sys.argv[2] )
@@ -194,7 +198,5 @@ elif cmd == "time":
   print "Drobo says it is:", time.ctime(settings[0])
 
 else:
-   usage()
-   if cmd != "help":
-     usage()
-     print "Unknown Command: ", cmd
+  usage()
+  print "Unknown Command: ", cmd
