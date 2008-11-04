@@ -123,6 +123,8 @@ else:
   l=Drobo.DiscoverLUNs()
   if cmd == 'list':
      print 'found Drobo LUNS at: ', str(l)
+     if ( getuid() != 0 ) and (len(l) < 1):
+        print 'probably should try again as root'
      sys.exit()
   elif len(l) > 1:
      print "More than one Drobo connected, please pick one: " + str(l) 

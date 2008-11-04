@@ -1,3 +1,7 @@
+0.3.3 
+  -- Chris's man pages & help improvements.
+  -- more messaging fixups for when you don't invoke as root.
+  -- fix for ubuntu Intrepid deciding all disks are Drobos.
   -- fixed all the firmware info parsing issues.
   -- firmware load issues should all be gone.
   -- Brad's fix for ddiag.c, done properly this time (my bad!)
