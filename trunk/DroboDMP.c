@@ -60,6 +60,8 @@ signed int put_mode_page(int sg_fd, void *data, int size,
 
     /* Prepare MODE command */
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
+    memset(&sense_buffer, 0, sizeof(sense_buffer));
+    fprintf(stderr, 'hithere!\n');
  
     if (debug) {
       fprintf( stderr, "\nCDB DUMP START:" );
@@ -129,6 +131,7 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
 
     /* Prepare MODE command */
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
+    memset(&sense_buffer, 0, sizeof(sense_buffer));
  
     if (debug) {
       fprintf( stderr, "\nCDB DUMP START:" );
@@ -294,7 +297,7 @@ PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
     int readwrite;
     int k;
 
-    if (debug) fprintf( stderr, "openfd/open %s, 0\n", file_name );
+    if (debug) fprintf( stderr, "openfd/open 0\n" );
 
     if (!PyArg_ParseTuple(args, "sll", &file_name, &readwrite, &debug )){
         if (debug) fprintf( stderr, "parsetuple broke\n" );
@@ -304,16 +307,17 @@ PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
         retval=Py_BuildValue("i", (signed int)-1);
 	return(retval);
     }
-    if (debug) fprintf( stderr, "openfd/open %s, 0\n", file_name );
+    if (debug) fprintf( stderr, "openfd/open %s, 1\n", file_name );
 
     if ((drobo_fd = open(file_name, readwrite?O_RDWR:O_RDONLY)) < 0) {
         drobo_fd=-1;
         PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
-        if (debug) fprintf( stderr, "open broke\n" );
+        if (debug) fprintf( stderr, "open broke 1.5\n" );
         return(NULL);
     }
 
-    if (debug) fprintf( stderr, "openfd/ioctl %s, 1\n", file_name );
+    if (debug) fprintf( stderr, "openfd/open %s, succeeded 2\n", file_name );
+    if (debug) fprintf( stderr, "openfd/ioctl %s, about to 3\n", file_name );
 
     /* Just to be safe, check we have a new sg device by trying an ioctl */
     if ((ioctl(drobo_fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
@@ -325,7 +329,8 @@ PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
         if (debug) fprintf( stderr, "openfd/ioctl %s, worked...\n", file_name );
     }
     // following looks stupid, but without the temp variable, segaults on ubuntu 8.04, amd64
-    retval=Py_BuildValue("i", (signed int)-1);
+    if (debug) fprintf(stderr, "\ngeneric scsi ioctl said version is %d.\n", k);
+    retval=Py_BuildValue("i", (signed int)drobo_fd);
     if (debug) fprintf(stderr, "\nback from buildvalue\n");
     return(retval);
 }
