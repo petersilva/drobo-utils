@@ -1,0 +1,58 @@
+.TH DROBOM "8" "October 2008" "drobom " "System Administration Utilities"
+.SH NAME
+drobom \- CLI for managing drobo units
+.SH SYNOPSIS
+.B drobom
+\fI<command> \fR[ \fI<device> \fR] [ \fIarguments\fR... ]
+.SH DESCRIPTION
+.SS "command is one of:"
+.TP
+blink
+identify the drobo by making the lights blink
+.TP
+diag
+dump diagnostics file into /tmp directory
+.IP
+fwcheck query drobo.com for updates to firmware for the given Drobo
+fwload  load a specific firmware for the given Drobo. Arguments:
+.TP
+<fwimage>
+the firmware file to load.
+.TP
+fwupgrade
+upgrade the firmware to the latest and greatest, recommended by DRI
+.TP
+help
+print this text
+.TP
+info
+print all available information on a Drobo
+.TP
+list
+show device files for all Drobos found.
+.IP
+settime sync Drobo's clock to UTC
+setlunsize      Set the size of LUNS on device. Arguments:
+.TP
+<device>
+to set the lunsize on
+.TP
+<sz>
+integer number of TiB to set the lunsize to
+.TP
+<confirmation>
+Specify 'PleaseEraseMyData' if you really mean it
+.IP
+Note: After execution, Drobo reboots, wait a few minutes before accessing again
+.TP
+shutdown
+shutdown drobo (DRI calls this 'standby' ... umount first!)
+.TP
+status
+report how is the Drobo doing
+.SS
+device
+raw block device of a drobo. If not given, it will be searched for.
+.SH AUTHOR
+This manual page was written by Chris AtLee <chris@atlee.ca> for the Debian
+project (but may be used by others).
