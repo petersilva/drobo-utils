@@ -397,17 +397,30 @@ Caveats:
    restart.
 
 
-Building a debian package:
+Building debian & ubuntu packages:
 
    (assumes you have installed the Build dependencies...)
 
-   cd trunk
+   #obtain a fresh tree with no svn cruft...
+   svn export http...
+   mv trunk drobo-utils-<version>
+   cd drobo-utils-<version>
+
+   ln -s notdebian debian   # real debian packages use another debian/ tree.
+    # this debian/ config is just for non-distro packages.
+    # builds for debian and Ubuntu.
+
    dpkg-buildpackage -rfakeroot
    cd ..
-   su
-   dpkg -i droboutils_0.1.1-1_i386.deb
 
-   (Doesn't work on amd64... no clue why... help welcome...)
+   mv drobo_utils_0.99.9-1_i386 --> droboutils_0.1.1-1_i386_ubunutuIntrepid.deb
+
+   rm the source tar # because it will have the 'debian' link in it.
+   cd drobo-utils-<version>
+   rm debian
+   tar it up into ...
+
+   
 
 
 Firmware Compatibility:
