@@ -289,14 +289,18 @@ class Drobo:
          the character device associated with the drobo unit
      """   
      self.char_dev_file = chardev  
-     self.fd=0
+     self.fd=-1
      
      if SIMULATE == 0:
         self.fd=DroboDMP.openfd(chardev,0,DEBUG)
+        if self.fd < 0 :
+            raise DroboException
 
      self.features = []    
      self.transactionID=1
      self.relaystart=0
+
+
  
   def __del__(self):
      if DEBUG >0:
@@ -304,6 +308,8 @@ class Drobo:
 
      if (self.fd >0):
            DroboDMP.closefd()
+     self.fd=0
+
 
   def format_script(self,fstype='ext3'):
      """ return a shell script giving the code to commands required to 
@@ -674,6 +680,14 @@ class Drobo:
     hwlevel=inqw[10] 
     fwi=self.GetSubPageFirmware()
     fwv= str(fwi[0]) + '.' + str(fwi[1]) + '.' + str(fwi[2])
+
+    #FIXME ugly hack to force v1 to get onto the v2 firmware stream
+    #  current dri index.txt file says v1's should run 1.1.2, but win/Mac dashboards upgrade
+    #  to 1.2.4 anyways...  so I guess linux should too.
+    #  if a v1 is running 1.1.2, then just claim to be an early v2 firmware, all should work.
+    #if fwv == "1.200.11177": 
+    #   fwv="1.201.12942"     
+
     fwarch = fwi[6].lower()
 
     print 'looking for firmware for:', fwarch, fwv, 'hw version:', hwlevel
@@ -1165,12 +1179,24 @@ def DiscoverLUNs():
        if ( potential[0:2] == "sd" and len(potential) == 3 ):
 	  dev_file= devdir + '/' + potential
           try: 
+              fw=[]
               d = Drobo( dev_file )
+
+              # more thorough checks for Drobohood...
+              # for some reason under ubuntu intrepid, start getting responses of all bits set.
+              # need some ways to spot a real drobo.  
+              cfg = d.GetSubPageConfig()
+              if ( len(cfg) != 3 ) or ( cfg[1] != 4 ): # this page returns three fields, valud 4
+                 pass  # Assert: All Drobo have 4 slots.
+                  
+              # assuming you get past the first barrier...
               fw=d.GetSubPageFirmware()
+              #print 'length of fw query response: %d, fw: %s' % (len(fw), fw)
               if ( len(fw) >= 8 ) and (len(fw[7]) >= 5):
 	          devices.append(dev_file)
           except:
  	      pass
+              
        else:
 	  pass
     return devices
