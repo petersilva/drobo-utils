@@ -402,11 +402,14 @@ Building debian & ubuntu packages:
    (assumes you have installed the Build dependencies...)
 
    #obtain a fresh tree with no svn cruft...
-   svn export http...
+   svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
    mv trunk drobo-utils-<version>
    cd drobo-utils-<version>
 
    ln -s notdebian debian   # real debian packages use another debian/ tree.
+   chmod 755 notdebian/rules # I dunno why the permissions are wrong...
+   vi notdebian/changelog
+
     # this debian/ config is just for non-distro packages.
     # builds for debian and Ubuntu.
 
