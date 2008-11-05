@@ -402,26 +402,29 @@ Building debian & ubuntu packages:
    (assumes you have installed the Build dependencies...)
 
    #obtain a fresh tree with no svn cruft...
+
    svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
-   mv trunk drobo-utils-<version>
-   cd drobo-utils-<version>
+   mv trunk drobo-utils-0.3.3
+   cd drobo-utils-0.3.3
 
-   ln -s notdebian debian   # real debian packages use another debian/ tree.
-   chmod 755 notdebian/rules # I dunno why the permissions are wrong...
-   vi notdebian/changelog
+   ln -s notdebian debian     # real debian packages use another debian/ tree.
+   chmod 755 notdebian/rules  # I dunno why the permissions are wrong...
+   vi notdebian/changelog     # if you want...
 
-    # this debian/ config is just for non-distro packages.
-    # builds for debian and Ubuntu.
+   # this debian/ config is just for non-distro packages.
+   # builds for debian and Ubuntu.
 
    dpkg-buildpackage -rfakeroot
    cd ..
+   # rename it for whatever distro is appropriate...
+   mv drobo_utils_0.3.3-1_i386 --> droboutils_0.3.3-1_i386_ubunutuIntrepid.deb
 
-   mv drobo_utils_0.99.9-1_i386 --> droboutils_0.1.1-1_i386_ubunutuIntrepid.deb
-
-   rm the source tar # because it will have the 'debian' link in it.
-   cd drobo-utils-<version>
+   # rebuild the source tar because it will have the 'debian' link in it.
+   cd drobo-utils-0.99.9
    rm debian
-   tar it up into ...
+   cd ..
+   tar -czvf drobo-utils-0.3.3-1.tgz drobo-utils-0.99.9
+
 
    
 
