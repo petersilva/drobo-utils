@@ -168,7 +168,8 @@ class DroboGUI(QtGui.QMainWindow):
 	#print self.statusmsg
         #self.__StatusBar_space()
         self.statusBar().showMessage( self.statusmsg )
-        self.statusmsg = 'Status: ' + str(self.drobo.GetSubPageStatus()) + ' update: ' + str(self.updates)
+        ss = self.drobo.GetSubPageStatus()
+        self.statusmsg = 'Status: ' + str(ss[0]) + ' update: ' + str(self.updates)
 
         if self.Format.inProgress and ( self.fmt_process.poll() != None) :
                # reset to normal state...
