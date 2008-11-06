@@ -23,11 +23,10 @@ def toTiB(num):
   convert input number to computerish Terabytes.... (ok... TibiBytes blech...)
 
   STATUS: works bizarrely...
-  bug in python 2.5? - a number which is 2 TB -1, + any number < 5000 ends up smaller than 2TiB.  so I just add 5000 to get the correct answer. did a manual binary search, and even 4096 doesn't work...
+  bug in python 2.5? - a number which is 2 TB -1, + any number < 5000 ends up smaller than 2TiB.  so at first I just added 5000 to get the correct answer. did a manual binary search, and even 4096 doesn't work... but when I change OS's, even that didn't workreliably...  so now I just round it at each division...
   """
-  num=num+5000
-  #print num, num/1024, num/(1024*1024), num/(1024*1024*1024)
-  g = (num)/(1024*1024*1024*1024)
+  #print num, num/1024, num/(1024*1024), num/(1024*1024*1024), 
+  g = round(round(round(round(num/1024)/1024)/1024)/1024)
   return int(g)
  
 
