@@ -1121,11 +1121,8 @@ class Drobo:
      ss=self.__getsubpage(0x09, 'LL' )
      s=unitstatus(ss[0])
 
-     print 'ss = ', ss
      if ss[1] > 0 : # relay out in progress
-        print 'relay out is started'
         if self.relaystart == 0:
-           print 'relay out is started 2'
            self.relaystart=time.time()
            self.relayinitialcount=ss[1]
            s.append( 'no estimate yet ' )
@@ -1137,7 +1134,6 @@ class Drobo:
            amtleft= ss[1]
            pctleft= 100.0 * amtleft / self.relayinitialcount 
            pctdone= 100 - pctleft
-           print 'pctleft = %g' % pctleft
            
            if amtdone == 0:
               s.append( 'gathering stats, no estimate yet ' )
