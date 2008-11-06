@@ -290,15 +290,32 @@ class Drobo:
      """   
      self.char_dev_file = chardev  
      self.fd=-1
+     self.features = []    
+     self.transactionID=1
+     self.relaystart=0
      
      if SIMULATE == 0:
         self.fd=DroboDMP.openfd(chardev,0,DEBUG)
         if self.fd < 0 :
             raise DroboException
 
-     self.features = []    
-     self.transactionID=1
-     self.relaystart=0
+        # more thorough checks for Drobohood...
+        # for some reason under ubuntu intrepid, start getting responses of all bits set.
+        # need some ways to spot a real drobo.  
+        cfg = self.GetSubPageConfig()
+        if ( len(cfg) != 3 ) or ( cfg[0] != 4 ): # this page returns three fields, 
+	    raise DroboException # Assert: All Drobo have 4 slots.
+                  
+        # assuming you get past the first barrier...
+        fw=self.GetSubPageFirmware()
+        #print 'length of fw query response: %d, fw: %s' % (len(fw), fw)
+        if ( len(fw) < 8 ) and (len(fw[7]) < 5):
+            raise DroboException
+
+        if ( fw[6].lower() != 'armmarvell' ):
+            raise DroboException
+        
+
 
 
  
@@ -1127,7 +1144,6 @@ class Drobo:
            self.relayinitialcount=ss[1]
            s.append( 'no estimate yet ' )
         else: 
-           print 'relay out is started 3'
            now=time.time()
            runningtime=now - self.relaystart
            amtdone= self.relayinitialcount - ss[1]
@@ -1189,19 +1205,8 @@ def DiscoverLUNs():
           try: 
               fw=[]
               d = Drobo( dev_file )
+	      devices.append(dev_file)
 
-              # more thorough checks for Drobohood...
-              # for some reason under ubuntu intrepid, start getting responses of all bits set.
-              # need some ways to spot a real drobo.  
-              cfg = d.GetSubPageConfig()
-              if ( len(cfg) != 3 ) or ( cfg[1] != 4 ): # this page returns three fields, valud 4
-                 pass  # Assert: All Drobo have 4 slots.
-                  
-              # assuming you get past the first barrier...
-              fw=d.GetSubPageFirmware()
-              #print 'length of fw query response: %d, fw: %s' % (len(fw), fw)
-              if ( len(fw) >= 8 ) and (len(fw[7]) >= 5):
-	          devices.append(dev_file)
           except:
  	      pass
               
