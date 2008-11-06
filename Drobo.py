@@ -1087,7 +1087,7 @@ class Drobo:
         returns ( Major, Minor )
 
         STATUS: working... 
-            soupcon: at firmware 1.0.3, seemed to demand and additional byte.
+            soupcon: at firmware 1.0.3, seemed to demand an additional byte.
               might be a confused artifact of dev.
             at 1.1.1 the additional byte leads to resid > 0 in the C call, 
             so matches docs. 
