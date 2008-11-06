@@ -26,6 +26,7 @@ MULTIPLE LUN support:
 
 
 Better STATUS progress reporting:
+   -- the block count is there, but heuristics for determining timing suck.
    -- some sort of indicator of how long 'relay out' will be in progress.
    -- when it is busy, it should say so... like when I emptied an
       ntfs it took hours for the led indicators to drop from 70% to 0.
