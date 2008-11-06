@@ -306,6 +306,10 @@ class Drobo:
         if ( len(cfg) != 3 ) or ( cfg[0] != 4 ): # this page returns three fields, 
 	    raise DroboException # Assert: All Drobo have 4 slots.
                   
+        set=self.GetSubPageSettings()
+        if ( set[2] != 'TRUSTED DATA' ):
+            raise DroboException
+
         # assuming you get past the first barrier...
         fw=self.GetSubPageFirmware()
         #print 'length of fw query response: %d, fw: %s' % (len(fw), fw)
@@ -1145,7 +1149,7 @@ class Drobo:
            s.append( 'no estimate yet ' )
         else: 
            now=time.time()
-           runningtime=now - self.relaystart
+           runningtime=(now - self.relaystart)/60.0
            amtdone= self.relayinitialcount - ss[1]
            amtleft= ss[1]
            pctleft= 100.0 * amtleft / self.relayinitialcount 
@@ -1154,14 +1158,14 @@ class Drobo:
            if amtdone == 0:
               s.append( 'gathering stats, no estimate yet ' )
            else:
-              rate=  60.0 * pctdone / runningtime # pct/minute...
+              rate=  pctdone / runningtime 
               timeleft = pctleft*rate  # timeleft in minutes...
-              s.append( '%d blocks & %d minutes ' % (ss[1], timeleft) )
+              s.append( '%d blocks left ' % ss[1] )
      else:
         if self.relaystart > 0:
            self.relaystart == 0
 
-     return s
+     return ( s, ss[1] )
 
   def GetSubPageOptions(self): 
      """

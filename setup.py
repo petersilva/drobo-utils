@@ -13,9 +13,7 @@ setup (name = 'Drobo-utils',
        py_modules=['Drobo','DroboGUI'],
        scripts=['drobom', 'droboview'],
        data_files = [
-                    ('share/pixmaps',             ['Drobo-Front-0000.gif']),
-                    ('/usr/share/man/man8',             ['drobom.8']),
-                    ('/usr/share/man/man8',             ['droboview.8'])
+                    ('share/pixmaps',             ['Drobo-Front-0000.gif'])
                     ]
 
       )
