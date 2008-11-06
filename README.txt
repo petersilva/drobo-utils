@@ -367,18 +367,11 @@ root@pepino:/home/peter/drobo/drobo-utils/trunk#
    it should start up with the latest firmware available for your drobo.
    
 
-   The drobom commands, like DRI's dashboard, will only permit you
-   to get the latest and greatest firmware and upgrade.  if you
-   don't mind using python, you can also load arbitrary firmware
-   files like so:
+   The drobom commands, like DRI's dashboard, will normally
+   get the latest and greatest firmware and upgrade.  If you have
+   the need, you can load arbitrary firmware from the CLI with
+   fwload command.
 
-   #!/usr/bin/python
-   import Drobo
-   l=Drobo.Drobo("/dev/sdf")
-   if l.PickFirmware("/home/peter/.drobo-utils/v1.10.tdf"):
-      l.writeFirmware()
-   else:
-      print 'failed to validate firmware'
 
    
 Caveats:
@@ -403,8 +396,7 @@ Building debian & ubuntu packages:
 
    #obtain a fresh tree with no svn cruft...
 
-   svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
-   mv trunk drobo-utils-0.3.3
+   svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk drobo-utils-0.3.3
    cd drobo-utils-0.3.3
 
    ln -s notdebian debian     # real debian packages use another debian/ tree.
