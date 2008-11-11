@@ -60,8 +60,8 @@ signed int put_mode_page(int sg_fd, void *data, int size,
 
     /* Prepare MODE command */
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
-    memset(&sense_buffer, 0, sizeof(sense_buffer));
-    fprintf(stderr, 'hithere!\n');
+    /* memset(&sense_buffer, 0, sizeof(sense_buffer)); */
+
  
     if (debug) {
       fprintf( stderr, "\nCDB DUMP START:" );
