@@ -1,0 +1,204 @@
+#!/usr/bin/python
+
+
+import sys
+import Drobo
+import time
+from posix import getuid
+
+def usage():
+   print "\nUsage: drobom <command> [ <device> ] [ arguments... ] \n"
+   print "command is one of: "
+   print "\tblink\tidentify the drobo by making the lights blink"
+   print "\tdiag\tdump diagnostics file into /tmp directory"
+   print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
+   print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
+   print "\t\t<fwimage>\tthe firmware file to load."
+   print "\tfwupgrade\tupgrade the firmware to the latest and greatest, recommended by DRI"
+   print "\thelp\tprint this text"
+   print "\tinfo\tprint all available information on a Drobo"
+   print "\tlist\tshow device files for all Drobos found."
+   print "\tsettime\tsync Drobo's clock to UTC"
+   print "\tsetlunsize\tSet the size of LUNS on device. Arguments:"
+   print "\t\t<device>\tto set the lunsize on"
+   print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
+   print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you really mean it"
+   print "\t\tNote: After execution, Drobo reboots, wait a few minutes before accessing again"
+   print "\tshutdown\tshutdown drobo (DRI calls this 'standby' ... umount first!)"
+   print "\tstatus\treport how is the Drobo doing"
+   print "\nDevice\tis the raw character device of a drobo. If not given, will search."
+
+
+
+def info(d):
+  print '---------------------------------------------------------'
+  print 'Info about Drobo ' + d.char_dev_file
+  print '---------------------------------------------------------'
+  print
+  
+  config=d.GetSubPageConfig()
+  print 'query config result: '
+  print config
+  print 'max lun size is: ', config[2]
+  print
+  
+  c=d.GetSubPageCapacity()
+  print 'query capacity result:'
+  print c
+  print 'Physical space... used: ',  c[1] , ' free: ' , c[0],  ' Total: ', c[2]
+  print
+  
+  protocol=d.GetSubPageProtocol()
+  print 'query protocol version result: '
+  print protocol 
+  print
+  
+  settings=d.GetSubPageSettings()
+  print 'query settings result:' 
+  print settings
+  print 'Drobo time is', time.ctime(settings[0])
+
+  #print 'drobo says it is now: ', time.ctime(settings[0]), ' GMT offset:', str(settings[1])
+  print
+  
+  slotinfo=d.GetSubPageSlotInfo()
+  print 'query slotinfo result:  number of slots:'
+  print slotinfo[0]
+  print slotinfo[1]
+  print slotinfo[2]
+  print slotinfo[3]
+  print
+  
+  firmware=d.GetSubPageFirmware()
+  print 'query firmware result:' 
+  print firmware
+  print 'drobo says firmware revision: ', str(firmware[0]), '.', str(firmware[1]), '(', str(firmware[2]), ') was built: ', firmware[5]
+  print
+  
+  status=d.GetSubPageStatus()
+  print 'query status result:' 
+  print status
+  print
+  
+  options=d.GetSubPageOptions()
+  print 'query options result:'
+  print options
+  print
+  
+  luninfo=d.GetSubPageLUNs()
+  print 'query luninfo result:'
+  print luninfo
+  print
+
+  print '---------------------------------------------------------'
+
+def update(pct):
+  print "write is %2d%% done." % ( pct )
+
+# Mainline...
+
+
+if len(sys.argv) == 1:
+   usage()
+   sys.exit()
+
+cmd=sys.argv[1]
+
+if cmd in ("help", "--help", "-h"):
+  usage()
+  sys.exit()
+
+if len(sys.argv) > 2:
+  try:
+     d=Drobo.Drobo( sys.argv[2] )
+
+  except:
+     print "failed to open %s as a drobo" % sys.argv[2] 
+     if getuid() != 0:
+         print"I see you are not root... probably just permissions .. try again as root."
+
+     sys.exit()
+
+else:
+  l=Drobo.DiscoverLUNs()
+  if cmd == 'list':
+     print 'found Drobo LUNS at: ', str(l)
+     if ( getuid() != 0 ) and (len(l) < 1):
+        print 'probably should try again as root'
+     sys.exit()
+  elif len(l) > 1:
+     print "More than one Drobo connected, please pick one: " + str(l) 
+     sys.exit()
+  elif len(l) < 1:
+     if getuid() != 0:
+       print "No Drobo found: try again using root."
+     else:
+       print "No Drobo discovered, is one connected?"
+     sys.exit()
+  else:
+     d = Drobo.Drobo( l[0] )
+
+#assert d is a valid drobo object...
+
+
+
+if cmd == "blink":
+   d.Blink() 
+   
+elif cmd == "diag":
+   f=d.dumpDiagnostics()
+   print "diagnostics in ", f
+
+elif cmd == 'fwcheck':
+   d.PickLatestFirmware()
+
+elif cmd == 'fwload':
+   if d.PickFirmware(sys.argv[3]):
+     d.writeFirmware(update)
+     d.Sync()
+
+elif cmd == 'fwupgrade':
+   if d.updateFirmwareRepository():
+     d.writeFirmware(update)
+     d.Sync()
+
+elif cmd == 'info':
+   info(d)
+
+
+elif cmd == "setlunsize": 
+   print sys.argv[3], sys.argv[4]
+   lunsize=int(sys.argv[3])
+
+   if lunsize > 16 or lunsize < 1:
+        print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
+        sys.exit()
+
+   if sys.argv[4] == 'PleaseEraseMyData':
+        print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
+        d.SetLunSize(lunsize)
+        print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
+   else:
+        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+
+elif cmd == "settime": 
+  d.Sync()          
+
+elif cmd == "shutdown":
+   d.Standby() 
+   
+elif cmd == "status":
+   c=d.GetSubPageCapacity()
+   if c[2] > 0 :
+      pfull = 100 * ((c[1]+1.0)/c[2])
+      print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
+   else:
+      print "firmware too old to report capacity properly... or the drobo is empty..."
+
+elif cmd == "time":
+  settings=d.GetSubPageSettings()
+  print "Drobo says it is:", time.ctime(settings[0])
+
+else:
+  usage()
+  print "Unknown Command: ", cmd

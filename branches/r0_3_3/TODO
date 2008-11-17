@@ -1,0 +1,66 @@
+
+in no particular order:
+
+Testing standard....
+	-- format with 1TB LUNS.
+	-- build FS.
+	-- install oldest fw.
+	-- format FAT32.
+	-- roll forward from there.
+
+STANDARD menu entries for droboview...
+
+MULTIPLE LUN support:
+  ON multiple Drobos with a single LUN:
+        That is the assumed case.  In that case, when you invoke ./droboview,
+        it will start up one GUI per Drobo.
+
+  ON MULTIPLE LUNS on a single Drobo:
+        Currently it will start up one GUI per LUN, which will get confusing.
+
+        Don´t know how to tell when two ways to get at a single drobo are
+        the same one.  Serial number?
+
+        cannot test this configuration.  anyone want to send me a couple
+        of terabytes?
+
+
+Better STATUS progress reporting:
+   -- the block count is there, but heuristics for determining timing suck.
+   -- some sort of indicator of how long 'relay out' will be in progress.
+   -- when it is busy, it should say so... like when I emptied an
+      ntfs it took hours for the led indicators to drop from 70% to 0.
+      It should say something about what is going on.
+
+
+Documentation Dialogs:
+   -- need a blame/credit window.
+   -- maybe a help window.
+
+
+LIVELIER GUI:
+   -- have status queries proceed asynchronously from the GUI.
+      right now, if the drobo is slow, the GUI makes it slower, and gets very slow too.
+      should run as a daemon, async. from the GUI.
+
+Re-design the whole darn thing.
+   -- there should be some sort of service integrated with dbus-hal
+   -- not sure that a GUI is needed at all. but if it is, it should be a DBUS client.
+   -- how does authentication work in DBUS?
+
+
+   of interest:
+   -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
+
+
+use ctypes to replace the C stub...
+
+
+Revision date: 2008/08/10
+
+copyright:
+
+Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
+named COPYING in the root of the source directory tree.
+Installation:
