@@ -287,13 +287,30 @@ root@alu:~# mount /dev/sdd1 /mnt
 
 NOTES:
 
-drobo-utils is completely untested with multiple LUNS.  Best to make LUN
-large enough to span all your space.  starting up droboview will probably 
-spawn a GUI for each LUN, so you may end up seeing double...
+Multiple LUNS
+
+LUN is a 'Logical UNit', from SCSI terminology, when RAID units became
+too large for support in the past, and were sub-divided to present 
+smaller units the operating system.  The default LUNSIZE on Drobos 
+is 2 TiB (adjustable using the tools.) If more disk space (after 
+allowing for parity/redundancy) than LUNSIZE is installed in a 
+unit, Drobo will show a second (or even third) LUN.  Each LUN 
+shows up in Linux as a separate disk (examples if the first
+LUN shows up as /dev/sde, the next will be /dev/sdf, then /dev/sdg.)
+
+If you think you should see multiple LUNS and you don't, you
+might have a look at some kernel settings:
+make sure that scsi_mod kernel module is loaded, make 
+sure /sys/module/scsi_mod/parameters/max_luns is > 1.
+
+drobo-utils is untested with multiple LUNS.  starting up droboview 
+will probably spawn a GUI for each LUN, so you may end up seeing double...
 
 Probably not a good idea to run two GUI's for a single drobo.  the GUI
 polls continuously for changes to the device, and that might interfere
 if you try to, say, upgrade the firmware, with the other GUI.
+
+
 
 ON LUNSIZES >= 2TB:
  -- On older distributions, there are a couple of gotchas related to 
@@ -305,9 +322,11 @@ ON LUNSIZES >= 2TB:
            (bug #524948 reported to bugzilla.gnome.org) It's just the GUI, 
            as libparted is fine, and other tools based on it
            still work. 
+
   -- on linux kernel < 2.6.24 supposedly, the USB layer won't let one address 
      LUNs/offsets > 2 TB.  For example, Ubuntu hardy (8.04) released in Spring 
      2008 has a 2.6.24, and so is OK.  I've never been able to test this problem. 
+
   -- ext3 with 4K blocks is supposed to allow file system capacity of 8 TiB.
      4K blocks seem to be assigned by default. So I think a good max. 
      It would be fun to set the LunSIZE to 8 TiB and test it out...
