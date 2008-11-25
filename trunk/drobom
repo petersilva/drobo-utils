@@ -173,6 +173,10 @@ elif cmd == "setlunsize":
    if lunsize > 16 or lunsize < 1:
         print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
         sys.exit()
+ 
+   if lunsize != 8 and lunsize != 8 and lunsize != 4 and lunsize != 2 and lunsize != 1:
+        print 'lun size needs to be a power of 2 TiB, %d is invalid' % lunsize
+        sys.exit()
 
    if sys.argv[4] == 'PleaseEraseMyData':
         print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
