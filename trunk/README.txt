@@ -159,8 +159,11 @@ see if something sensible happens... on my system with a drobo
 the following happens:
 
 % ./drobom status
-/dev/sdd 100% full - ['Red alert', 'Bad disk', 'No redundancy']
+/dev/sdz 100% full - ['Red alert', 'Bad disk', 'No redundancy']
 %
+
+Note: drive changed to sdz to avoid copy/paste errors.
+
 very scary, but my drobo is in bad shape right now... you should just get []
 as a status, which means there is nothing wrong.   If you get an error
 like it isn't detecting any drobos:
@@ -211,7 +214,7 @@ WARNING: AFTER THE SECOND LINE, YOU ARE TOAST.
 WARNING: BEST TO BACKUP YOUR DATA BEFOREHAND...
 
 if you didn't use the GUI, Here is what you have to type:
-parted -i /dev/sdd 
+parted -i /dev/sdz 
 mklabel gpt
 mkpart ext2 0 100%
 quit
@@ -224,21 +227,21 @@ below takes a while, just have a little patience, it´ll be fine.
 
 From the Doboshare forums, building a file system:
 
-mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode  /dev/sdd1
+mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode  /dev/sdz1
 
-(If you want an ntfs file system, then mkntfs -f -L Drobo01 /dev/sdd1 
+(If you want an ntfs file system, then mkntfs -f -L Drobo01 /dev/sdz1 
 ought to work too... )
 On my system the process looked like this:
 
 -------------------
-root@alu:~# parted -i /dev/sdd
+root@alu:~# parted -i /dev/sdz
 GNU Parted 1.7.1
-Using /dev/sdd
+Using /dev/sdz
 Welcome to GNU Parted! Type 'help' to view a list of commands.
 (parted) mklabel gpt
 (parted) mkpart ext2 0 100%
 (parted) quit
-root@alu:~# fdisk /dev/sdd
+root@alu:~# fdisk /dev/sdz
 GNU Fdisk 1.0
 Copyright (C) 1998 - 2006 Free Software Foundation, Inc.
 This program is free software, covered by the GNU General Public License.
@@ -247,17 +250,17 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-Using /dev/sdd
+Using /dev/sdz
 Command (m for help): p
 
-Disk /dev/sdd: 2199 GB, 2199020382720 bytes
+Disk /dev/sdz: 2199 GB, 2199020382720 bytes
 255 heads, 63 sectors/track, 267349 cylinders
 Units = cylinders of 16065 * 512 = 8225280 bytes
 
    Device Boot      Start         End      Blocks   Id  System
-/dev/sdd1               1      267350  2147488843   83  Linux
+/dev/sdz1               1      267350  2147488843   83  Linux
 Command (m for help): q
-root@alu:~# mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdd1
+root@alu:~# mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdz1
 mke2fs 1.40.8 (13-Mar-2008)
 Filesystem label=Drobo01
 OS type: Linux
@@ -281,7 +284,7 @@ Writing superblocks and filesystem accounting information: done
 This filesystem will be automatically checked every 26 mounts or
 180 days, whichever comes first.  Use tune2fs -c or -i to override.
 root@alu:~#
-root@alu:~# mount /dev/sdd1 /mnt
+root@alu:~# mount /dev/sdz1 /mnt
 
 -------------------
 
