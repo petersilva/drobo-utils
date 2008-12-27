@@ -303,9 +303,17 @@ class Drobo:
         # for some reason under ubuntu intrepid, start getting responses of all bits set.
         # need some ways to spot a real drobo.  
         cfg = self.GetSubPageConfig()
-        if ( len(cfg) != 3 ): # or ( cfg[0] != 4 ): # this page returns three fields, 
-            print "length of cfg is: %d, should be 3" % len(cfg)
-            print "cfg[0] = %s, should be 4. All Drobos have 4 slots" % cfg[0]
+        if DEBUG > 0:
+            print "cfg: ", cfg
+
+        if ( len(cfg) != 3 ): # We ask this page to return three fields...
+            if DEBUG > 0:
+              print "%s length of cfg is: %d, should be 3" % (chardev, len(cfg))
+	    raise DroboException 
+
+        if ( cfg[0] != 4 ): 
+            if DEBUG > 0:
+              print "%s cfg[0] = %s, should be 4. All Drobos have 4 slots" % (chardev, cfg[0])
 	    raise DroboException # Assert: All Drobo have 4 slots.
  
         set=self.GetSubPageSettings()
@@ -313,19 +321,21 @@ class Drobo:
             print "settings: ", set
 
         if ( set[2] != 'TRUSTED DATA' ) and ( set[2] != 'Drobo disk pack'):
-            print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" %\
-                 ( chardev, set[2] )
+            if DEBUG > 0:
+              print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( chardev, set[2] )
             raise DroboException
 
         # assuming you get past the first barrier...
         fw=self.GetSubPageFirmware()
         if ( len(fw) < 8 ) and (len(fw[7]) < 5):
-            print "%s length of fw query: is %d, should be < 8." % (chardev, len(fw))
-            print "%s len(fw[7]) query: is %d, should be < 5." % (chardev, len(fw[7]))
+            if DEBUG > 0:
+              print "%s length of fw query: is %d, should be < 8." % (chardev, len(fw))
+              print "%s len(fw[7]) query: is %d, should be < 5." % (chardev, len(fw[7]))
             raise DroboException
 
         if ( fw[6].lower() != 'armmarvell' ):
-            print "%s fw[6] is not armmarvell." % chardev
+            if DEBUG > 0:
+              print "%s fw[6] is not armmarvell." % chardev
             raise DroboException
         
 
