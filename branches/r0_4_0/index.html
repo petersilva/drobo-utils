@@ -1,0 +1,329 @@
+<html>
+<head>
+<title>Drobo-Utils: Drobo: API, CLI, &amp; Dashboard for linux</title>
+</head>
+<body>
+<H2>Drobo-Utils: Drobo: API, CLI, &amp; Dashboard for linux</H2>
+<IMG SRC="droboview_prototype4.png" scale=50%>
+<P>
+[ <A HREF="gallery.html">Image Gallery</a> ] 
+[ <A HREF="http://sourceforge.net/project/showfiles.php?group_id=222830">Download</a>]
+<P>
+Drobo-utils is a set of linux tools to query and manage Data Robotics
+Drobo storage systems.   If you fire up droboview, it should look pretty
+familiar to those who have seen the dashboard on other operating systems. 
+Droboview is built on a little programmer interface which can be installed 
+on the system and used by other applications as well.
+<P>
+For experienced Linux hands, there is a command line interface, drobom,
+which offers the same functionality as droboview.
+<P>
+<PRE>
+
+Components:
+  droboview   - Graphical User interface to see how the Drobo is doing.
+                this is a bit like the ´dashboard´ app for other OS´s.
+  drobom      - CLI script, accesses Drobo.py with no GUI stuff.
+  DroboGUI.py - implements GUI. uses Drobo.py for Drobo related stuff.
+  Drobo.py   -- overall Drobo io manager, provides API & "python CLI"
+                uses DroboDMP.c to do raw io.
+  DroboDMP.c -- python module to perform the detailed drobo ioctls.
+                only platform specific stuff is in here...
+  setup.py --   python version of a Makefile
+</PRE>
+
+<H2>Links &amp; Help!</H2>
+<UL>
+<LI><A HREF="http://drobo.com">http://drobo.com</a> -- where to get a drobo
+<LI><A HREF="http://sourceforge.net/projects/drobo-utils/">http://sourceforge.net/projects/drobo-utils/ </a> -- development home page.  source code there as a download too...
+<LI><A HREF="http://drobospace.com">http://drobospace.com</a>	-- vendor forums. (serial number required for access.)
+<LI><A HREF="http://groups.google.com/group/drobo-talk?hl=en">http://groups.google.com/group/drobo-talk?hl=en</a> -- a forum for talking about drobos without editorial prying.
+</UL>
+you try the google groups or just post to drobo-utils-devel@sourceforge.net, but for now, it's just me... my email works too... Peter.A.Silva@gmail.com (help welcome!)
+
+<H2>Requirements:</H2>
+drobo-utils was developed on Kubuntu Hardy Heron.  Any similarly recent distro ought to do.  To get drobo-utils running, you need packages something like (these are ubuntu packages, names may vary on other distros):
+
+<PRE>
+essential:
+  python      -- interpreter for python language
+  python-qt4  -- python-qt4... This is actually a new version only in 
+                              the newest distros.
+  libsgutils1-dev -- ioctl support.
+  python-dev      -- to build DroboDMP extension.
+  parted      -- disk partitioner.
+
+INSTALLING pre-requisites.:  
+On ubuntu, it would typically look like so:
+
+	open a shell window. they enter the following package installation commands:
+
+	% sudo aptitude install python-qt4 libsgutils1-dev libsgutils1 python-dev  
+	% sudo aptitude install parted kdesudo
+
+On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' and
+some of the package names will change.  A typical difference is that packages for developers
+have the -devel suffix on Redhat derived distributions, instead of the -dev favoured
+by debian derived ones.
+
+here is an exmple from fedora 7 (courtesy of help4death on the google group):
+
+% yum install python
+% yum install sg3_utils
+% yum install PyQt4
+% yum install python-devel
+% yum install libsgutils.so.1
+% yum install sg3_utils-devel
+
+
+</PRE>
+
+<H2>Install From Package:</H2>
+Point your browser at: <A HREF="http://sourceforge.net/project/showfiles.php?group_id=222830">http://sourceforge.net/project/showfiles.php?group_id=222830</a> where current packages are available.  
+If you are running Ubuntu 8.10 on a intel platform, then there is a pre-built 
+binary ready for you.  Normally, development occurs on the trunk of the svn tree.  
+After a given trunk has passed release QA, it will be copied to a branch for 
+maintenance.  So all the branches are stable versions, trunk is live.  If need 
+to work from source, so you can either download a .tar.gz package from sourceforge, 
+or get any version, including the bleeding edge latest &amp; greatest via subversion.
+
+<PRE>
+
+   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk drobo-utils
+
+</PRE>
+using tar or svn, you need to get yourself into the trunk directory after downloading. Once there...
+
+<H2>Build From Source:</H2>
+
+Assuming you have all of the above parts, you should be able to just do:
+
+<UL>
+	python setup.py build
+</UL>
+
+which on my system looks like this:
+<PRE>
+
+alu% python ./setup.py build
+running build
+running build_py
+creating build
+creating build/lib.linux-i686-2.5
+copying Drobo.py -> build/lib.linux-i686-2.5
+copying DroboGUI.py -> build/lib.linux-i686-2.5
+running build_ext
+building 'DroboDMP' extension
+creating build/temp.linux-i686-2.5
+gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.5 -c DroboDMP.c -o build/temp.linux-i686-2.5/DroboDMP.o
+gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions build/temp.linux-i686-2.5/DroboDMP.o -o build/lib.linux-i686-2.5/DroboDMP.so
+running build_scripts
+creating build/scripts-2.5
+copying and adjusting drobom -> build/scripts-2.5
+copying and adjusting droboview -> build/scripts-2.5
+changing mode of build/scripts-2.5/drobom from 644 to 755
+changing mode of build/scripts-2.5/droboview from 644 to 755
+alu%   
+</PRE>
+<P>
+It should create a build/lib<somthing> sub-directory.  It will also
+compile DroboDMP.c a put the result in a shared object object library 
+in that directory.   To make python look there, you need to tell it:
+<PRE>
+
+C-ish shells:
+setenv PYTHONPATH `pwd`/build/lib.linux*
+
+Bournish shells:
+export PYTHONPATH=`pwd`/build/lib.linux*
+
+</PRE>
+If all has gone well, you can kick the tires 
+by starting it up with: 
+<UL>         
+        sudo ./drobom status 
+</UL>
+<P>
+see if something sensible happens... on my system with a drobo
+the following happens:
+<PRE>
+% sudo ./drobom status
+/dev/sdz 100% full - ['Red alert', 'Bad disk', 'No redundancy']
+%
+</PRE>
+NOTE: <I>it says 'sdz'.  I changed the drive id throughout this help file to avoid copy/paste errors. </I>
+<P>
+very scary, but my drobo was in bad shape at the time... you should just get []
+as a status, which means there is nothing wrong.  
+If you get something about not being able to find DroboDMP, then try just using the python installer:
+<PRE>
+
+% sudo python setup.py install
+
+</PRE>
+<P>
+To get all kinds of information on your drobo, try './drobom info'
+Once that is working, and assuming you have python-qt4 installed, try:
+<UL>
+	sudo ./droboview
+</UL>
+<P>
+which should start a GUI for each drobo attached to your machine.
+<P>
+<H2>Setup Drobo with Linux:</H2>
+<P>
+The dashboard is fairly self explanatory.  There is a 'Format' tab.
+You can change the LUN size or create a file system, just not both at once.
+If you want to change the LUN size do that first.  Then exit and restart droboview,
+as the drobo's reboot confuses it.  Then you can build the file system you want
+on the LUN.
+<P>
+While the dashboard works fine with any version of firmware, only versions 
+1.1.1 and later fully support ext3, which would be the normal choice.
+You can, of course set up an NTFS or HPS+ or FAT32 if you really want,
+but it seems actively counter-intuitive on Linux.  Have not tested
+HFS, but ntfs-3g worked fine initially.  However, unless you are
+going to physically move the disk to between systems, the native (ext3) 
+format has many advantages.  
+<P>
+If you have a fear of the GUI, or you would rather prepare the Drobo manually,
+the commands to do so are simple and straightforward.  Also, the GUI only formats the first LUN on a Drobo, as multiple LUNS have not been tested.  For the second or third LUNS you can use these commands to prepare them for use.  The ´coffee is hot´ disclaimer is necessary at this point:
+<PRE><BOLD>
+
+WARNING: THE FOLLOWING 4 LINES WILL ERASE ALL DATA ON YOUR DROBO!
+WARNING: NO, IT WILL NOT ASK ANY QUESTIONS!
+WARNING: ASK YOURSELF, before you start: ARE YOU SURE? 
+WARNING: AFTER THE SECOND LINE, YOU ARE TOAST.
+WARNING: BEST TO BACKUP YOUR DATA BEFOREHAND...
+</BOLD>
+<P>
+Here is what you have to type:
+parted -i /dev/sdz 
+mklabel gpt
+mkpart ext2 0 100%
+quit
+</PRE>
+<P>
+The above sets up the drobo LUN as one big partition, with a label that says
+it ought to contain an ext2 file system.  If you want an NTFS file system,
+then write ´ntfs´ in place of ext2.  The next step is to add the file
+system into the partition.  while the above step was instantaneous, the step 
+below takes a while (like 10 minutes per TiB), just have a little patience, it´ll be fine.
+<P>
+From the Doboshare forums, the recipe for building an ext3 file system:
+
+<P>
+mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode  /dev/sdz1
+
+<P>
+(If you want an ntfs file system, then mkntfs -f -L Drobo01 /dev/sdz1 
+ought to work too... )
+On my system the process looked like this:
+
+<PRE>
+-------------------
+root@alu:~# parted -i /dev/sdz
+GNU Parted 1.7.1
+Using /dev/sdz
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted) mklabel gpt
+(parted) mkpart ext2 0 100%
+(parted) quit
+root@alu:~# fdisk /dev/sdz
+GNU Fdisk 1.0
+Copyright (C) 1998 - 2006 Free Software Foundation, Inc.
+This program is free software, covered by the GNU General Public License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+Using /dev/sdz
+Command (m for help): p
+
+Disk /dev/sdz: 2199 GB, 2199020382720 bytes
+255 heads, 63 sectors/track, 267349 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdz1               1      267350  2147488843   83  Linux
+Command (m for help): q
+root@alu:~# mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdz1
+mke2fs 1.40.8 (13-Mar-2008)
+Filesystem label=Drobo01
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+8388608 inodes, 536870886 blocks
+0 blocks (0.00%) reserved for the super user
+First data block=0
+16384 block groups
+32768 blocks per group, 32768 fragments per group
+512 inodes per group
+Superblock backups stored on blocks:
+        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+        4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
+        102400000, 214990848, 512000000
+
+Writing inode tables: done
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+This filesystem will be automatically checked every 26 mounts or
+180 days, whichever comes first.  Use tune2fs -c or -i to override.
+root@alu:~#
+root@alu:~# mount /dev/sdz1 /mnt
+-------------------
+</PRE>
+<P>
+If there is more than one LUN for your drobo, the next lun should show up as /dev/sde, then /dev/sdf, etc... repeat partitioning and building of file systems for each lun.  Yes, you can fire them off all at once if you like.
+<P>
+NOTE:
+drobo-utils is completely untested with multiple LUNS.  instructions above based on educated guesses, but I only have ever used a single LUN.  
+<P>
+ON LUNSIZES >= 2TB:
+<UL>
+<LI>last I checked (2008/09) DRI does not support LUNS bigger than 2 TiB for ext2.
+
+<LI>On older distributions, there are a couple of gotchas related to 
+    linux tools which aren't 2TB ready...  to exceed 2 TB, you need to:
+    <UL>
+    <LI>use GPT partitions, which aren´t supported by older fdisk
+	   versions.  Tools based on libparted work fine, mostly.
+    
+    <LI>gparted fails, and seems to have a 2 TB limit on devices.
+           (bug #524948 reported to bugzilla.gnome.org) It's just the GUI, 
+           as libparted is fine, and other tools based on it
+           still work. One can created a label with:
+    </UL>
+</UL>
+
+(assuming the disk is /dev/sdd)
+
+<H3>Caveats:</H3>
+<P>
+droboview isn't suited to run continuously for long periods, 
+as it has a memory leak...  total foot print starts out at 32M
+with a 14 MB resident set size, of which 10 MB are shared, so only 
+about 4M of real memory consumed.   but the RSS grows at about 
+2MB/hour.  Best to restart it daily, or use it when necessary, but not leave it
+on for days.
+
+<H3>Getting a Snapshot:</H3>
+
+svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
+<P>
+for commit access, you need a sourceforge user account.
+
+
+<H3>About this page</H3>
+<pre>
+Revision date: 2008/11/24
+
+copyright:
+
+Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
+named COPYING in the root of the source directory tree.
+
+</PRE>
