@@ -49,11 +49,12 @@ SIMULATE = 0
 # set to non-zero to increase verbosity of library functions.
 DEBUG = 0
 # It's a bit field, to debug the DroboDMP layer set bit3 (ie. 0x08)
-DBG_General = 0x01 
+DBG_Chatty = 0x01 
 DBG_HWDialog = 0x02
 DBG_Instantiation = 0x04
 DBG_DMP = 0x08 # C-layer...  not used here...
 DBG_Detection = 0x10
+DBG_General = 0x20 
 
 #
 # FIXME: if installed with "python setup.py install" then this 
@@ -401,7 +402,7 @@ class Drobo:
      fd.write( "#!/bin/sh\n" )
 
      if fstype == 'FAT32':
-         ptype='mbr'
+         ptype='msdos'
      else:
          ptype='gpt' 
 
@@ -428,7 +429,7 @@ class Drobo:
          fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
          fd.write( 'mkntfs -f -L Drobo01  %s1\n' % self.char_dev_file )
      elif fstype == 'FAT32':
-         fd.write( "parted %s mkpart fat32 0 100%%\n" % self.char_dev_file )
+         fd.write( "parted %s mkpart primary fat32 0 100%%\n" % self.char_dev_file )
          fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
          fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % self.char_dev_file )
      else:
@@ -548,7 +549,8 @@ class Drobo:
 
        status:  Broken!  always sets LUNSIZE to 16TB
     """
-    print 'set lunsize to %d TiB' % tb
+    if (DEBUG & DBG_Chatty):
+       print 'set lunsize to %d TiB' % tb
 
     buffer=struct.pack( ">l", tb )
     sblen=len(buffer)
@@ -601,7 +603,7 @@ class Drobo:
 
         decryption reported to be XOR of 165, 0xa5... not added yet.
     """
-    if DEBUG & DBG_General:
+    if DEBUG & DBG_Chatty:
       print "Dumping Diagnostics..."
 
     # tried 32000 ... it only returned 5K, so try something small.
@@ -661,14 +663,17 @@ class Drobo:
        sets self.fwdata
 
     """
-    print 'Reading Firmware from = %s' % name
+    if (DEBUG & DBG_Chatty):
+       print 'Reading Firmware from = %s' % name
+
     if ( name[-1] == 'z' ): # data is zipped...
        inqw=self.inquire()
        hwlevel=inqw[10] 
        z=zipfile.ZipFile(name,'r')
        for f in z.namelist():
-           print f , ' ? '
-           print 'firmware for hw rev ', f[-5] , ' this drobo is rev ', hwlevel[0]
+           if (DEBUG & DBG_General):
+              print f , ' ? '
+              print 'firmware for hw rev ', f[-5] , ' this drobo is rev ', hwlevel[0]
 	   if f[-5] == hwlevel[0]:
               self.fwdata = z.read(f) 
     else: # old file...
@@ -744,7 +749,8 @@ class Drobo:
 
     fwarch = fwi[6].lower()
 
-    print 'looking for firmware for:', fwarch, fwv, 'hw version:', hwlevel
+    if (DEBUG & DBG_Chatty):
+      print 'looking for firmware for:', fwarch, fwv, 'hw version:', hwlevel
     listing_file=urllib2.urlopen( Drobo.fwsite + "index.txt")
     list_of_firmware_string=listing_file.read().strip("\t\r")
     list_of_firmware=list_of_firmware_string.split("|") 
@@ -773,11 +779,12 @@ class Drobo:
               k[4]=m.group(1);
           if k[4] == fwv:
               if len(k) > 4: 
-                print 'This Drobo should be running: ', value
+                if (DEBUG & DBG_Chatty):
+                   print 'This Drobo should be running: ', value
                 return (fwarch, fwv, hwlevel, value)
       i=i+2
- 
-    print 'no matching firmware found, must be the latest and greatest!'
+    if (DEBUG & DBG_Chatty):
+       print 'no matching firmware found, must be the latest and greatest!'
     return ( '','','','' )
 
   def downloadFirmware( self, fwname, localfw ):
@@ -787,21 +794,24 @@ class Drobo:
 
       STATUS: works.
     """
-    print 'downloading firmware ', fwname, '...'
+    if (DEBUG & DBG_Chatty):
+      print 'downloading firmware ', fwname, '...'
     self.fwdata=None
     firmware_url=urllib2.urlopen( Drobo.fwsite + fwname )
     filedata = firmware_url.read()
     f = open(localfw,'w+')
     f.write(filedata)
     f.close()
-    print 'local copy written'
+    if (DEBUG & DBG_Chatty ) :
+        print 'local copy written'
 
     if ( fwname[-1] == 'z' ): # data is zipped...
        self.PickFirmware(localfw)
     else: 
        self.fwdata=filedata
 
-    print 'downloading done '
+    if (DEBUG & DBG_Chatty ) :
+       print 'downloading done '
     return self.fwdata
 
   def validateFirmware(self):
@@ -822,22 +832,25 @@ class Drobo:
        STATUS: working.
 
     """
-    print 'validateFirmware start...'
+    if (DEBUG & DBG_Chatty):
+      print 'validateFirmware start...'
     self.fwhdr = struct.unpack('>ll4sl16slllll256sl', self.fwdata[0:312])
 
     if  len(self.fwdata) != ( self.fwhdr[0] + self.fwhdr[8] ) :
 	print 'header corrupt... Length does not validate.'
 	return 0
 
-    print 'header+body lengths validated.  Good.'
+    if (DEBUG & DBG_Chatty):
+      print 'header+body lengths validated.  Good.'
     #print self.fwhdr
 
     if  self.fwhdr[2] != 'TDIH' :
         print 'bad Magic, not a valid firmware'
         return 0
 
-    print 'Magic number validated. Good.'
-    print '%d + %d = %d length validated. Good.' % ( self.fwhdr[0], self.fwhdr[8], len(self.fwdata) )
+    if (DEBUG & DBG_Chatty):
+      print 'Magic number validated. Good.'
+      print '%d + %d = %d length validated. Good.' % ( self.fwhdr[0], self.fwhdr[8], len(self.fwdata) )
 
     # http://bugs.python.org/issue1202
     # doesn't work on 64 bit, only on 32bit... weird...
@@ -845,20 +858,23 @@ class Drobo:
     hdrcrc = zlib.crc32( self.fwdata[0:308] + blank + self.fwdata[312:self.fwhdr[0]] ) & 0xffffffffL
     r = self.fwhdr[11] & 0xffffffffL
 
-    print 'CRC from header: %d, calculated using python zlib crc32: %d ' % ( r, hdrcrc)
+    if (DEBUG & DBG_Chatty):
+      print 'CRC from header: %d, calculated using python zlib crc32: %d ' % ( r, hdrcrc)
     if r != hdrcrc :
         print 'file corrupt, header checksum wrong'
         return 0
     bodycrc = zlib.crc32( self.fwdata[self.fwhdr[0]:] ) & 0xffffffffL
     q = self.fwhdr[9] & 0xffffffffL
  
-    print 'CRC for body from header: %d, calculated: %d ' % ( q, bodycrc)
+    if (DEBUG & DBG_Chatty):
+      print 'CRC for body from header: %d, calculated: %d ' % ( q, bodycrc)
     if q != bodycrc :
         print 'file corrupt, payload checksum wrong'
         return 0
     
-    print '32 bit Cyclic Redundancy Check correct. Good.'
-    print 'validateFirmware successful...'
+    if (DEBUG & DBG_Chatty):
+      print '32 bit Cyclic Redundancy Check correct. Good.'
+      print 'validateFirmware successful...'
 
     return 1 
     
@@ -888,20 +904,24 @@ class Drobo:
 
     fwname = fwpath.split('/')
     localfw = Drobo.localfwrepository + '/' + fwarch + '_' + hwlevel + '_' + fwname[-1] 
-    print 'looking for: %s' % localfw
+    if (DEBUG & DBG_Chatty):
+       print 'looking for: %s' % localfw
     if not os.path.exists(localfw):
-       print 'not present, fetching from drobo.com'
+       if (DEBUG & DBG_Chatty):
+          print 'not present, fetching from drobo.com'
        self.fwdata = self.downloadFirmware(fwpath,localfw)
        good = self.validateFirmware()
        if not good:
           print 'downloaded firmware did not validate.' 
           return 0
     else:
-       print 'local copy already present:', localfw
+       if (DEBUG & DBG_Chatty):
+          print 'local copy already present:', localfw
        good = self.PickFirmware(localfw)
 
     if good:
-      print 'correct fw available'
+      if (DEBUG & DBG_Chatty):
+         print 'correct fw available'
       return 1
  
     print 'no valid firmware found'
@@ -938,8 +958,9 @@ class Drobo:
     j=i+buflen 
     moretocome=0x01
 
-    print 'writeFirmware: i=%d, start=%d, last=%d fw length= %d\n' % \
-      ( i, self.fwhdr[0], totallength, len(buffer) )
+    if (DEBUG & DBG_Chatty ) :
+      print 'writeFirmware: i=%d, start=%d, last=%d fw length= %d\n' % \
+         ( i, self.fwhdr[0], totallength, len(buffer) )
 
     while (written == buflen) and ( i < len(self.fwdata)) :
 
@@ -956,9 +977,12 @@ class Drobo:
         i=j
 
         function(i*100/totallength)
-        print 'wrote ',written, ' bytes.  Cumulative: ',  i, ' of', totallength
 
-    print 'writeFirmware Done.  i=%d, len=%d' % ( i, totallength )
+        if (DEBUG & DBG_Chatty ) :
+            print 'wrote ',written, ' bytes.  Cumulative: ',  i, ' of', totallength
+
+    if (DEBUG & DBG_Chatty ) :
+       print 'writeFirmware Done.  i=%d, len=%d' % ( i, totallength )
 
     self.__transactionNext()
     
