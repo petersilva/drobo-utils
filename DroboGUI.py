@@ -53,26 +53,21 @@ class DroboAbout(QtGui.QWidget):
    def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.main = QtGui.QLabel("""
-  drobo-utils: software to manage a Drobo 
-  storage unit from Data Robotics 
-  International Corp.
+  drobo-utils: software to manage a Drobo storage unit from Data Robotics International Corp.
+  Winner of the Data Robotics Bounty 2008 for a linux dashboard!  
+  Home page:  http://drobo-utils.sourceforge.net
 
-  http://drobo-utils.sourceforge.net
-
-  Copyright 2008 Peter Silva
-  ( Peter.A.Silva@gmail.com )
-
+  Copyright 2008 Peter Silva ( Peter.A.Silva@gmail.com )
   license: General Public License (GPL) v3
 
-  with Contributions from: 
-     Chris Atlee (chris@atlee.ca)
-     Brad Guillory, <withheld@spammenot.norge>
+  with contributions from: Chris Atlee (chris@atlee.ca), Brad Guillory, <withheld@spammenot.norge> 
+  and inspiration from: Joe Krahn
         """ , self)
         self.setMinimumSize(240, 240)
         self.quit = QtGui.QPushButton('Quit',self)
         self.quit.setCheckable(False)
         self.quit.setMinimumWidth(200)
-        self.quit.move(30,200)
+        #self.quit.move(-30,-100)
         self.connect(self.quit, QtCore.SIGNAL('clicked()'), 
                 self.hide)
  
