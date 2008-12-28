@@ -1,16 +1,33 @@
 This software is copyright under GPL.  See near end file for details...
 
-Random useful bits for developers. 
+Random useful bits for developers.  (aka notes to myself ;-)
 
  
 dpkg vs. python install:
-   setup.py puts things in /usr/bin,  dpkg in /usr/sbin.  haven't reviewed 
-   for other conflicts, least confusing to use one or the other method
-   on a system.  (if you do python install, then dpkg --purge drobo-utils)
+   the dpkg stuff in notdebian puts stuff in /usr/sbin while setup.py puts things in /usr/bin.  
+   python install does not install man pages either, which the dpkg takes care of.
+   The libs are placed differently too.  haven't reviewed for other conflicts, least 
+   confusing to use one or the other method on a system.  
+   (if you do python install, then dpkg --purge drobo-utils)
 
    There doesn't seem to be a distutils way to remove a package.
    I just do an installation, then manually remove the files it puts it.
-   python install does not install man pages either.
+
+
+Making a release.
+
+  1 - make a branch
+   svn copy https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<branch>
+
+  2 - Stamp the branch with version 
+   vi notdebian/changelog     # review version tags for accuracy and consistency.
+   vi Drobo.py                # edit VERSION
+
+  3 - Build packages for testing & Install them. (see separate recipe.)
+
+  4 - Run QA.
+   typically make a branch for each release.  Record results of release tests in the branch (QA.txt)
+   as new tests are created, modify QA.txt on trunk for to keep references for the next release.
 
 
 
@@ -19,16 +36,15 @@ Building debian & ubuntu packages:
    (assumes you have installed the Build dependencies...)
 
    #obtain a fresh tree with no svn cruft...
+   to just build a package:
+   svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<version>
 
-   svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
-   mv trunk drobo-utils-0.3.3
-   cd drobo-utils-0.3.3
+   mv trunk drobo-utils-<version>
+   cd drobo-utils-<version>
 
    ln -s notdebian debian     # real debian packages use another debian/ tree.
    chmod 755 notdebian/rules  # I dunno why the permissions are wrong...
 
-   vi notdebian/changelog     # review version tags for accuracy and consistency.
-   vi Drobo.py                # /VERSION
 
    # this debian/ config is just for non-distro packages.
    # builds for debian and Ubuntu.
@@ -44,19 +60,7 @@ Building debian & ubuntu packages:
    cd ..
    tar -czvf drobo-utils-0.3.3-1.tgz drobo-utils-0.99.9
 
-
-QA Test checklist prior to release:
-
-   1.1 drobom status... check for accuracy.
-   1.2 drobom settime
-   1.3 drobom status... check for accuracy.
-   1.4 drobom fwload (something really old)
-   1.5 drobom fwupgrade
-   1.6 drobom fwupgrade (if needed.)
-   1.7 drobom setlunsize 1,2,3  (should fail on 3)
-   1.8 drobom create file systems, each type.
-   
-   ....
+   apply QA tests. as per QA.txt recording results there.
 
 
 Revision date: 2008/11/11
