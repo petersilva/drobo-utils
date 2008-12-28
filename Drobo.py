@@ -38,6 +38,9 @@ import zipfile,zlib
 #only for simulation mode...
 import random
 
+# obviously need to update this with every release.
+VERSION = 'running trunk at: ' + time.ctime(time.time())
+
 # This isn't entirely simulation mode.  It is to aid development
 # when no drobo is available.  you can format random disks, including 
 # non-drobos.  So do not activate unless you read what the code does first.
