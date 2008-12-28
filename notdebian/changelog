@@ -1,11 +1,13 @@
-drobo-utils (0.3.3-1) unstable; urgency=high
+drobo-utils (0.4.0-1) unstable; urgency=medium
 
-  * Chris's man pages & help improvements.
-  * lunsize display bug fixed.
-  * more messaging fixups for when you don't invoke as root.
-  * fix for ubuntu Intrepid deciding all disks are Drobos.
-  * fixed all the firmware info parsing issues.
-  * firmware load issues should all be gone.
-  * Brad's fix for ddiag.c, done properly this time (my bad!)
+  -- IMPORTANT: firmware 1.3.0 support added.  Earlier drobo-utils
+     versions will not recognize a drobo running 1.3.0 or later.
+  -- CLI is more normal...  use getopts (got rid of device as fixed place
+arg.)
+     now allows command to be an option as well.
+  -- Changed DEBUG from a flag requiring code modification, to a bitmap
+     honored as a command-line argument (--verbose)
+  -- misc. improvements in documentation.
+
 
  -- Peter Silva <Peter.A.Silva@gmail.com>  Fri, 12 Sep 2008 11:31:43 -0400
