@@ -197,7 +197,7 @@ elif cmd == 'info':
 
 elif cmd == "setlunsize": 
    print args[1], args[2]
-   lunsize=int(args[2])
+   lunsize=int(args[1])
 
    if lunsize > 16 or lunsize < 1:
         print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
