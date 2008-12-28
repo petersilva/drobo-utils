@@ -39,7 +39,7 @@ import zipfile,zlib
 import random
 
 # obviously need to update this with every release.
-VERSION = 'running trunk at: ' + time.ctime(time.time())
+VERSION = '0.4.0'
 
 # This isn't entirely simulation mode.  It is to aid development
 # when no drobo is available.  you can format random disks, including 
@@ -188,7 +188,6 @@ def partformat(n):
            tried added >>4 but that
 
 	   says only one bit is supposed to be set, but, I dunno if I trust it.
-
            returning a tuple for now.
     """
     f = []
@@ -401,7 +400,7 @@ class Drobo:
      fd.write( "#!/bin/sh\n" )
 
      if fstype == 'FAT32':
-         ptype='mbr'
+         ptype='msdos'
      else:
          ptype='gpt' 
 
@@ -428,7 +427,7 @@ class Drobo:
          fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
          fd.write( 'mkntfs -f -L Drobo01  %s1\n' % self.char_dev_file )
      elif fstype == 'FAT32':
-         fd.write( "parted %s mkpart fat32 0 100%%\n" % self.char_dev_file )
+         fd.write( "parted %s mkpart primary fat32 0 100%%\n" % self.char_dev_file )
          fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
          fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % self.char_dev_file )
      else:
