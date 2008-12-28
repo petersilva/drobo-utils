@@ -18,6 +18,7 @@ def usage():
    print " -v, --verbose <debug_code>\t bit-field, default is 0 (off) "
    print "\t1 - General, 2 - Hardware Dialog, 4 - Initiation, 8 - DMP layer, 16- Detection"
    print "\t255 will print everything...\n"
+   print " -V, --version\treport version of drobo-utils."
    print "\ncommand is one of: "
    print "\tblink\tidentify the drobo by making the lights blink"
    print "\tdiag\tdump diagnostics file into /tmp directory"
@@ -115,8 +116,8 @@ debug=0
 
 try:
         opts, args = getopt.getopt(sys.argv[1:], \
-            "c:d:hv:", \
-            ["command=", "device=", "help", "verbosity="])
+            "c:d:hv:V", \
+            ["command=", "device=", "help", "verbosity=", "version"])
 except getopt.GetoptError, err:
         usage()
         sys.exit(2)
@@ -137,6 +138,9 @@ for o, a in opts:
             sys.exit()
         elif o in ("-v", "--verbosity", "--verbose") :
             debug = int(a)
+        elif o in ("-V", "--version" ):
+            print Drobo.VERSION
+            sys.exit()
         else:
             assert False, "unhandled option"
 
