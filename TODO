@@ -1,12 +1,27 @@
 
 in no particular order:
 
-Testing standard....
-	-- format with 1TB LUNS.
-	-- build FS.
-	-- install oldest fw.
-	-- format FAT32.
-	-- roll forward from there.
+BUG: 
+  when running two fw uploads, the second one will not run easily.
+  need to wait for transaction to timeout...  perhaps randomize id?
+
+  partition types do not appear to be correctly displayed...
+   some confusion between NTFS vs. EXT3  no obvious ill effect.
+
+  partition type should pre-select in Format dialog...
+
+
+gnats:
+  man page does not document output.  
+  -- what is the meaning of the output? provide a sample...
+
+  help pages?
+
+review print statements:
+  commands are now perhaps too verbose by default.
+   -- modify to ease parsing, add verbosity option to get current level.
+  should they write to stderr?
+
 
 STANDARD menu entries for droboview...
 
@@ -34,7 +49,6 @@ Better STATUS progress reporting:
 
 
 Documentation Dialogs:
-   -- need a blame/credit window.
    -- maybe a help window.
 
 
@@ -56,11 +70,10 @@ Re-design the whole darn thing.
 use ctypes to replace the C stub...
 
 
-Revision date: 2008/08/10
+Revision date: 2008/12/27
 
 copyright:
 
 Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
 Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 named COPYING in the root of the source directory tree.
-Installation:
