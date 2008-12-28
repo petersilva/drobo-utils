@@ -5,6 +5,7 @@ import sys
 import Drobo
 import time
 import getopt
+import string
 from posix import getuid
 
 def usage():
@@ -146,7 +147,7 @@ if cmd==None :
 if d == None:
   l=Drobo.DiscoverLUNs(debugflags=debug)
   if cmd == 'list':
-     print 'found Drobo LUNS at: ', str(l)
+     print ' '.join(l)
      if ( getuid() != 0 ) and (len(l) < 1):
         print 'probably should try again as root'
      sys.exit()
