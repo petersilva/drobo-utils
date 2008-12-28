@@ -1,2 +1,2 @@
 #!/bin/sh
-exec drobom view
+exec drobom $* view
