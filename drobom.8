@@ -1,10 +1,25 @@
-.TH DROBOM "8" "October 2008" "drobom " "System Administration Utilities"
+.TH DROBOM "8" "October 2008" "droboa " "System Administration Utilities"
 .SH NAME
 drobom \- CLI for managing drobo units
 .SH SYNOPSIS
 .B drobom
-\fI<command> \fR[ \fI<device> \fR] [ \fIarguments\fR... ]
+[ \fIoptions\fR ] \fI<command> \fR[ \fIarguments\fR... ]
 .SH DESCRIPTION
+.SS "options is one of:"
+.TP
+-c, --command
+the command to execute.
+.TP
+-d, --device
+the device to operate on (default searches all devices and picks first one found.)
+.TP
+-v, --verbose
+verbosity, a bit-field to trigger increased output as needed, mostly for debugging. 
+1 - General, 2 - Hardware Dialog, 4 - Initiation, 8 - DMP layer, 16- Detection
+255 will print everything... (default: 0, as terse as possible.)
+.TP
+-h, --help
+print a usage message
 .SS "command is one of:"
 .TP
 blink
@@ -12,10 +27,11 @@ identify the drobo by making the lights blink
 .TP
 diag
 dump diagnostics file into /tmp directory
-.IP
+.TP
 fwcheck query drobo.com for updates to firmware for the given Drobo
 fwload  load a specific firmware for the given Drobo. Arguments:
-.TP
+.sp
+.br
 <fwimage>
 the firmware file to load.
 .TP
@@ -32,17 +48,14 @@ list
 show device files for all Drobos found.
 .IP
 settime sync Drobo's clock to UTC
-setlunsize      Set the size of LUNS on device. Arguments:
-.TP
-<device>
-to set the lunsize on
-.TP
+setlunsize  Set the size of LUNS on device. Arguments:
+.sp
 <sz>
 integer number of TiB to set the lunsize to
-.TP
+.sp
 <confirmation>
 Specify 'PleaseEraseMyData' if you really mean it
-.IP
+.sp
 Note: After execution, Drobo reboots, wait a few minutes before accessing again
 .TP
 shutdown
