@@ -6,6 +6,10 @@
   -- Changed DEBUG from a flag requiring code modification, to a bitmap
      honored as a command-line argument (--verbose)
   -- misc. improvements in documentation.
+  -- droboview now only launches for first drobo found in list, and stays foreground
+     always.
+  -- drobom list returns a list that is easier to parse (suitable for use in backticks.)
+
 
 0.3.3 release: 2008/11/05
   -- lunsize display bug fixed.

@@ -10,6 +10,7 @@ from posix import getuid
 
 def usage():
    print "\nUsage: drobom [options] <command> [ arguments... ] \n"
+   print " drobo management interface, version: %s\n" % Drobo.VERSION
    print "options may be one of: "
    print " -c, --command <command>\tcommand to run."
    print " -d, --device <device>\tpick a specific disk, rather than scan"
@@ -33,6 +34,7 @@ def usage():
    print "\t\tNote: After execution, Drobo reboots, wait a few minutes before accessing again"
    print "\tshutdown\tshutdown drobo (DRI calls this 'standby' ... umount first!)"
    print "\tstatus\treport how is the Drobo doing"
+   print "\tview\tstart up a management dashboard GUI"
 
 
 
@@ -189,7 +191,6 @@ elif cmd == 'fwupgrade':
 elif cmd == 'info':
    info(d)
 
-
 elif cmd == "setlunsize": 
    print args[1], args[2]
    lunsize=int(args[2])
@@ -226,6 +227,18 @@ elif cmd == "status":
 elif cmd == "time":
   settings=d.GetSubPageSettings()
   print "Drobo says it is:", time.ctime(settings[0])
+
+elif cmd == "view":
+  import sys,subprocess
+  from PyQt4 import QtGui
+  from PyQt4 import QtCore
+  from DroboGUI import DroboGUI
+
+  # fire up a GUI for the given LUN, stays foreground...
+  app = QtGui.QApplication(sys.argv)
+  tb = DroboGUI(d)
+  tb.show()
+  app.exec_()
 
 else:
   usage()

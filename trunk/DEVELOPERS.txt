@@ -2,14 +2,6 @@ This software is copyright under GPL.  See near end file for details...
 
 Random useful bits for developers. 
 
-Debugging:
-
-   in Drobo.py 
-
-   DEBUG = 1  --- makes things a lot more traceable.
-
-   when reporting problems, debug listings can be useful, but only
-   if the problem isn't reproducible elsewhere.
  
 dpkg vs. python install:
    setup.py puts things in /usr/bin,  dpkg in /usr/sbin.  haven't reviewed 
@@ -17,6 +9,8 @@ dpkg vs. python install:
    on a system.  (if you do python install, then dpkg --purge drobo-utils)
 
    There doesn't seem to be a distutils way to remove a package.
+   I just do an installation, then manually remove the files it puts it.
+   python install does not install man pages either.
 
 
 

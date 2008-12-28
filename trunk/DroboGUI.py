@@ -57,6 +57,7 @@ class DroboAbout(QtGui.QWidget):
   Winner of the Data Robotics Bounty 2008 for a linux dashboard!  
   Home page:  http://drobo-utils.sourceforge.net
 
+  Version: """ + Drobo.VERSION + """ 
   Copyright 2008 Peter Silva ( Peter.A.Silva@gmail.com )
   license: General Public License (GPL) v3
 
