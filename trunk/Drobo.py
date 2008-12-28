@@ -43,10 +43,14 @@ import random
 # non-drobos.  So do not activate unless you read what the code does first.
 SIMULATE = 0
 
-# set to 1 to increase verbosity of library functions.
-# too verbose for most uses.
+# set to non-zero to increase verbosity of library functions.
 DEBUG = 0
-
+# It's a bit field, to debug the DroboDMP layer set bit3 (ie. 0x08)
+DBG_General = 0x01 
+DBG_HWDialog = 0x02
+DBG_Instantiation = 0x04
+DBG_DMP = 0x08 # C-layer...  not used here...
+DBG_Detection = 0x10
 
 #
 # FIXME: if installed with "python setup.py install" then this 
@@ -114,7 +118,7 @@ def ledstatus(n):
     """
     colourstats=[ 'black', 'red', 'yellow', 'green', ['red', 'green'], 
       [ 'red', 'yellow' ], ['red', 'black'] ] 
-    if DEBUG > 0:
+    if DEBUG & DBG_General:
          print 'colourstats, argument n is: ', n
     if ( n == 0x80 ):  # empty
        return 'gray'
@@ -284,18 +288,25 @@ class Drobo:
   """
 
 
-  def __init__(self,chardev):
+  def __init__(self,chardev,debugflags=0):
      """ chardev is /dev/sdX... 
          the character device associated with the drobo unit
      """   
+     global DEBUG
+
+     DEBUG=debugflags
+
+     if DEBUG & DBG_Instantiation :
+        print '__init__ '
+
      self.char_dev_file = chardev  
      self.fd=-1
      self.features = []    
      self.transactionID=1
      self.relaystart=0
-     
+ 
      if SIMULATE == 0:
-        self.fd=DroboDMP.openfd(chardev,0,DEBUG)
+        self.fd=DroboDMP.openfd(chardev,0,debugflags)
         if self.fd < 0 :
             raise DroboException
 
@@ -303,38 +314,38 @@ class Drobo:
         # for some reason under ubuntu intrepid, start getting responses of all bits set.
         # need some ways to spot a real drobo.  
         cfg = self.GetSubPageConfig()
-        if DEBUG > 0:
+        if DEBUG & DBG_Detection:
             print "cfg: ", cfg
 
         if ( len(cfg) != 3 ): # We ask this page to return three fields...
-            if DEBUG > 0:
+            if DEBUG & DBG_Detection:
               print "%s length of cfg is: %d, should be 3" % (chardev, len(cfg))
 	    raise DroboException 
 
         if ( cfg[0] != 4 ): 
-            if DEBUG > 0:
+            if DEBUG & DBG_Detection:
               print "%s cfg[0] = %s, should be 4. All Drobos have 4 slots" % (chardev, cfg[0])
 	    raise DroboException # Assert: All Drobo have 4 slots.
  
         set=self.GetSubPageSettings()
-        if DEBUG > 0:
+        if DEBUG & DBG_Detection:
             print "settings: ", set
 
         if ( set[2] != 'TRUSTED DATA' ) and ( set[2] != 'Drobo disk pack'):
-            if DEBUG > 0:
+            if DEBUG & DBG_Detection:
               print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( chardev, set[2] )
             raise DroboException
 
         # assuming you get past the first barrier...
         fw=self.GetSubPageFirmware()
         if ( len(fw) < 8 ) and (len(fw[7]) < 5):
-            if DEBUG > 0:
+            if DEBUG & DBG_Detection:
               print "%s length of fw query: is %d, should be < 8." % (chardev, len(fw))
               print "%s len(fw[7]) query: is %d, should be < 5." % (chardev, len(fw[7]))
             raise DroboException
 
         if ( fw[6].lower() != 'armmarvell' ):
-            if DEBUG > 0:
+            if DEBUG & DBG_Detection:
               print "%s fw[6] is not armmarvell." % chardev
             raise DroboException
         
@@ -343,7 +354,7 @@ class Drobo:
 
  
   def __del__(self):
-     if DEBUG >0:
+     if DEBUG & DBG_Instantiation :
         print '__del__ '
 
      if (self.fd >0):
@@ -444,7 +455,7 @@ class Drobo:
        second byte is the sub-page code.
        following two bytes have the length of the record (max: 65535)
     """
-    if DEBUG >0:
+    if DEBUG & DBG_HWDialog:
        print 'getsubpage'
 
     if SIMULATE:
@@ -460,7 +471,7 @@ class Drobo:
 
     if ( len(cmdout) == paklen ):
       result = struct.unpack(mypack, cmdout)
-      if DEBUG >0:
+      if DEBUG & DBG_HWDialog :
           print 'the 4 byte header on the returned sense buffer: ', result[0:3]
           #print 'result is: ', result[3:]
       return result[3:]
@@ -485,7 +496,7 @@ class Drobo:
      note: command is asynchronous, returns before operation is complete.
     """
 
-    if DEBUG >0:
+    if DEBUG & DBG_HWDialog:
         print 'issuecommand...'
 
     if SIMULATE:
@@ -587,7 +598,7 @@ class Drobo:
 
         decryption reported to be XOR of 165, 0xa5... not added yet.
     """
-    if DEBUG > 0:
+    if DEBUG & DBG_General:
       print "Dumping Diagnostics..."
 
     # tried 32000 ... it only returned 5K, so try something small.
@@ -598,7 +609,7 @@ class Drobo:
 
     todev=0
 
-    if DEBUG > 0:
+    if DEBUG & DBG_General:
         print "Page 0..."
 
     cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
@@ -612,7 +623,7 @@ class Drobo:
         i=i+1
 	diags=diags+cmdout
 
-        if DEBUG > 0:
+        if DEBUG & DBG_General:
             print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
        
     return diags
@@ -915,7 +926,7 @@ class Drobo:
     
     written = DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
 
-    if DEBUG > 0:
+    if DEBUG & DBG_General:
       print "Page 0..."
 
     buflen=32768
@@ -955,7 +966,7 @@ class Drobo:
     cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
     status = struct.unpack( '>B', cmdout )
 
-    if DEBUG > 0 : 
+    if DEBUG & DBG_General : 
       print 'Drobo thinks write status is: ', status[0]
 
         
@@ -1212,11 +1223,14 @@ class Drobo:
 
 
 
-def DiscoverLUNs():
+def DiscoverLUNs(debugflags=0):
     """ find all Drobo LUNs accessible to this user on this system. 
 	returns a list of character device files 
               samples: ( "/dev/sdc", "/dev/sdd" )
     """
+    global DEBUG
+    DEBUG=debugflags
+
     if SIMULATE:
        return [ "/dev/sdb" ]
 
@@ -1225,9 +1239,11 @@ def DiscoverLUNs():
     for potential in os.listdir(devdir):
        if ( potential[0:2] == "sd" and len(potential) == 3 ):
 	  dev_file= devdir + '/' + potential
+          if ( DEBUG & DBG_Detection ):
+             print "trying: ", dev_file
           try: 
               fw=[]
-              d = Drobo( dev_file )
+              d = Drobo( dev_file,debugflags=debugflags )
 	      devices.append(dev_file)
 
           except:

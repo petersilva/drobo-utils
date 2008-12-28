@@ -41,6 +41,7 @@
 #include <scsi/sg_io_linux.h>
 
 #define DEBUG (1)
+#define DBG_DMP (0x08)
 
 /* FIXME: this is crap... I did not want to bother with a full python 
  * object, so I settled for a couple global variables.
@@ -62,8 +63,7 @@ signed int put_mode_page(int sg_fd, void *data, int size,
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
     /* memset(&sense_buffer, 0, sizeof(sense_buffer)); */
 
- 
-    if (debug) {
+    if (debug & DBG_DMP) {
       fprintf( stderr, "\nCDB DUMP START:" );
       for (i=0; i < mcblen; i++) {
          if ((i%8)==0) fprintf(stderr, "\nCDB[%03x] ", i );
@@ -103,7 +103,7 @@ signed int put_mode_page(int sg_fd, void *data, int size,
         return(-1);
     }
 
-    if (debug) fprintf(stderr, 
+    if (debug & DBG_DMP) fprintf(stderr, 
         "\nwrite... ioctl returned: %x, size=%x, io_hdr: status=%x, sb_len_wr=%x, resid=%x, \n", 
           i, size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
 
@@ -116,7 +116,7 @@ signed int put_mode_page(int sg_fd, void *data, int size,
         size -= io_hdr.resid   ;
       }
     }
-    if (debug) fprintf(stderr,"\nput_mode_page ... wrote=%x\n", size );
+    if (debug& DBG_DMP) fprintf(stderr,"\nput_mode_page ... wrote=%x\n", size );
     return(size);
 }
 
@@ -129,11 +129,12 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
     int i;
     unsigned char c;
 
+
     /* Prepare MODE command */
     memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
     memset(&sense_buffer, 0, sizeof(sense_buffer));
  
-    if (debug) {
+    if (debug& DBG_DMP) {
       fprintf( stderr, "\nCDB DUMP START:" );
       for (i=0; i < mcblen; i++) {
          if ((i%8)==0) fprintf(stderr, "\nCDB[%03x] ", i );
@@ -166,7 +167,7 @@ signed int get_mode_page(int sg_fd, void *page_struct, int size,
         return(-1);
     }
 
-    if (debug) fprintf(stderr, 
+    if (debug& DBG_DMP) fprintf(stderr, 
         "\nread.. size=%x, io_hdr: status=%x, sb_len_wr=%x, resid=%x, \n", 
           size, io_hdr.status, io_hdr.sb_len_wr, io_hdr.resid );
 
@@ -205,7 +206,7 @@ PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
     long written = 0;
 
     // parse arguments... 
-    if (debug) fprintf(stderr, "put_sub_page 1\n");
+    if (debug& DBG_DMP) fprintf(stderr, "put_sub_page 1\n");
 
     if (!PyArg_ParseTuple(args, "s#s#l", &mcb, &mcblen, &buffer, &buflen, &debug )){
         PyErr_SetString( PyExc_ValueError, 
@@ -213,14 +214,14 @@ PyObject *drobodmp_put_sub_page( PyObject* self, PyObject* args ) {
         return(NULL);
     }
 
-    if (debug) {
+    if (debug& DBG_DMP) {
          fprintf( stderr, "\n put_sub_page mcblen=%d, buflen=%d \n", mcblen, buflen );
          fprintf(stderr, "put_sub_page 2\n");
     };
 
     written = put_mode_page(drobo_fd, buffer, buflen, mcb, mcblen, 1, debug);
 
-    if (debug) fprintf(stderr, "put_sub_page 3\n");
+    if (debug& DBG_DMP) fprintf(stderr, "put_sub_page 3\n");
   
     return(Py_BuildValue("i", written));
 };
@@ -259,11 +260,11 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
         return(NULL);
     }
 
-    if (debug) fprintf(stderr, "get_sub_page 2\n");
+    if (debug& DBG_DMP) fprintf(stderr, "get_sub_page 2\n");
 
     empty_tuple=PyTuple_New(0);
 
-    if (debug) fprintf(stderr, "get_sub_page 3\n");
+    if (debug& DBG_DMP) fprintf(stderr, "get_sub_page 3\n");
 
     buffer = PyMem_Malloc(sz);
     if (buffer == NULL)  {
@@ -271,11 +272,11 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
     }
     bzero(buffer,sz);
  
-    if (debug) fprintf(stderr, "get_sub_page 4\n");
+    if (debug& DBG_DMP) fprintf(stderr, "get_sub_page 4\n");
 
     szwritten = get_mode_page(drobo_fd, buffer, sz, mcb, mcblen, out, debug);
 
-    if (debug) fprintf(stderr, "get_sub_page 5 szwritten=%d\n", szwritten);
+    if (debug& DBG_DMP) fprintf(stderr, "get_sub_page 5 szwritten=%d\n", szwritten);
 
     if (szwritten > 0)  {
          retval = PyString_FromStringAndSize(buffer, szwritten );
@@ -285,7 +286,7 @@ PyObject *drobodmp_get_sub_page( PyObject* self, PyObject* args ) {
          return Py_None;
     }
 
-    if (debug) fprintf(stderr, "get_sub_page 6\n");
+    if (debug& DBG_DMP) fprintf(stderr, "get_sub_page 6\n");
 
     return(retval);
 };
@@ -297,27 +298,27 @@ PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
     int readwrite;
     int k;
 
-    if (debug) fprintf( stderr, "openfd/open 0\n" );
+    if (debug& DBG_DMP) fprintf( stderr, "openfd/open 0\n" );
 
     if (!PyArg_ParseTuple(args, "sll", &file_name, &readwrite, &debug )){
-        if (debug) fprintf( stderr, "parsetuple broke\n" );
+        if (debug& DBG_DMP) fprintf( stderr, "parsetuple broke\n" );
         PyErr_SetString( PyExc_ValueError, 
 	  "requires 3 arguments: filename, rwflag, debugflag.  rwflag=0 --> rdonly " );
         // following looks stupid, but without the temp variable, segaults on ubuntu 8.04, amd64
         retval=Py_BuildValue("i", (signed int)-1);
 	return(retval);
     }
-    if (debug) fprintf( stderr, "openfd/open %s, 1\n", file_name );
+    if (debug& DBG_DMP) fprintf( stderr, "openfd/open %s, 1\n", file_name );
 
     if ((drobo_fd = open(file_name, readwrite?O_RDWR:O_RDONLY)) < 0) {
         drobo_fd=-1;
         PyErr_SetFromErrnoWithFilename( PyExc_OSError, file_name );
-        if (debug) fprintf( stderr, "open broke 1.5\n" );
+        if (debug& DBG_DMP) fprintf( stderr, "open broke 1.5\n" );
         return(NULL);
     }
 
-    if (debug) fprintf( stderr, "openfd/open %s, succeeded 2\n", file_name );
-    if (debug) fprintf( stderr, "openfd/ioctl %s, about to 3\n", file_name );
+    if (debug& DBG_DMP) fprintf( stderr, "openfd/open %s, succeeded 2\n", file_name );
+    if (debug& DBG_DMP) fprintf( stderr, "openfd/ioctl %s, about to 3\n", file_name );
 
     /* Just to be safe, check we have a new sg device by trying an ioctl */
     if ((ioctl(drobo_fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000)) {
@@ -326,12 +327,12 @@ PyObject *drobodmp_openfd( PyObject* self, PyObject* args ) {
         drobo_fd=-1;
         return(NULL);
     } else {
-        if (debug) fprintf( stderr, "openfd/ioctl %s, worked...\n", file_name );
+        if (debug& DBG_DMP) fprintf( stderr, "openfd/ioctl %s, worked...\n", file_name );
     }
     // following looks stupid, but without the temp variable, segaults on ubuntu 8.04, amd64
-    if (debug) fprintf(stderr, "\ngeneric scsi ioctl said version is %d.\n", k);
+    if (debug& DBG_DMP) fprintf(stderr, "\ngeneric scsi ioctl said version is %d.\n", k);
     retval=Py_BuildValue("i", (signed int)drobo_fd);
-    if (debug) fprintf(stderr, "\nback from buildvalue\n");
+    if (debug& DBG_DMP) fprintf(stderr, "\nback from buildvalue\n");
     return(retval);
 }
 

@@ -4,29 +4,34 @@
 import sys
 import Drobo
 import time
+import getopt
 from posix import getuid
 
 def usage():
-   print "\nUsage: drobom <command> [ <device> ] [ arguments... ] \n"
-   print "command is one of: "
+   print "\nUsage: drobom [options] <command> [ arguments... ] \n"
+   print "options may be one of: "
+   print " -c, --command <command>\tcommand to run."
+   print " -d, --device <device>\tpick a specific disk, rather than scan"
+   print " -h, --help \t\tprint this help text"
+   print " -v, --verbose <debug_code>\t bit-field, default is 0 (off) "
+   print "\t1 - General, 2 - Hardware Dialog, 4 - Initiation, 8 - DMP layer, 16- Detection"
+   print "\t255 will print everything...\n"
+   print "\ncommand is one of: "
    print "\tblink\tidentify the drobo by making the lights blink"
    print "\tdiag\tdump diagnostics file into /tmp directory"
    print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
    print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
    print "\t\t<fwimage>\tthe firmware file to load."
    print "\tfwupgrade\tupgrade the firmware to the latest and greatest, recommended by DRI"
-   print "\thelp\tprint this text"
    print "\tinfo\tprint all available information on a Drobo"
    print "\tlist\tshow device files for all Drobos found."
    print "\tsettime\tsync Drobo's clock to UTC"
    print "\tsetlunsize\tSet the size of LUNS on device. Arguments:"
-   print "\t\t<device>\tto set the lunsize on"
    print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
    print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you really mean it"
    print "\t\tNote: After execution, Drobo reboots, wait a few minutes before accessing again"
    print "\tshutdown\tshutdown drobo (DRI calls this 'standby' ... umount first!)"
    print "\tstatus\treport how is the Drobo doing"
-   print "\nDevice\tis the raw character device of a drobo. If not given, will search."
 
 
 
@@ -97,30 +102,49 @@ def update(pct):
 
 # Mainline...
 
-
 if len(sys.argv) == 1:
-   usage()
-   sys.exit()
-
-cmd=sys.argv[1]
-
-if cmd in ("help", "--help", "-h"):
   usage()
   sys.exit()
 
-if len(sys.argv) > 2:
-  try:
-     d=Drobo.Drobo( sys.argv[2] )
+d=None
+cmd=None
+debug=0
 
-  except:
-     print "failed to open %s as a drobo" % sys.argv[2] 
-     if getuid() != 0:
-         print"I see you are not root... probably just permissions .. try again as root."
+try:
+        opts, args = getopt.getopt(sys.argv[1:], \
+            "c:d:hv:", \
+            ["command=", "device=", "help", "verbosity="])
+except getopt.GetoptError, err:
+        usage()
+        sys.exit(2)
 
+for o, a in opts:
+        if o in ("-c", "--command"):
+	    cmd = a
+        elif o in ("-d", "--device"):
+            try:
+              d=Drobo.Drobo( a , debugflags=debug)
+            except:
+              print "failed to open %s as a drobo" % a
+              if getuid() != 0:
+                print"I see you are not root... probably just permissions .. try again as root."
+              sys.exit()
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit()
+        elif o in ("-v", "--verbosity", "--verbose") :
+            debug = int(a)
+        else:
+            assert False, "unhandled option"
+
+if cmd==None :
+  if len(args) == 0:
+     usage()
      sys.exit()
+  cmd=args[0]
 
-else:
-  l=Drobo.DiscoverLUNs()
+if d == None:
+  l=Drobo.DiscoverLUNs(debugflags=debug)
   if cmd == 'list':
      print 'found Drobo LUNS at: ', str(l)
      if ( getuid() != 0 ) and (len(l) < 1):
@@ -136,10 +160,9 @@ else:
        print "No Drobo discovered, is one connected?"
      sys.exit()
   else:
-     d = Drobo.Drobo( l[0] )
+     d = Drobo.Drobo( l[0], debugflags=debug )
 
 #assert d is a valid drobo object...
-
 
 
 if cmd == "blink":
@@ -153,7 +176,7 @@ elif cmd == 'fwcheck':
    d.PickLatestFirmware()
 
 elif cmd == 'fwload':
-   if d.PickFirmware(sys.argv[3]):
+   if d.PickFirmware(args[1]):
      d.writeFirmware(update)
      d.Sync()
 
@@ -167,8 +190,8 @@ elif cmd == 'info':
 
 
 elif cmd == "setlunsize": 
-   print sys.argv[3], sys.argv[4]
-   lunsize=int(sys.argv[3])
+   print args[1], args[2]
+   lunsize=int(args[2])
 
    if lunsize > 16 or lunsize < 1:
         print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
@@ -178,7 +201,7 @@ elif cmd == "setlunsize":
         print 'lun size needs to be a power of 2 TiB, %d is invalid' % lunsize
         sys.exit()
 
-   if sys.argv[4] == 'PleaseEraseMyData':
+   if args[2] == 'PleaseEraseMyData':
         print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
         d.SetLunSize(lunsize)
         print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
