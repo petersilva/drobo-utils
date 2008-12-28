@@ -1,14 +1,489 @@
 QA Test checklist prior to release:
 
    1.1 drobom status... check for accuracy.
-   1.2 drobom settime
+
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom status                                            
+/dev/sdf 02% full - ([], 0)                                                                             
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom info
+--------------------------------------------------------- 
+Info about Drobo /dev/sdf                                 
+--------------------------------------------------------- 
+
+query config result: 
+(4, 16, 2199023185408)
+max lun size is:  2199023185408
+
+query capacity result:
+(482615435264, 11185217536, 493800652800, 0)
+Physical space... used:  11185217536  free:  482615435264  Total:  493800652800
+
+query protocol version result: 
+(0, 10)                        
+
+query settings result:
+(1230413329, 8, 'TRUSTED DATA')
+Drobo time is Sat Dec 27 16:28:49 2008
+
+query slotinfo result:  number of slots:
+(0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS')
+(1, 0, 0, 'gray', '', '')
+(2, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS')
+(3, 0, 0, 'gray', '', '')
+
+query firmware result:
+(1, 243, 14490, 13, 6, 'Sep 15 2008,19:03:01', 'ArmMarvell', '1.2.4', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', 'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', 'FAT32_FORMAT_VOLNAME', 'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2'])
+drobo says firmware revision:  1 . 243 ( 14490 ) was built:  Sep 15 2008,19:03:01
+
+query status result:
+([], 0)
+
+query options result:
+(1, 0, 0)
+
+query luninfo result:
+[(0, 2199023185920, 11185217536, 'MBR', ['NTFS'])]
+
+---------------------------------------------------------
+peter@pepino:/drobo10/peter/drobo/r0_4_0$
+
+   1.2 drobom settime & status
+
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom settime
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom info
+--------------------------------------------------------- 
+Info about Drobo /dev/sdf                                 
+--------------------------------------------------------- 
+
+query config result: 
+(4, 16, 2199023185408)
+max lun size is:  2199023185408
+
+query capacity result:
+(482615435264, 11185217536, 493800652800, 0)
+Physical space... used:  11185217536  free:  482615435264  Total:  493800652800
+
+query protocol version result: 
+(0, 10)                        
+
+query settings result:
+(1230442735, 8, 'TRUSTED DATA')
+Drobo time is Sun Dec 28 00:38:55 2008
+
+query slotinfo result:  number of slots:
+(0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS')
+(1, 0, 0, 'gray', '', '')
+(2, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS')
+(3, 0, 0, 'gray', '', '')
+
+query firmware result:
+(1, 243, 14490, 13, 6, 'Sep 15 2008,19:03:01', 'ArmMarvell', '1.2.4', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', 'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', 'FAT32_FORMAT_VOLNAME', 'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2'])
+drobo says firmware revision:  1 . 243 ( 14490 ) was built:  Sep 15 2008,19:03:01
+
+query status result:
+([], 0)
+
+query options result:
+(1, 0, 0)
+
+query luninfo result:
+[(0, 2199023185920, 11185217536, 'MBR', ['NTFS'])]
+
+---------------------------------------------------------
+peter@pepino:/drobo10/peter/drobo/r0_4_0$
    1.3 drobom status... check for accuracy.
+        done above.
+
    1.4 drobom fwload (something really old)
+
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom fwload ~root/.drobo-utils/v1.03.tdf     
+Reading Firmware from = /root/.drobo-utils/v1.03.tdf                                          
+validateFirmware start...                                                                     
+header+body lengths validated.  Good.                                                         
+Magic number validated. Good.                                                                 
+484 + 2748276 = 2748760 length validated. Good.                                               
+CRC from header: 358896933, calculated using python zlib crc32: 358896933                     
+CRC for body from header: 3943205637, calculated: 3943205637                                  
+32 bit Cyclic Redundancy Check correct. Good.                                                 
+validateFirmware successful...                                                                
+writeFirmware: i=484, start=484, last=2748760 fw length= 488                                  
+
+write is  1% done.
+wrote  32768  bytes.  Cumulative:  33252  of 2748760
+write is  2% done.                                  
+wrote  32768  bytes.  Cumulative:  66020  of 2748760
+write is  3% done.                                  
+wrote  32768  bytes.  Cumulative:  98788  of 2748760
+write is  4% done.                                  
+wrote  32768  bytes.  Cumulative:  131556  of 2748760
+write is  5% done.                                   
+wrote  32768  bytes.  Cumulative:  164324  of 2748760
+write is  7% done.                                   
+wrote  32768  bytes.  Cumulative:  197092  of 2748760
+write is  8% done.                                   
+wrote  32768  bytes.  Cumulative:  229860  of 2748760
+write is  9% done.                                   
+wrote  32768  bytes.  Cumulative:  262628  of 2748760
+write is 10% done.                                   
+wrote  32768  bytes.  Cumulative:  295396  of 2748760
+write is 11% done.                                   
+wrote  32768  bytes.  Cumulative:  328164  of 2748760
+write is 13% done.                                   
+wrote  32768  bytes.  Cumulative:  360932  of 2748760
+write is 14% done.                                   
+wrote  32768  bytes.  Cumulative:  393700  of 2748760
+write is 15% done.                                   
+wrote  32768  bytes.  Cumulative:  426468  of 2748760
+write is 16% done.                                   
+wrote  32768  bytes.  Cumulative:  459236  of 2748760
+write is 17% done.                                   
+wrote  32768  bytes.  Cumulative:  492004  of 2748760
+write is 19% done.                                   
+wrote  32768  bytes.  Cumulative:  524772  of 2748760
+write is 20% done.                                   
+wrote  32768  bytes.  Cumulative:  557540  of 2748760
+write is 21% done.                                   
+wrote  32768  bytes.  Cumulative:  590308  of 2748760
+write is 22% done.                                   
+wrote  32768  bytes.  Cumulative:  623076  of 2748760
+write is 23% done.                                   
+wrote  32768  bytes.  Cumulative:  655844  of 2748760
+write is 25% done.                                   
+wrote  32768  bytes.  Cumulative:  688612  of 2748760
+write is 26% done.                                   
+wrote  32768  bytes.  Cumulative:  721380  of 2748760
+write is 27% done.                                   
+wrote  32768  bytes.  Cumulative:  754148  of 2748760
+write is 28% done.                                   
+wrote  32768  bytes.  Cumulative:  786916  of 2748760
+write is 29% done.                                   
+wrote  32768  bytes.  Cumulative:  819684  of 2748760
+write is 31% done.                                   
+wrote  32768  bytes.  Cumulative:  852452  of 2748760
+write is 32% done.                                   
+wrote  32768  bytes.  Cumulative:  885220  of 2748760
+write is 33% done.                                   
+wrote  32768  bytes.  Cumulative:  917988  of 2748760
+write is 34% done.                                   
+wrote  32768  bytes.  Cumulative:  950756  of 2748760
+write is 35% done.                                   
+wrote  32768  bytes.  Cumulative:  983524  of 2748760
+write is 36% done.                                   
+wrote  32768  bytes.  Cumulative:  1016292  of 2748760
+write is 38% done.                                    
+wrote  32768  bytes.  Cumulative:  1049060  of 2748760
+write is 39% done.                                    
+wrote  32768  bytes.  Cumulative:  1081828  of 2748760
+write is 40% done.                                    
+wrote  32768  bytes.  Cumulative:  1114596  of 2748760
+write is 41% done.                                    
+wrote  32768  bytes.  Cumulative:  1147364  of 2748760
+write is 42% done.                                    
+wrote  32768  bytes.  Cumulative:  1180132  of 2748760
+write is 44% done.                                    
+wrote  32768  bytes.  Cumulative:  1212900  of 2748760
+write is 45% done.                                    
+wrote  32768  bytes.  Cumulative:  1245668  of 2748760
+write is 46% done.                                    
+wrote  32768  bytes.  Cumulative:  1278436  of 2748760
+write is 47% done.                                    
+wrote  32768  bytes.  Cumulative:  1311204  of 2748760
+write is 48% done.                                    
+wrote  32768  bytes.  Cumulative:  1343972  of 2748760
+write is 50% done.                                    
+wrote  32768  bytes.  Cumulative:  1376740  of 2748760
+write is 51% done.                                    
+wrote  32768  bytes.  Cumulative:  1409508  of 2748760
+write is 52% done.                                    
+wrote  32768  bytes.  Cumulative:  1442276  of 2748760
+write is 53% done.                                    
+wrote  32768  bytes.  Cumulative:  1475044  of 2748760
+write is 54% done.                                    
+wrote  32768  bytes.  Cumulative:  1507812  of 2748760
+write is 56% done.                                    
+wrote  32768  bytes.  Cumulative:  1540580  of 2748760
+write is 57% done.                                    
+wrote  32768  bytes.  Cumulative:  1573348  of 2748760
+write is 58% done.                                    
+wrote  32768  bytes.  Cumulative:  1606116  of 2748760
+write is 59% done.                                    
+wrote  32768  bytes.  Cumulative:  1638884  of 2748760
+write is 60% done.                                    
+wrote  32768  bytes.  Cumulative:  1671652  of 2748760
+write is 62% done.                                    
+wrote  32768  bytes.  Cumulative:  1704420  of 2748760
+write is 63% done.                                    
+wrote  32768  bytes.  Cumulative:  1737188  of 2748760
+write is 64% done.                                    
+wrote  32768  bytes.  Cumulative:  1769956  of 2748760
+write is 65% done.                                    
+wrote  32768  bytes.  Cumulative:  1802724  of 2748760
+write is 66% done.                                    
+wrote  32768  bytes.  Cumulative:  1835492  of 2748760
+write is 67% done.                                    
+wrote  32768  bytes.  Cumulative:  1868260  of 2748760
+write is 69% done.                                    
+wrote  32768  bytes.  Cumulative:  1901028  of 2748760
+write is 70% done.                                    
+wrote  32768  bytes.  Cumulative:  1933796  of 2748760
+write is 71% done.                                    
+wrote  32768  bytes.  Cumulative:  1966564  of 2748760
+write is 72% done.                                    
+wrote  32768  bytes.  Cumulative:  1999332  of 2748760
+write is 73% done.                                    
+wrote  32768  bytes.  Cumulative:  2032100  of 2748760
+write is 75% done.                                    
+wrote  32768  bytes.  Cumulative:  2064868  of 2748760
+write is 76% done.                                    
+wrote  32768  bytes.  Cumulative:  2097636  of 2748760
+write is 77% done.                                    
+wrote  32768  bytes.  Cumulative:  2130404  of 2748760
+write is 78% done.                                    
+wrote  32768  bytes.  Cumulative:  2163172  of 2748760
+write is 79% done.                                    
+wrote  32768  bytes.  Cumulative:  2195940  of 2748760
+write is 81% done.                                    
+wrote  32768  bytes.  Cumulative:  2228708  of 2748760
+write is 82% done.                                    
+wrote  32768  bytes.  Cumulative:  2261476  of 2748760
+write is 83% done.                                    
+wrote  32768  bytes.  Cumulative:  2294244  of 2748760
+write is 84% done.                                    
+wrote  32768  bytes.  Cumulative:  2327012  of 2748760
+write is 85% done.                                    
+wrote  32768  bytes.  Cumulative:  2359780  of 2748760
+write is 87% done.
+wrote  32768  bytes.  Cumulative:  2392548  of 2748760
+write is 88% done.
+wrote  32768  bytes.  Cumulative:  2425316  of 2748760
+write is 89% done.
+wrote  32768  bytes.  Cumulative:  2458084  of 2748760
+write is 90% done.
+wrote  32768  bytes.  Cumulative:  2490852  of 2748760
+write is 91% done.
+wrote  32768  bytes.  Cumulative:  2523620  of 2748760
+write is 93% done.
+wrote  32768  bytes.  Cumulative:  2556388  of 2748760
+write is 94% done.
+wrote  32768  bytes.  Cumulative:  2589156  of 2748760
+write is 95% done.
+wrote  32768  bytes.  Cumulative:  2621924  of 2748760
+write is 96% done.
+wrote  32768  bytes.  Cumulative:  2654692  of 2748760
+write is 97% done.
+wrote  32768  bytes.  Cumulative:  2687460  of 2748760
+write is 98% done.
+wrote  32768  bytes.  Cumulative:  2720228  of 2748760
+write is 100% done.
+wrote  28532  bytes.  Cumulative:  2748760  of 2748760
+writeFirmware Done.  i=2748760, len=2748760
+
+sudo drobom shutdown
+# hard reset...
+
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom status
+/dev/sdf 00% full - ([], 0)                                 
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom info
+--------------------------------------------------------- 
+Info about Drobo /dev/sdf                                 
+--------------------------------------------------------- 
+
+query config result: 
+(4, 1, 2199023250944)
+max lun size is:  2199023250944
+
+query capacity result:
+(495452160000, 0, 495452160000, 0)
+Physical space... used:  0  free:  495452160000  Total:  495452160000
+
+query protocol version result: 
+(0, 10)                        
+
+query settings result:
+(298, 8, 'TRUSTED DATA')
+Drobo time is Wed Dec 31 19:04:58 1969
+
+query slotinfo result:  number of slots:
+(0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS')
+(1, 0, 0, 'gray', '', '')                                  
+(2, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS')
+(3, 0, 0, 'gray', '', '')                                  
+
+query firmware result:
+(1, 172, 9222, 8, 0, 'Sep 13 2007,16:07:38', 'ArmMarvell', '1.0.3', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE'])             
+drobo says firmware revision:  1 . 172 ( 9222 ) was built:  Sep 13 2007,16:07:38                        
+
+query status result:
+([], 0)             
+
+query options result:
+(0, 0, 0)            
+
+query luninfo result:
+[(0, 495452160000, 0)]
+
+---------------------------------------------------------
+peter@pepino:/drobo10/peter/drobo/r0_4_0$
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom view
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom view
+Clicked format...
+Really formatting...
+Information: Don't forget to update /etc/fstab, if necessary.
+
+
+Disk /dev/sdf: 2199GB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      17.4kB  2199GB  2199GB               ntfs
+
+Information: Don't forget to update /etc/fstab, if necessary.
+
+Cluster size has been automatically set to 4096 bytes.
+Creating NTFS volume structures.
+mkntfs completed successfully. Have a nice day.
+it took: 20 updates to run
+peter@pepino:/drobo10/peter/drobo/r0_4_0$
+
+completed in GUI 'Format Done' in blue...
+
    1.5 drobom fwupgrade
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom view
+looking for firmware for: armmarvell 1.172.9222 hw version: 1.00
+This Drobo should be running:  raptor/firmware/armmarvell/v1.12.tdf
+checkup: this Drobo is a armmarvell hw rev: 1.00, and needs: 1.172.9222
+looking for firmware for: armmarvell 1.172.9222 hw version: 1.00       
+This Drobo should be running:  raptor/firmware/armmarvell/v1.12.tdf    
+looking for: /home/peter/.drobo-utils/armmarvell_1.00_v1.12.tdf        
+local copy already present: /home/peter/.drobo-utils/armmarvell_1.00_v1.12.tdf
+Reading Firmware from = /home/peter/.drobo-utils/armmarvell_1.00_v1.12.tdf    
+validateFirmware start...                                                     
+header+body lengths validated.  Good.                                         
+Magic number validated. Good.                                                 
+484 + 2942433 = 2942917 length validated. Good.                               
+CRC from header: 1401631832, calculated using python zlib crc32: 1401631832   
+CRC for body from header: 2717012571, calculated: 2717012571                  
+32 bit Cyclic Redundancy Check correct. Good.                                 
+validateFirmware successful...                                                
+correct fw available                                                          
+writeFirmware: i=484, start=484, last=2942917 fw length= 488                  
+
+wrote  32768  bytes.  Cumulative:  33252  of 2942917
+wrote  32768  bytes.  Cumulative:  66020  of 2942917
+wrote  32768  bytes.  Cumulative:  98788  of 2942917
+wrote  32768  bytes.  Cumulative:  131556  of 2942917
+wrote  32768  bytes.  Cumulative:  164324  of 2942917
+wrote  32768  bytes.  Cumulative:  197092  of 2942917
+wrote  32768  bytes.  Cumulative:  229860  of 2942917
+wrote  32768  bytes.  Cumulative:  262628  of 2942917
+wrote  32768  bytes.  Cumulative:  295396  of 2942917
+wrote  32768  bytes.  Cumulative:  328164  of 2942917
+wrote  32768  bytes.  Cumulative:  360932  of 2942917
+wrote  32768  bytes.  Cumulative:  393700  of 2942917
+wrote  32768  bytes.  Cumulative:  426468  of 2942917
+wrote  32768  bytes.  Cumulative:  459236  of 2942917
+wrote  32768  bytes.  Cumulative:  492004  of 2942917
+wrote  32768  bytes.  Cumulative:  524772  of 2942917
+wrote  32768  bytes.  Cumulative:  557540  of 2942917
+wrote  32768  bytes.  Cumulative:  590308  of 2942917
+wrote  32768  bytes.  Cumulative:  623076  of 2942917
+wrote  32768  bytes.  Cumulative:  655844  of 2942917
+wrote  32768  bytes.  Cumulative:  688612  of 2942917
+wrote  32768  bytes.  Cumulative:  721380  of 2942917
+wrote  32768  bytes.  Cumulative:  754148  of 2942917
+wrote  32768  bytes.  Cumulative:  786916  of 2942917
+wrote  32768  bytes.  Cumulative:  819684  of 2942917
+wrote  32768  bytes.  Cumulative:  852452  of 2942917
+wrote  32768  bytes.  Cumulative:  885220  of 2942917
+wrote  32768  bytes.  Cumulative:  917988  of 2942917
+wrote  32768  bytes.  Cumulative:  950756  of 2942917
+wrote  32768  bytes.  Cumulative:  983524  of 2942917
+wrote  32768  bytes.  Cumulative:  1016292  of 2942917
+wrote  32768  bytes.  Cumulative:  1049060  of 2942917
+wrote  32768  bytes.  Cumulative:  1081828  of 2942917
+wrote  32768  bytes.  Cumulative:  1114596  of 2942917
+wrote  32768  bytes.  Cumulative:  1147364  of 2942917
+wrote  32768  bytes.  Cumulative:  1180132  of 2942917
+wrote  32768  bytes.  Cumulative:  1212900  of 2942917
+wrote  32768  bytes.  Cumulative:  1245668  of 2942917
+wrote  32768  bytes.  Cumulative:  1278436  of 2942917
+wrote  32768  bytes.  Cumulative:  1311204  of 2942917
+wrote  32768  bytes.  Cumulative:  1343972  of 2942917
+wrote  32768  bytes.  Cumulative:  1376740  of 2942917
+wrote  32768  bytes.  Cumulative:  1409508  of 2942917
+wrote  32768  bytes.  Cumulative:  1442276  of 2942917
+wrote  32768  bytes.  Cumulative:  1475044  of 2942917
+wrote  32768  bytes.  Cumulative:  1507812  of 2942917
+wrote  32768  bytes.  Cumulative:  1540580  of 2942917
+wrote  32768  bytes.  Cumulative:  1573348  of 2942917
+wrote  32768  bytes.  Cumulative:  1606116  of 2942917
+wrote  32768  bytes.  Cumulative:  1638884  of 2942917
+wrote  32768  bytes.  Cumulative:  1671652  of 2942917
+wrote  32768  bytes.  Cumulative:  1704420  of 2942917
+wrote  32768  bytes.  Cumulative:  1737188  of 2942917
+wrote  32768  bytes.  Cumulative:  1769956  of 2942917
+wrote  32768  bytes.  Cumulative:  1802724  of 2942917
+wrote  32768  bytes.  Cumulative:  1835492  of 2942917
+wrote  32768  bytes.  Cumulative:  1868260  of 2942917
+wrote  32768  bytes.  Cumulative:  1901028  of 2942917
+wrote  32768  bytes.  Cumulative:  1933796  of 2942917
+wrote  32768  bytes.  Cumulative:  1966564  of 2942917
+wrote  32768  bytes.  Cumulative:  1999332  of 2942917
+wrote  32768  bytes.  Cumulative:  2032100  of 2942917
+wrote  32768  bytes.  Cumulative:  2064868  of 2942917
+wrote  32768  bytes.  Cumulative:  2097636  of 2942917
+wrote  32768  bytes.  Cumulative:  2130404  of 2942917
+wrote  32768  bytes.  Cumulative:  2163172  of 2942917
+wrote  32768  bytes.  Cumulative:  2195940  of 2942917
+wrote  32768  bytes.  Cumulative:  2228708  of 2942917
+wrote  32768  bytes.  Cumulative:  2261476  of 2942917
+wrote  32768  bytes.  Cumulative:  2294244  of 2942917
+wrote  32768  bytes.  Cumulative:  2327012  of 2942917
+wrote  32768  bytes.  Cumulative:  2359780  of 2942917
+wrote  32768  bytes.  Cumulative:  2392548  of 2942917
+wrote  32768  bytes.  Cumulative:  2425316  of 2942917
+wrote  32768  bytes.  Cumulative:  2458084  of 2942917
+wrote  32768  bytes.  Cumulative:  2490852  of 2942917
+wrote  32768  bytes.  Cumulative:  2523620  of 2942917
+wrote  32768  bytes.  Cumulative:  2556388  of 2942917
+wrote  32768  bytes.  Cumulative:  2589156  of 2942917
+wrote  32768  bytes.  Cumulative:  2621924  of 2942917
+wrote  32768  bytes.  Cumulative:  2654692  of 2942917
+wrote  32768  bytes.  Cumulative:  2687460  of 2942917
+wrote  32768  bytes.  Cumulative:  2720228  of 2942917
+wrote  32768  bytes.  Cumulative:  2752996  of 2942917
+wrote  32768  bytes.  Cumulative:  2785764  of 2942917
+wrote  32768  bytes.  Cumulative:  2818532  of 2942917
+wrote  32768  bytes.  Cumulative:  2851300  of 2942917
+wrote  32768  bytes.  Cumulative:  2884068  of 2942917
+wrote  32768  bytes.  Cumulative:  2916836  of 2942917
+wrote  26081  bytes.  Cumulative:  2942917  of 2942917
+writeFirmware Done.  i=2942917, len=2942917
+
    1.6 drobom fwupgrade (if needed.)
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom fwupgrade
+	-- failed two times, then did fwcheck, then fwupgrade, OK!
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom status
+/dev/sdf 00% full - (['New firmware installed'], 0)
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom shutdown
+
    1.7 drobom setlunsize 1,2,3  (should fail on 3)
+worked on 1.
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo ./drobom setlunsize 3 PleaseEraseMyData
+3 PleaseEraseMyData
+lun size needs to be a power of 2 TiB, 3 is invalid
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo ./drobom setlunsize 2 PleaseEraseMyData
+2 PleaseEraseMyData
+You asked nicely, so I will set the lunsize to 2 as you requested
+set lunsize to 2 TiB
+Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.
+peter@pepino:/drobo10/peter/drobo/r0_4_0$ sudo drobom info
+
+
    1.8 drobom create file systems, each type.
-   
+ NTFS done!
+MSDOS done!
+ext3 done!   
    ....
 
-
+passed!
