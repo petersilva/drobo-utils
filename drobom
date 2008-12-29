@@ -102,7 +102,8 @@ def info(d):
   print '---------------------------------------------------------'
 
 def update(pct):
-  print "write is %2d%% done." % ( pct )
+  if debug & Drobo.DBG_Chatty:
+     print "write is %2d%% done." % ( pct )
 
 # Mainline...
 
@@ -180,7 +181,8 @@ elif cmd == "diag":
    print "diagnostics in ", f
 
 elif cmd == 'fwcheck':
-   d.PickLatestFirmware()
+   tuple=d.PickLatestFirmware()
+   print tuple[3]
 
 elif cmd == 'fwload':
    if d.PickFirmware(args[1]):
@@ -197,7 +199,7 @@ elif cmd == 'info':
 
 elif cmd == "setlunsize": 
    print args[1], args[2]
-   lunsize=int(args[2])
+   lunsize=int(args[1])
 
    if lunsize > 16 or lunsize < 1:
         print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize

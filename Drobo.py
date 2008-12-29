@@ -38,6 +38,9 @@ import zipfile,zlib
 #only for simulation mode...
 import random
 
+# maximum transaction ID before wrapping...
+MAX_TRANSACTION = 250
+
 # obviously need to update this with every release.
 VERSION = 'running trunk at: ' + time.ctime(time.time())
 
@@ -306,7 +309,9 @@ class Drobo:
      self.char_dev_file = chardev  
      self.fd=-1
      self.features = []    
-     self.transactionID=1
+
+     self.transactionID=random.randint(0,MAX_TRANSACTION)
+
      self.relaystart=0
  
      if SIMULATE == 0:
@@ -486,7 +491,7 @@ class Drobo:
   def __transactionNext(self):
     """ Increment the transaction member for some modeSelect pages.
     """
-    if (self.transactionID > 200):
+    if (self.transactionID > MAX_TRANSACTION):
        self.transactionID=0
     self.transactionID=self.transactionID+1
 
@@ -958,7 +963,7 @@ class Drobo:
     j=i+buflen 
     moretocome=0x01
 
-    if (DEBUG & DBG_Chatty ) :
+    if (DEBUG & DBG_General ) :
       print 'writeFirmware: i=%d, start=%d, last=%d fw length= %d\n' % \
          ( i, self.fwhdr[0], totallength, len(buffer) )
 
@@ -978,10 +983,10 @@ class Drobo:
 
         function(i*100/totallength)
 
-        if (DEBUG & DBG_Chatty ) :
+        if (DEBUG & DBG_General ) :
             print 'wrote ',written, ' bytes.  Cumulative: ',  i, ' of', totallength
 
-    if (DEBUG & DBG_Chatty ) :
+    if (DEBUG & DBG_General ) :
        print 'writeFirmware Done.  i=%d, len=%d' % ( i, totallength )
 
     self.__transactionNext()
