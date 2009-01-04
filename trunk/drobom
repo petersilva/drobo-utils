@@ -128,7 +128,7 @@ for o, a in opts:
 	    cmd = a
         elif o in ("-d", "--device"):
             try:
-              d=Drobo.Drobo( a , debugflags=debug)
+              d=Drobo.Drobo( [ a ], debugflags=debug)
             except:
               print "failed to open %s as a drobo" % a
               if getuid() != 0:
@@ -154,7 +154,9 @@ if cmd==None :
 if d == None:
   l=Drobo.DiscoverLUNs(debugflags=debug)
   if cmd == 'list':
-     print l
+
+     print ' '.join(map(lambda x: ':'.join(x) , l ))
+
      if ( getuid() != 0 ) and (len(l) < 1):
         print 'probably should try again as root'
      sys.exit()
@@ -168,7 +170,7 @@ if d == None:
        print "No Drobo discovered, is one connected?"
      sys.exit()
   else:
-     d = Drobo.Drobo( l[0][0], debugflags=debug )
+     d = Drobo.Drobo( l[0], debugflags=debug )
 
 #assert d is a valid drobo object...
 
@@ -226,7 +228,7 @@ elif cmd == "status":
    c=d.GetSubPageCapacity()
    if c[2] > 0 :
       pfull = 100 * ((c[1]+1.0)/c[2])
-      print "%s %02d%% full - %s" % ( d.char_dev_file, pfull, d.GetSubPageStatus() )
+      print "%s %02d%% full - %s" % ( ':'.join(d.char_devs), pfull, d.GetSubPageStatus() )
    else:
       print "firmware too old to report capacity properly... or the drobo is empty..."
 
