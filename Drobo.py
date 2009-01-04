@@ -1254,11 +1254,50 @@ class Drobo:
          return ( 0,0,0 )
 
 
+def hierdevlist():
+  """
+  return a list of attached scsi devices, like so
+
+  [ [lun0, lun1, lun2], [lun0, lun1, lun2] ]
+
+  run sg_scan, sample output line: 
+  /dev/sdh: scsi41 channel=0 id=0 lun=0 [em]
+
+  """
+  alldev=[]
+  lastdev=''
+  devluns=[]
+  c = commands.getstatusoutput("sg_scan /dev/sd?")
+  print c
+  if c[0] != 0:
+     print "problem running sg_scan: %s" % c[1]
+     print "make sure sg3_utils is installed."
+     return []
+
+  if c[1][0:8] == 'sg_scan:' :
+     print "problem running sg_scan: %s" % c[1]
+     return []
+
+  for l in c[1].split("\n"):
+    (c1, bus, channel, id, lun, emulation ) = l.split(' ')
+    charfile=c1.strip(':')
+    thisdev=bus+channel+id
+    if thisdev==lastdev:
+      devluns.append(charfile) 
+    else:
+      alldev.append(devluns)
+      devluns=[charfile]
+    lastdev=thisdev
+    
+  alldev.append(devluns)
+  alldev=alldev[1:]
+  return alldev
+
 
 def DiscoverLUNs(debugflags=0):
     """ find all Drobo LUNs accessible to this user on this system. 
-	returns a list of character device files 
-              samples: ( "/dev/sdc", "/dev/sdd" )
+	returns a list of list of character device files 
+              samples: [ [ "/dev/sdf", "/dev/sdg" ], [ /dev/sdh ] ] 
     """
     global DEBUG
     DEBUG=debugflags
@@ -1266,19 +1305,21 @@ def DiscoverLUNs(debugflags=0):
     if SIMULATE:
        return [ "/dev/sdb" ]
 
-    devdir="/dev"
+    #devdir="/dev"
     devices=[]
-    for potential in os.listdir(devdir):
-       if ( potential[0:2] == "sd" and len(potential) == 3 ):
-	  dev_file= devdir + '/' + potential
-          if ( DEBUG & DBG_Detection ):
+    #for potential in os.listdir(devdir):
+    for potential in hierdevlist():
+       dev_file=potential[0]
+       #if ( potential[0:2] == "sd" and len(potential) == 3 ):
+       #  dev_file= devdir + '/' + potential
+       if ( DEBUG & DBG_Detection ):
              print "trying: ", dev_file
-          try: 
+       try: 
               fw=[]
               d = Drobo( dev_file,debugflags=debugflags )
-	      devices.append(dev_file)
+	      devices.append(potential)
 
-          except:
+       except:
  	      pass
               
        else:
