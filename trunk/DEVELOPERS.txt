@@ -63,7 +63,7 @@ Building debian & ubuntu packages:
    apply QA tests. as per QA.txt recording results there.
 
 
-Revision date: 2008/11/11
+Revision date: 2008/12/27
 
 copyright:
 

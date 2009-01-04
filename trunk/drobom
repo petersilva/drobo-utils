@@ -154,7 +154,7 @@ if cmd==None :
 if d == None:
   l=Drobo.DiscoverLUNs(debugflags=debug)
   if cmd == 'list':
-     print ' '.join(l)
+     print l
      if ( getuid() != 0 ) and (len(l) < 1):
         print 'probably should try again as root'
      sys.exit()
@@ -168,7 +168,7 @@ if d == None:
        print "No Drobo discovered, is one connected?"
      sys.exit()
   else:
-     d = Drobo.Drobo( l[0], debugflags=debug )
+     d = Drobo.Drobo( l[0][0], debugflags=debug )
 
 #assert d is a valid drobo object...
 
