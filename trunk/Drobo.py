@@ -44,10 +44,6 @@ MAX_TRANSACTION = 250
 # obviously need to update this with every release.
 VERSION = 'running trunk at: ' + time.ctime(time.time())
 
-# This isn't entirely simulation mode.  It is to aid development
-# when no drobo is available.  you can format random disks, including 
-# non-drobos.  So do not activate unless you read what the code does first.
-SIMULATE = 0
 
 # set to non-zero to increase verbosity of library functions.
 DEBUG = 0
@@ -58,6 +54,11 @@ DBG_Instantiation = 0x04
 DBG_DMP = 0x08 # C-layer...  not used here...
 DBG_Detection = 0x10
 DBG_General = 0x20 
+
+# This isn't entirely simulation mode.  It is to aid development
+# when no drobo is available.  you can format random disks, including 
+# non-drobos.  So do not activate unless you read what the code does first.
+DBG_Simulation = 0x80
 
 #
 # FIXME: if installed with "python setup.py install" then this 
@@ -315,7 +316,7 @@ class Drobo:
 
      self.relaystart=0
  
-     if SIMULATE == 0:
+     if DEBUG & DBG_Simulation == 0:
         self.fd=DroboDMP.openfd(self.char_dev_file,0,debugflags)
         if self.fd < 0 :
             raise DroboException
@@ -443,7 +444,7 @@ class Drobo:
      fd.close()
      os.chmod(format_script,0700)
 
-     #if SIMULATE !=0:
+     #if DEBUG & DBG_Simulation !=0:
      return format_script 
      #fmt_process = subprocess.Popen( format_script, close_fds=True )
      #pid, sts = os.waitpid(fmt_process.pid, 0)
@@ -468,7 +469,7 @@ class Drobo:
     if DEBUG & DBG_HWDialog:
        print 'getsubpage'
 
-    if SIMULATE:
+    if DEBUG & DBG_Simulation:
        return ()
 
     mypack = '>BBH' + pack
@@ -509,7 +510,7 @@ class Drobo:
     if DEBUG & DBG_HWDialog:
         print 'issuecommand...'
 
-    if SIMULATE:
+    if DEBUG & DBG_Simulation:
         self.__transactionNext()
         return
 
@@ -1013,7 +1014,7 @@ class Drobo:
      """ 
      # SlotCount, Reserved, MaxLuns, MaxLunSz, Reserved, unused, unused 
 
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
 	return (4, 16, 2199023250944)
 
      result=self.__getsubpage( 0x01, 'BBBQBHH'  )
@@ -1022,7 +1023,7 @@ class Drobo:
   def GetSubPageCapacity(self):
      """ returns: ( Free, Used, Virtual, Unprotected ) 
      """
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
         capacity = 495452160000
         used = random.randint(0,capacity)
 	return (capacity-used, used, capacity, 125184245760)
@@ -1037,7 +1038,7 @@ class Drobo:
               returns one colour if one colour is constant, set of
               colours if there is flashing going on.
      """
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
        return ( (0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), (1, 750156374016, 0, 'green', 'WDC WD7500AAKS-00RBA0', 'WDC WD7500AAKS-0'), (2, 0, 0, ledstatus(random.randint(0,6)), '', ''), (3, 0, 0, 'gray', '', ''))
 
      slotrec='HBQQB32s16sL'
@@ -1097,7 +1098,7 @@ class Drobo:
       8 x H-length, B-LunID, Q-TotalCapacity, B-PartScheme, B-PartCount, B-Format, 5B-rsvd 
      
      """
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
        return [(0, 2199023251456, 5092651008, 'GPT', ['EXT3'])]
 
      lp="HBQQ"
@@ -1137,7 +1138,7 @@ class Drobo:
 		-- so I just claim it says 8 and shut up.
 
      """
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
         return (1220112079, 8, 'TRUSTED DATA')
 
      ( utc, offset, name ) = self.__getsubpage(0x05, 'LH32s' )
@@ -1155,7 +1156,7 @@ class Drobo:
             at 1.1.1 the additional byte leads to resid > 0 in the C call, 
             so matches docs. 
      """
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
          return (0, 10)
 
      return self.__getsubpage( 0x06, 'BB' )
@@ -1177,7 +1178,7 @@ class Drobo:
             I shortened Extra for that.
 	    byte 0x80 is supposed to be feature flags, found it a 0x73...
      """
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
         return (1, 201, 12942, 12, 6, 'May 13 2008,15:29:32', 'ArmMarvell', '1.1.2', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', 'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', 'FAT32_FORMAT_VOLNAME', 'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2'])
 
      raw=self.__getsubpage(0x08, 'BBHBB32s16s16s240s' )
@@ -1199,7 +1200,7 @@ class Drobo:
       when I remove a disk, I get [ 'No Redundancy', 'Relay out in progress'],
       but when I format, it stays empty...
      """
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
          return unitstatus(random.randint(0,16535))       
 
      ss=self.__getsubpage(0x09, 'LL' )
@@ -1245,7 +1246,7 @@ class Drobo:
         other cases where there bit shfts are claimed have ended unhappily... 
         hmm...
      """
-     if SIMULATE:
+     if DEBUG & DBG_Simulation:
         return (1, 0, 0)
 
      try: # insert try/except for compatibility with firmware <= 1.1.0  
@@ -1302,8 +1303,8 @@ def DiscoverLUNs(debugflags=0):
     global DEBUG
     DEBUG=debugflags
 
-    if SIMULATE:
-       return [ "/dev/sdb" ]
+    if DEBUG & DBG_Simulation:
+       return [ [ "/dev/sdb", "/dev/sdc" ], [ "/dev/sdd" ] ]
 
     #devdir="/dev"
     devices=[]
