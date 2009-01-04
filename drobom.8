@@ -1,11 +1,11 @@
-.TH DROBOM "8" "October 2008" "droboa " "System Administration Utilities"
+.TH DROBOM 8 October 2008 droboa  System Administration Utilities
 .SH NAME
 drobom \- CLI for managing drobo units
 .SH SYNOPSIS
 .B drobom
 [ \fIoptions\fR ] \fI<command> \fR[ \fIarguments\fR... ]
 .SH DESCRIPTION
-.SS "options is one of:"
+.SS options is one of:
 .TP
 -c, --command
 the command to execute.
@@ -24,7 +24,7 @@ verbosity, a bit-field to trigger increased output as needed, mostly for debuggi
 -V, --version
 print the version id.
 
-.SS "command is one of:"
+.SS command is one of:
 .TP
 blink
 identify the drobo by making the lights blink
@@ -45,13 +45,14 @@ upgrade the firmware to the latest and greatest, recommended by DRI
 help
 print this text
 .TP
-info
-print all available information on a Drobo
+info  <toprint>
+print information on a Drobo. The <toprint> argument is a comma separated list of the values below (default is to print all of them): config, capacity, protocol, settings, slots, firmware, status, options, luns
 .TP
 list
 show device files for all Drobos found.
-.IP
+.TP
 settime sync Drobo's clock to UTC
+.TP
 setlunsize  Set the size of LUNS on device. Arguments:
 .sp
 <sz>

@@ -8,6 +8,8 @@ import getopt
 import string
 from posix import getuid
 
+toprint = [ "config", "capacity", "protocol", "settings", "slots", "firmware", "status", "options", "luns" ]
+
 def usage():
    print "\nUsage: drobom [options] <command> [ arguments... ] \n"
    print " drobo management interface, version: %s\n" % Drobo.VERSION
@@ -26,8 +28,9 @@ def usage():
    print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
    print "\t\t<fwimage>\tthe firmware file to load."
    print "\tfwupgrade\tupgrade the firmware to the latest and greatest, recommended by DRI"
-   print "\tinfo\tprint all available information on a Drobo"
-   print "\tlist\tshow device files for all Drobos found."
+   print "\tinfo <options>\tprint information on a Drobo"
+   print "\t\t<options>\tcomma separated list of: %s" % ','.join(toprint)
+   print "\tlist \tshow device files for all Drobos found."
    print "\tsettime\tsync Drobo's clock to UTC"
    print "\tsetlunsize\tSet the size of LUNS on device. Arguments:"
    print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
@@ -38,72 +41,109 @@ def usage():
    print "\tview\tstart up a management dashboard GUI"
 
 
-
-def info(d):
-  print '---------------------------------------------------------'
-  print 'Info about Drobo ' + d.char_dev_file
-  print '---------------------------------------------------------'
-  print
-  
+def printconfig(d):
   config=d.GetSubPageConfig()
-  print 'query config result: '
-  print config
-  print 'max lun size is: ', config[2]
-  print
-  
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query config result: '
+    print config
+    print 'max lun size is: ', config[2]
+    print
+  else:
+    print config
+
+def printcapacity(d):
   c=d.GetSubPageCapacity()
-  print 'query capacity result:'
-  print c
-  print 'Physical space... used: ',  c[1] , ' free: ' , c[0],  ' Total: ', c[2]
-  print
-  
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query capacity result:'
+    print c
+    print 'Physical space... used: ',  c[1] , ' free: ' , c[0],  ' Total: ', c[2]
+    print
+  else:
+    print c
+
+
+def printprotocol(d):
   protocol=d.GetSubPageProtocol()
-  print 'query protocol version result: '
-  print protocol 
-  print
-  
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query protocol version result: '
+    print protocol 
+    print
+  else:
+    print protocol
+
+def printsettings(d):
   settings=d.GetSubPageSettings()
-  print 'query settings result:' 
-  print settings
-  print 'Drobo time is', time.ctime(settings[0])
-
-  #print 'drobo says it is now: ', time.ctime(settings[0]), ' GMT offset:', str(settings[1])
-  print
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query settings result:' 
+    print settings
+    print 'Drobo time is', time.ctime(settings[0])
+    print
+  else:
+    print settings
   
+def printslots(d):
   slotinfo=d.GetSubPageSlotInfo()
-  print 'query slotinfo result:  number of slots:'
-  print slotinfo[0]
-  print slotinfo[1]
-  print slotinfo[2]
-  print slotinfo[3]
-  print
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query slotinfo result:  number of slots:'
+    print slotinfo[0]
+    print slotinfo[1]
+    print slotinfo[2]
+    print slotinfo[3]
+    print
+  else:
+    print slotinfo
   
+def printfirmware(d):
   firmware=d.GetSubPageFirmware()
-  print 'query firmware result:' 
-  print firmware
-  print 'drobo says firmware revision: ', str(firmware[0]), '.', str(firmware[1]), '(', str(firmware[2]), ') was built: ', firmware[5]
-  print
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query firmware result:' 
+    print firmware
+    print 'drobo says firmware revision: ', str(firmware[0]), '.', str(firmware[1]), '(', str(firmware[2]), ') was built: ', firmware[5]
+    print
+  else:
+    print firmware
   
+def printstatus(d):
   status=d.GetSubPageStatus()
-  print 'query status result:' 
-  print status
-  print
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query status result:' 
+    print status
+    print
+  else:
+    print status
   
+def printoptions(d):
   options=d.GetSubPageOptions()
-  print 'query options result:'
-  print options
-  print
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query options result:'
+    print options
+    print
+  else:
+    print options
   
+def printluns(d):
   luninfo=d.GetSubPageLUNs()
-  print 'query luninfo result:'
-  print luninfo
-  print
-
-  print '---------------------------------------------------------'
-
-def update(pct):
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+    print 'query luninfo result:'
+    for i in luninfo:
+       print i
+    print
+  else:
+    for i in luninfo:
+       print i
+ 
+def info(d,choices):
   if debug & Drobo.DBG_Chatty:
-     print "write is %2d%% done." % ( pct )
+    print '---------------------------------------------------------'
+    print 'Info about Drobo ' + d.char_dev_file
+    print '---------------------------------------------------------'
+
+  for c in choices:
+     eval( "print" + c + "(d)"  )
+
+  if debug & Drobo.DBG_Chatty:
+    print '---------------------------------------------------------'
+
 
 # Mainline...
 
@@ -113,7 +153,8 @@ if len(sys.argv) == 1:
 
 d=None
 cmd=None
-debug=0
+#default is chatty
+debug=1
 
 try:
         opts, args = getopt.getopt(sys.argv[1:], \
@@ -197,10 +238,11 @@ elif cmd == 'fwupgrade':
      d.Sync()
 
 elif cmd == 'info':
-   info(d)
+   if len(args) > 1:
+     toprint=args[1].split(',')
+   info(d,toprint)
 
 elif cmd == "setlunsize": 
-   print args[1], args[2]
    lunsize=int(args[1])
 
    if lunsize > 16 or lunsize < 1:

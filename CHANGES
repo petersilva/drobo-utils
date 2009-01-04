@@ -1,6 +1,7 @@
 0.4.1
   * Multiple LUN detection now done properly, should work better 
     with multiple LUNS and multiple Drobos.
+  * added modular info printing with csv list of outputs.
 
 
 0.4.0 
