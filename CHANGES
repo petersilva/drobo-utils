@@ -1,3 +1,8 @@
+0.4.1
+  * Multiple LUN detection now done properly, should work better 
+    with multiple LUNS and multiple Drobos.
+
+
 0.4.0 
   * IMPORTANT: firmware 1.3.0 support added.  Earlier drobo-utils 
      versions will not recognize a drobo running 1.3.0 or later.

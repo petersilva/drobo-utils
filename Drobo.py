@@ -295,7 +295,7 @@ class Drobo:
   """
 
 
-  def __init__(self,chardev,debugflags=0):
+  def __init__(self,chardevs,debugflags=0):
      """ chardev is /dev/sdX... 
          the character device associated with the drobo unit
      """   
@@ -306,7 +306,8 @@ class Drobo:
      if DEBUG & DBG_Instantiation :
         print '__init__ '
 
-     self.char_dev_file = chardev  
+     self.char_dev_file = chardevs[0]
+     self.char_devs = chardevs
      self.fd=-1
      self.features = []    
 
@@ -315,7 +316,7 @@ class Drobo:
      self.relaystart=0
  
      if SIMULATE == 0:
-        self.fd=DroboDMP.openfd(chardev,0,debugflags)
+        self.fd=DroboDMP.openfd(self.char_dev_file,0,debugflags)
         if self.fd < 0 :
             raise DroboException
 
@@ -328,12 +329,12 @@ class Drobo:
 
         if ( len(cfg) != 3 ): # We ask this page to return three fields...
             if DEBUG & DBG_Detection:
-              print "%s length of cfg is: %d, should be 3" % (chardev, len(cfg))
+              print "%s length of cfg is: %d, should be 3" % (self.char_dev_file, len(cfg))
 	    raise DroboException 
 
         if ( cfg[0] != 4 ): 
             if DEBUG & DBG_Detection:
-              print "%s cfg[0] = %s, should be 4. All Drobos have 4 slots" % (chardev, cfg[0])
+              print "%s cfg[0] = %s, should be 4. All Drobos have 4 slots" % (self.char_dev_file, cfg[0])
 	    raise DroboException # Assert: All Drobo have 4 slots.
  
         set=self.GetSubPageSettings()
@@ -342,20 +343,20 @@ class Drobo:
 
         if ( set[2] != 'TRUSTED DATA' ) and ( set[2] != 'Drobo disk pack'):
             if DEBUG & DBG_Detection:
-              print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( chardev, set[2] )
+              print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( self.char_dev_file, set[2] )
             raise DroboException
 
         # assuming you get past the first barrier...
         fw=self.GetSubPageFirmware()
         if ( len(fw) < 8 ) and (len(fw[7]) < 5):
             if DEBUG & DBG_Detection:
-              print "%s length of fw query: is %d, should be < 8." % (chardev, len(fw))
-              print "%s len(fw[7]) query: is %d, should be < 5." % (chardev, len(fw[7]))
+              print "%s length of fw query: is %d, should be < 8." % (self.char_dev_file, len(fw))
+              print "%s len(fw[7]) query: is %d, should be < 5." % (self.char_dev_file, len(fw[7]))
             raise DroboException
 
         if ( fw[6].lower() != 'armmarvell' ):
             if DEBUG & DBG_Detection:
-              print "%s fw[6] is not armmarvell." % chardev
+              print "%s fw[6] is not armmarvell." % self.char_dev_file
             raise DroboException
         
 
@@ -1268,7 +1269,6 @@ def hierdevlist():
   lastdev=''
   devluns=[]
   c = commands.getstatusoutput("sg_scan /dev/sd?")
-  print c
   if c[0] != 0:
      print "problem running sg_scan: %s" % c[1]
      print "make sure sg3_utils is installed."
@@ -1297,7 +1297,7 @@ def hierdevlist():
 def DiscoverLUNs(debugflags=0):
     """ find all Drobo LUNs accessible to this user on this system. 
 	returns a list of list of character device files 
-              samples: [ [ "/dev/sdf", "/dev/sdg" ], [ /dev/sdh ] ] 
+              samples: [ [ "/dev/sdf", "/dev/sdg" ], [ "/dev/sdh" ] ] 
     """
     global DEBUG
     DEBUG=debugflags
@@ -1309,14 +1309,11 @@ def DiscoverLUNs(debugflags=0):
     devices=[]
     #for potential in os.listdir(devdir):
     for potential in hierdevlist():
-       dev_file=potential[0]
-       #if ( potential[0:2] == "sd" and len(potential) == 3 ):
-       #  dev_file= devdir + '/' + potential
        if ( DEBUG & DBG_Detection ):
              print "trying: ", dev_file
        try: 
               fw=[]
-              d = Drobo( dev_file,debugflags=debugflags )
+              d = Drobo( potential,debugflags=debugflags )
 	      devices.append(potential)
 
        except:
