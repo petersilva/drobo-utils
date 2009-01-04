@@ -1,7 +1,7 @@
 
 in no particular order:
 
-BUG: 
+BUGS: 
   when running two fw uploads, the second one will not run easily.
   need to wait for transaction to timeout...  perhaps randomize id?
 
