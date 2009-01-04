@@ -1,6 +1,6 @@
 0.4.1
   * Multiple LUN detection now done properly, should work better 
-    with multiple LUNS and multiple Drobos.
+    with multiple LUNS and multiple Drobos.  new dependency: sg3-utils 
   * added modular info printing with csv list of outputs.
 
 

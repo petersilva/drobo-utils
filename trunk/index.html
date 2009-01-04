@@ -52,13 +52,14 @@ essential:
   libsgutils1-dev -- ioctl support.
   python-dev      -- to build DroboDMP extension.
   parted      -- disk partitioner.
+  sg3-utils   -- used to interrogate SCSI subsystem.
 
 INSTALLING pre-requisites.:  
 On ubuntu, it would typically look like so:
 
 	open a shell window. they enter the following package installation commands:
 
-	% sudo aptitude install python-qt4 libsgutils1-dev libsgutils1 python-dev  
+	% sudo aptitude install python-qt4 sg3-utils libsgutils1-dev libsgutils1 python-dev  
 	% sudo aptitude install parted kdesudo
 
 On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' and
