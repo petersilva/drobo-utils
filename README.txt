@@ -47,6 +47,7 @@ essential:
                               the newest distros.
   libsgutils1-dev -- ioctl support.
   python-dev      -- to build DroboDMP extension.
+  sg3-utils	  -- generic scsi utilities, used for detection.
 
 options:
   gtksudo or kdesudo - searches on startup for one or the other.
