@@ -90,18 +90,18 @@ class DroboException(exceptions.Exception):
      print " problem accessing a Drobo"
 
 
-def hexstr(hexstring): 
-    """ convert an array into a string representing hex...  """
+#def hexstr(hexstring): 
+#    """ convert an array into a string representing hex...  """
+#
+#    i=0
+#    for c in hexstring:
+#       if ( i % 8 ) == 0:
+#          print "\n%02x -" % i,
+#       print "%02x" % ord(c),
+#       i=i+1
+#    print
 
-    i=0
-    for c in hexstring:
-       if ( i % 8 ) == 0:
-          print "\n%02x -" % i,
-       print "%02x" % ord(c),
-       i=i+1
-    print
-
-def ledstatus(n):
+def _ledstatus(n):
     """ return colors decoded, given numeric slot status 
             goal: match what the lights are doing on the unit.
 
@@ -133,7 +133,7 @@ def ledstatus(n):
     return colourstats[n & 0x0f ]
 
 
-def unitstatus(n):
+def _unitstatus(n):
     """ return string, given numeric unit status 
    
     STATUS: working with ERRATA:
@@ -182,7 +182,7 @@ def unitstatus(n):
 
     return f
 
-def partformat(n):
+def _partformat(n):
     """ return Drobo's idea of what the partition type is
 
         STATUS: working with ERRATA: 
@@ -217,7 +217,7 @@ def partformat(n):
     return f
 
 
-def partscheme(n):
+def _partscheme(n):
    """ return what drobo thinks the partition scheme is
 
        STATUS: working, no issues.
@@ -232,7 +232,7 @@ def partscheme(n):
    if (n == 3):
      return "GPT"
    
-def unitfeatures(n):
+def _unitfeatures(n):
     """ return a list of features supported by a unit
     
         STATUS: working.
@@ -312,7 +312,7 @@ class Drobo:
      self.fd=-1
      self.features = []    
 
-     self.transactionID=random.randint(0,MAX_TRANSACTION)
+     self.transactionID=random.randint(1,MAX_TRANSACTION)
 
      self.relaystart=0
  
@@ -1039,7 +1039,7 @@ class Drobo:
               colours if there is flashing going on.
      """
      if DEBUG & DBG_Simulation:
-       return ( (0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), (1, 750156374016, 0, 'green', 'WDC WD7500AAKS-00RBA0', 'WDC WD7500AAKS-0'), (2, 0, 0, ledstatus(random.randint(0,6)), '', ''), (3, 0, 0, 'gray', '', ''))
+       return ( (0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), (1, 750156374016, 0, 'green', 'WDC WD7500AAKS-00RBA0', 'WDC WD7500AAKS-0'), (2, 0, 0, _ledstatus(random.randint(0,6)), '', ''), (3, 0, 0, 'gray', '', ''))
 
      slotrec='HBQQB32s16sL'
      r = self.__getsubpage( 0x03, 'B' + slotrec+slotrec+slotrec+slotrec )
@@ -1048,7 +1048,7 @@ class Drobo:
      j=0
      while (j < r[0] ):
        i=j*8
-       s = ( r[i+2], r[i+3], r[i+4], ledstatus( r[i+5] ), r[i+6].strip(" \0"),
+       s = ( r[i+2], r[i+3], r[i+4], _ledstatus( r[i+5] ), r[i+6].strip(" \0"),
 		r[i+7].strip(" \0") )
        l.append( s ) 
        j=j+1
@@ -1092,7 +1092,7 @@ class Drobo:
       are none, and it stays 1 when I add one.  now there are 8 when there is
       only one... unless 8 is ext2 fs. and I guessed wrong about part types...
 
-      See also ERRATA for partscheme
+      See also ERRATA for _partscheme
 
       dmp.h says
       8 x H-length, B-LunID, Q-TotalCapacity, B-PartScheme, B-PartCount, B-Format, 5B-rsvd 
@@ -1114,7 +1114,7 @@ class Drobo:
         j=i*4
         if ( 'SUPPORTS_NEW_LUNINFO2' in self.features ):
            k=i*7
-           li.append( (l[j+2], l2[k+3], l[j+4], partscheme(l2[k+4]), partformat(l2[k+5]) ) )
+           li.append( (l[j+2], l2[k+3], l[j+4], _partscheme(l2[k+4]), _partformat(l2[k+5]) ) )
         else:
            li.append( (l[j+2], l[j+3], l[j+4]) )
         i=i+1
@@ -1183,13 +1183,13 @@ class Drobo:
 
      raw=self.__getsubpage(0x08, 'BBHBB32s16s16s240s' )
      result = struct.unpack('>112sL32sH90s', raw[8])
-     self.features = unitfeatures(result[1])
+     self.features = _unitfeatures(result[1])
      return (raw[0], raw[1], raw[2], raw[3], raw[4], raw[5].strip(" \0"), 
          raw[6].strip(" \0"), raw[7].strip(" \0"), self.features )
 
   def GetSubPageStatus(self):
      """
-     return unitstatus
+     return _unitstatus
 
      STATUS: works a bit, 
         relayoutcount stuff completely untested...
@@ -1201,10 +1201,10 @@ class Drobo:
       but when I format, it stays empty...
      """
      if DEBUG & DBG_Simulation:
-         return unitstatus(random.randint(0,16535))       
+         return _unitstatus(random.randint(0,16535))       
 
      ss=self.__getsubpage(0x09, 'LL' )
-     s=unitstatus(ss[0])
+     s=_unitstatus(ss[0])
 
      if ss[1] > 0 : # relay out in progress
         if self.relaystart == 0:
