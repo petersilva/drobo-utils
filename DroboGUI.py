@@ -14,11 +14,11 @@ import subprocess
 import commands
 import string
 
-def toGB(num):
+def _toGB(num):
   g = num*1.0/(1000*1000*1000)
   return "%6.1f" % g
 
-def toTiB(num):
+def _toTiB(num):
   """
   convert input number to computerish Terabytes.... (ok... TibiBytes blech...)
 
@@ -31,19 +31,19 @@ def toTiB(num):
  
 
 
-def setDiskLabel(model,capacity): 
+def _setDiskLabel(model,capacity): 
     if (capacity == ''):
       label = model
     else:
       if ( capacity > 0):
-           label = model.rstrip() + '   ' + toGB(capacity) + 'GB '
+           label = model.rstrip() + '   ' + _toGB(capacity) + 'GB '
       else:
 	   label = 'empty'
     return label
 
 partitioner=""
 
-def runPartitioner():
+def _runPartitioner():
    """ invoke existing partitioning program...
    """
    print "partitioner = ", partitioner
@@ -95,16 +95,12 @@ class DroboGUI(QtGui.QMainWindow):
 
     def __StatusBar_space(self):
         c=self.drobo.GetSubPageCapacity()
-        self.statusmsg = 'used: ' + toGB(c[1]) + ' free: ' + toGB(c[0]) + ' Total: ' + toGB(c[2]) + ' GB, update# ' + str(self.updates)
+        self.statusmsg = 'used: ' + _toGB(c[1]) + ' free: ' + _toGB(c[0]) + ' Total: ' + _toGB(c[2]) + ' GB, update# ' + str(self.updates)
 	#print self.statusmsg
 	
     def __updateLEDs(self):
         """ update LEDS (implement flashing.)
         """
-        #if (self.Format.inProgress and self.Format.fstype == 'ext3'):
-        #   if  self.fmt_process.poll() == None:
-        #      line=self.fmt_process.stdout.readline()
-        #      print 'format progress:',line
 
         self.updates = self.updates + 1 
         i=0
@@ -142,24 +138,25 @@ class DroboGUI(QtGui.QMainWindow):
         luntooltip="luns, count: " + str(len(luninfo)) + "\n"
         for l in luninfo:
 	   luntooltip = luntooltip + "lun id: " + str(l[0]) + " used: " +  \
-                   toGB(l[2]) + " total: " + toGB(l[1]) 
-           if ( 'SUPPORTS_NEW_LUNINFO2' in self.drobo.features ):
-                   lintooltip = luntooltip + " scheme: " + l[3] + " type: " + str(l[4]) + "\n"
+                   _toGB(l[2]) + " total: " + _toGB(l[1]) 
+           if 'SUPPORTS_NEW_LUNINFO2' in self.drobo.features :
+              luntooltip = luntooltip + " scheme: " + l[3] + " type: " + str(l[4]) 
+           luntooltip = luntooltip + "\n"
 
         i=0
         while ( i < 4 ):
-          self.Device.slot[i][0].setText(setDiskLabel(self.s[i][5],self.s[i][1]))
+          self.Device.slot[i][0].setText(_setDiskLabel(self.s[i][5],self.s[i][1]))
           self.Device.slot[i][0].setToolTip(luntooltip)
 	  i=i+1
 
         c=self.drobo.GetSubPageConfig()
-        self.Format.lunsize =  toTiB(c[2])
+        self.Format.lunsize =  _toTiB(c[2])
 
         c=self.drobo.GetSubPageCapacity()
         if c[2] > 0:
            self.Device.fullbar.setValue( c[1]*100/c[2] )
            self.Device.fullbar.setToolTip( 
-	    "used: " + toGB(c[1]) + ' free: ' + toGB(c[0]) + ' Total: ' + toGB(c[2]) + ' GB, update# ' + str(self.updates) )
+	    "used: " + _toGB(c[1]) + ' free: ' + _toGB(c[0]) + ' Total: ' + _toGB(c[2]) + ' GB, update# ' + str(self.updates) )
 	#print self.statusmsg
         #self.__StatusBar_space()
         self.statusBar().showMessage( self.statusmsg )
@@ -340,7 +337,7 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.Format.horizontalSlider.setProperty("value",QtCore.QVariant(2))
         c=self.drobo.GetSubPageConfig()
-        self.Format.lunsize =  toTiB(c[2])
+        self.Format.lunsize =  _toTiB(c[2])
         self.Format.lunszlcd.display( self.Format.lunsize )
         self.Format.horizontalSlider.setValue( int(math.log(self.Format.lunsize,2)) )
 
@@ -537,7 +534,7 @@ class DroboGUI(QtGui.QMainWindow):
         #parted = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Manage Space', self)
         #parted.setShortcut('Ctrl+S')
         #parted.setStatusTip('Start up gparted Space Manager')
-        #self.connect(parted, QtCore.SIGNAL('triggered()'), runPartitioner)
+        #self.connect(parted, QtCore.SIGNAL('triggered()'), _runPartitioner)
         #tools = menubar.addMenu('&Tools')
         #tools.addAction(parted)
 
