@@ -10,6 +10,7 @@ BUGS:
 
   partition type should pre-select in Format dialog...
 
+  memory consumption on the GUI. still chews up 4 MB per hour...
 
 gnats:
   man page does not document output.  
