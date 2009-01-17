@@ -5,6 +5,16 @@
 #named COPYING in the root of the source directory tree.
 #
 
+#-------------------------------------------------------------------
+# debugging stuff: begin
+#-------------------------------------------------------------------
+
+#import pdb
+
+
+#------------------------------------------------------------------
+# debugging stuff: end
+#-------------------------------------------------------------------
 import os,sys,math
 from PyQt4 import QtGui
 from PyQt4 import QtCore
@@ -175,6 +185,7 @@ class DroboGUI(QtGui.QMainWindow):
                self.Format.Formatbutton.setText('Format Done!')
                self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
                        self.FormatLUN)
+        #pdb.set_trace()
 
     def __updateStatus(self):
         self.__updateLEDs() # only update display...
