@@ -32,6 +32,7 @@ def usage():
    print "\tinfo <options>\tprint information on a Drobo"
    print "\t\t<options>\tcomma separated list of: %s" % ','.join(toprint)
    print "\tlist \tshow device files for all Drobos found."
+   print "\tname <name> \tSet Drobo name"
    print "\tsettime\tsync Drobo's clock to UTC"
    print "\tsetlunsize\tSet the size of LUNS on device. Arguments:"
    print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
@@ -242,6 +243,9 @@ elif cmd == 'info':
    if len(args) > 1:
      toprint=args[1].split(',')
    info(d,toprint)
+
+elif cmd == "name": 
+  d.Sync(args[1])          
 
 elif cmd == "setlunsize": 
    lunsize=int(args[1])

@@ -342,10 +342,10 @@ class Drobo:
         if DEBUG & DBG_Detection:
             print "settings: ", set
 
-        if ( set[2] != 'TRUSTED DATA' ) and ( set[2] != 'Drobo disk pack'):
-            if DEBUG & DBG_Detection:
-              print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( self.char_dev_file, set[2] )
-            raise DroboException
+        #if ( set[2] != 'TRUSTED DATA' ) and ( set[2] != 'Drobo disk pack'):
+        #    if DEBUG & DBG_Detection:
+        #      print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( self.char_dev_file, set[2] )
+        #    raise DroboException
 
         # assuming you get past the first barrier...
         fw=self.GetSubPageFirmware()
@@ -531,8 +531,9 @@ class Drobo:
        raise DroboException
     # only way to verify success is to look at the Drobo...
 
-  def Sync(self):
-    """  Set the Drobo's current time to the host's time.
+  def Sync(self,NewName=None):
+    """  Set the Drobo's current time to the host's time,
+	 and the name to selected value.
 
      STATUS: works, maybe...
         DRI claims Drobos are all in California time.  afaict, it ignores TZ completely.
@@ -542,7 +543,9 @@ class Drobo:
     now=int(time.time())
     payload="LH32s"
     payloadlen=struct.calcsize(payload)
-    buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, payloadlen, now, 0 ,"Hi There" )
+    if NewName==None:
+    	NewName=self.GetSubPageSettings()[2]
+    buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, payloadlen, now, 0 , NewName )
     sblen=len(buffer)
 
     # mode select CDB. 
@@ -1258,18 +1261,17 @@ class Drobo:
 
 def hierdevlist():
   """
-  return a list of attached scsi devices, like so
+  return a list of attached Drobo devices, like so
 
   [ [lun0, lun1, lun2], [lun0, lun1, lun2] ]
 
   run sg_scan, sample output line: 
   /dev/sdh: scsi41 channel=0 id=0 lun=0 [em]
+    TRUSTED   Mass Storage      1.00 [rmb=0 cmdq=0 pqual=0 pdev=0x0]
+
 
   """
-  alldev=[]
-  lastdev=''
-  devluns=[]
-  c = commands.getstatusoutput("sg_scan /dev/sd?")
+  c = commands.getstatusoutput("sg_scan -i /dev/sd?")
   if c[0] != 0:
      print "problem running sg_scan: %s" % c[1]
      print "make sure sg3_utils is installed."
@@ -1279,18 +1281,31 @@ def hierdevlist():
      print "problem running sg_scan: %s" % c[1]
      return []
 
+  alldev=[]
+  lastdev=''
+  devluns=[]
+  isdrobo=False
+  even=0
   for l in c[1].split("\n"):
-    (c1, bus, channel, id, lun, emulation ) = l.split(' ')
-    charfile=c1.strip(':')
-    thisdev=bus+channel+id
-    if thisdev==lastdev:
-      devluns.append(charfile) 
+    if even:
+       isdrobo = ( re.split("[ \t]*",l)[1] == "TRUSTED" )
+       if thisdev==lastdev:
+          devluns.append(charfile) 
+       else:
+          if isdrobo:
+            alldev.append(devluns)
+          devluns=[charfile]
+       lastdev=thisdev
+       even=0
+
     else:
-      alldev.append(devluns)
-      devluns=[charfile]
-    lastdev=thisdev
-    
-  alldev.append(devluns)
+       (c1, bus, channel, id, lun, emulation ) = l.split(' ')
+       charfile=c1.strip(':')
+       thisdev=bus+channel+id
+       even=1
+
+  if isdrobo:
+    alldev.append(devluns)
   alldev=alldev[1:]
   return alldev
 
@@ -1306,9 +1321,7 @@ def DiscoverLUNs(debugflags=0):
     if DEBUG & DBG_Simulation:
        return [ [ "/dev/sdb", "/dev/sdc" ], [ "/dev/sdd" ] ]
 
-    #devdir="/dev"
     devices=[]
-    #for potential in os.listdir(devdir):
     for potential in hierdevlist():
        if ( DEBUG & DBG_Detection ):
              print "trying: ", dev_file
