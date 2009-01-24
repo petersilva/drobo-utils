@@ -78,7 +78,8 @@ DBG_Simulation = 0x80
 
 
 
-import DroboDMP
+#import DroboDMP
+import DroboIOctl
 
 class DroboException(exceptions.Exception):
   """  If there is a problem accessing the Drobo, this exception is raised.
@@ -309,7 +310,8 @@ class Drobo:
 
      self.char_dev_file = chardevs[0]
      self.char_devs = chardevs
-     self.fd=-1
+     #self.fd=-1
+     self.fd=None
      self.features = []    
 
      self.transactionID=random.randint(1,MAX_TRANSACTION)
@@ -317,8 +319,11 @@ class Drobo:
      self.relaystart=0
  
      if DEBUG & DBG_Simulation == 0:
-        self.fd=DroboDMP.openfd(self.char_dev_file,0,debugflags)
-        if self.fd < 0 :
+        #self.fd=DroboDMP.openfd(self.char_dev_file,0,debugflags)
+        print "hi about to instantiate"
+        self.fd=DroboIOctl.DroboIOctl(self.char_dev_file,0,debugflags)
+        print "hi back from ioctl constructor "
+        if self.fd == None :
             raise DroboException
 
         # more thorough checks for Drobohood...
@@ -342,10 +347,10 @@ class Drobo:
         if DEBUG & DBG_Detection:
             print "settings: ", set
 
-        if ( set[2] != 'TRUSTED DATA' ) and ( set[2] != 'Drobo disk pack'):
-            if DEBUG & DBG_Detection:
-              print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( self.char_dev_file, set[2] )
-            raise DroboException
+        #if ( set[2] != 'TRUSTED DATA' ) and ( set[2] != 'Drobo disk pack'):
+        #    if DEBUG & DBG_Detection:
+        #      print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( self.char_dev_file, set[2] )
+        #    raise DroboException
 
         # assuming you get past the first barrier...
         fw=self.GetSubPageFirmware()
@@ -369,8 +374,8 @@ class Drobo:
         print '__del__ '
 
      if (self.fd >0):
-           DroboDMP.closefd()
-     self.fd=0
+           self.fd.closefd()
+     self.fd=None
 
 
   def format_script(self,fstype='ext3'):
@@ -478,7 +483,7 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB", 
          0x5a, 0, 0x3a, sub_page, 0, 0, 0, paklen, 0 )
 
-    cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
+    cmdout = self.fd.get_sub_page(paklen, modepageblock,0, DEBUG)
 
     if ( len(cmdout) == paklen ):
       result = struct.unpack(mypack, cmdout)
@@ -518,7 +523,7 @@ class Drobo:
          0xea, 0x10, 0x00, command, 0x00, self.transactionID, 0x01 <<5, 0x01, 0x00 )
 
     try:
-       cmdout = DroboDMP.get_sub_page(1, modepageblock,1,DEBUG)
+       cmdout = self.fd.get_sub_page(1, modepageblock,1,DEBUG)
 
     except:
        print 'IF you see, "bad address", it is because you need to be the super user...'
@@ -531,8 +536,9 @@ class Drobo:
        raise DroboException
     # only way to verify success is to look at the Drobo...
 
-  def Sync(self):
-    """  Set the Drobo's current time to the host's time.
+  def Sync(self,NewName=None):
+    """  Set the Drobo's current time to the host's time,
+	 and the name to selected value.
 
      STATUS: works, maybe...
         DRI claims Drobos are all in California time.  afaict, it ignores TZ completely.
@@ -542,12 +548,14 @@ class Drobo:
     now=int(time.time())
     payload="LH32s"
     payloadlen=struct.calcsize(payload)
-    buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, payloadlen, now, 0 ,"Hi There" )
+    if NewName==None:
+    	NewName=self.GetSubPageSettings()[2]
+    buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, payloadlen, now, 0 , NewName )
     sblen=len(buffer)
 
     # mode select CDB. 
     modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, 0x05, 0, 0, 0, sblen, 0)
-    DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
+    self.fd.put_sub_page( modepageblock, buffer, DEBUG )
 
 
   def SetLunSize(self,tb):
@@ -566,7 +574,7 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB", 
       0xea, 0x10, 0x0, 0x0f, 0, self.transactionID, (0x01 <<5)|0x01, sblen, 0x00 )
 
-    DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
+    self.fd.put_sub_page( modepageblock, buffer, DEBUG )
     self.__transactionNext()
 
 
@@ -624,14 +632,14 @@ class Drobo:
     if DEBUG & DBG_General:
         print "Page 0..."
 
-    cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
+    cmdout = self.fd.get_sub_page( buflen, modepageblock, todev, DEBUG )
     diags=cmdout
     i=0
     while len(cmdout) == buflen:
         modepageblock=struct.pack( ">BBBBBBBHB", 
             0xea, 0x10, 0x80, diagcode, 0x00, self.transactionID, 0x01, buflen, 0x00 )
 
-        cmdout = DroboDMP.get_sub_page( buflen, modepageblock, todev, DEBUG )
+        cmdout = self.fd.get_sub_page( buflen, modepageblock, todev, DEBUG )
         i=i+1
 	diags=diags+cmdout
 
@@ -716,7 +724,7 @@ class Drobo:
 
     modepageblock=struct.pack( "BBBBBB", 0x12 , 0, 0, 0, paklen, 0 )
 
-    cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
+    cmdout = self.fd.get_sub_page(paklen, modepageblock,0, DEBUG)
     if ( len(cmdout) == paklen ):
       return struct.unpack(mypack, cmdout)
     else:
@@ -954,7 +962,7 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB", 
       0xea, 0x10, 0x00, 0x70, 0x00, self.transactionID, (0x01<<5)|0x01, len(buffer), 0x00 )
     
-    written = DroboDMP.put_sub_page( modepageblock, buffer, DEBUG )
+    written = self.fd.put_sub_page( modepageblock, buffer, DEBUG )
 
     if DEBUG & DBG_General:
       print "Page 0..."
@@ -980,7 +988,7 @@ class Drobo:
             buflen, 0x00 )
 
         j=i+buflen
-        written = DroboDMP.put_sub_page( modepageblock, self.fwdata[i:j], DEBUG )
+        written = self.fd.put_sub_page( modepageblock, self.fwdata[i:j], DEBUG )
         i=j
 
         function(i*100/totallength)
@@ -997,7 +1005,7 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB",
          0xea, 0x10, 0x80, 0x71, 0, self.transactionID, 0x01 << 5 , paklen, 0 )
 
-    cmdout = DroboDMP.get_sub_page(paklen, modepageblock,0, DEBUG)
+    cmdout = self.fd.get_sub_page(paklen, modepageblock,0, DEBUG)
     status = struct.unpack( '>B', cmdout )
 
     if DEBUG & DBG_General : 
@@ -1258,18 +1266,17 @@ class Drobo:
 
 def hierdevlist():
   """
-  return a list of attached scsi devices, like so
+  return a list of attached Drobo devices, like so
 
   [ [lun0, lun1, lun2], [lun0, lun1, lun2] ]
 
   run sg_scan, sample output line: 
   /dev/sdh: scsi41 channel=0 id=0 lun=0 [em]
+    TRUSTED   Mass Storage      1.00 [rmb=0 cmdq=0 pqual=0 pdev=0x0]
+
 
   """
-  alldev=[]
-  lastdev=''
-  devluns=[]
-  c = commands.getstatusoutput("sg_scan /dev/sd?")
+  c = commands.getstatusoutput("sg_scan -i /dev/sd?")
   if c[0] != 0:
      print "problem running sg_scan: %s" % c[1]
      print "make sure sg3_utils is installed."
@@ -1279,18 +1286,31 @@ def hierdevlist():
      print "problem running sg_scan: %s" % c[1]
      return []
 
+  alldev=[]
+  lastdev=''
+  devluns=[]
+  isdrobo=False
+  even=0
   for l in c[1].split("\n"):
-    (c1, bus, channel, id, lun, emulation ) = l.split(' ')
-    charfile=c1.strip(':')
-    thisdev=bus+channel+id
-    if thisdev==lastdev:
-      devluns.append(charfile) 
+    if even:
+       isdrobo = ( re.split("[ \t]*",l)[1] == "TRUSTED" )
+       if thisdev==lastdev:
+          devluns.append(charfile) 
+       else:
+          if isdrobo:
+            alldev.append(devluns)
+          devluns=[charfile]
+       lastdev=thisdev
+       even=0
+
     else:
-      alldev.append(devluns)
-      devluns=[charfile]
-    lastdev=thisdev
-    
-  alldev.append(devluns)
+       (c1, bus, channel, id, lun, emulation ) = l.split(' ')
+       charfile=c1.strip(':')
+       thisdev=bus+channel+id
+       even=1
+
+  if isdrobo:
+    alldev.append(devluns)
   alldev=alldev[1:]
   return alldev
 
@@ -1306,12 +1326,10 @@ def DiscoverLUNs(debugflags=0):
     if DEBUG & DBG_Simulation:
        return [ [ "/dev/sdb", "/dev/sdc" ], [ "/dev/sdd" ] ]
 
-    #devdir="/dev"
     devices=[]
-    #for potential in os.listdir(devdir):
     for potential in hierdevlist():
        if ( DEBUG & DBG_Detection ):
-             print "trying: ", dev_file
+             print "trying: ", potential
        try: 
               fw=[]
               d = Drobo( potential,debugflags=debugflags )

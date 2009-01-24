@@ -4,13 +4,12 @@
 
 from distutils.core import setup, Extension
 
-module1 = Extension('DroboDMP', sources = ['DroboDMP.c'])
+#module1 = Extension('DroboDMP', sources = ['DroboDMP.c'])
 
 setup (name = 'Drobo-utils',
        version = '1.0',
        description = 'Drobo Management Protocol io package',
-       ext_modules = [module1],
-       py_modules=['Drobo','DroboGUI'],
+       py_modules=['Drobo','DroboGUI', 'DroboIOctl'],
        scripts=['drobom', 'droboview'],
        data_files = [
                     ('share/pixmaps',             ['Drobo-Front-0000.gif'])

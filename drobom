@@ -32,6 +32,7 @@ def usage():
    print "\tinfo <options>\tprint information on a Drobo"
    print "\t\t<options>\tcomma separated list of: %s" % ','.join(toprint)
    print "\tlist \tshow device files for all Drobos found."
+   print "\tname <name> \tSet Drobo name"
    print "\tsettime\tsync Drobo's clock to UTC"
    print "\tsetlunsize\tSet the size of LUNS on device. Arguments:"
    print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
@@ -169,13 +170,14 @@ for o, a in opts:
         if o in ("-c", "--command"):
 	    cmd = a
         elif o in ("-d", "--device"):
-            try:
-              d=Drobo.Drobo( [ a ], debugflags=debug)
-            except:
-              print "failed to open %s as a drobo" % a
-              if getuid() != 0:
-                print"I see you are not root... probably just permissions .. try again as root."
-              sys.exit()
+            #try:
+            d=Drobo.Drobo( [ a ], debugflags=debug)
+	    sys.exit() # FIXME...
+            #except:
+            #  print "failed to open %s as a drobo" % a
+            #  if getuid() != 0:
+            #    print"I see you are not root... probably just permissions .. try again as root."
+            #  sys.exit()
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
@@ -242,6 +244,9 @@ elif cmd == 'info':
    if len(args) > 1:
      toprint=args[1].split(',')
    info(d,toprint)
+
+elif cmd == "name": 
+  d.Sync(args[1])          
 
 elif cmd == "setlunsize": 
    lunsize=int(args[1])
