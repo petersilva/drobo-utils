@@ -1,6 +1,7 @@
 
 from ctypes import *
 from fcntl import ioctl
+import Drobo
 
 def hexdump(label,data):
       i=0
@@ -116,7 +117,7 @@ class DroboIOctl():
     else:
       io_hdr.dxfer_direction=sg_io_hdr.SG_DXFER_FROM_DEV
 
-    if 1:
+    if 0:
         hexdump("mcb", mcb)
 
     io_hdr.cmd_len = len(mcb)
@@ -124,23 +125,23 @@ class DroboIOctl():
 
     sense_buffer = create_string_buffer(64)
     self.mx_sb_len = len(sense_buffer)
-    io_hdr.sbp=sense_buffer.raw
+    io_hdr.sbp=addressof(sense_buffer)
     io_hdr.sb_len_wr = 0 # initialize just in case...
 
     
     page_buffer=create_string_buffer(sz)
     io_hdr.dxfer_len = sz
-    io_hdr.dxferp = page_buffer.raw
+    io_hdr.dxferp = addressof(page_buffer)
 
     print "4 before ioctl, sense_buffer_len=", io_hdr.mx_sb_len
 
-    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr, 1)
+    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr)
 
     if i < 0:
         print "Drobo get_mode_page SG_IO ioctl error"
         return None
  
-    if 1:
+    if 0:
       print "5 after ioctl, result=", i
       print "status: ", io_hdr.status
       print "driver_status: ", io_hdr.driver_status
@@ -157,7 +158,8 @@ class DroboIOctl():
     else:
        retsz = sz
 
-    print "the length is: ", retsz
+    #hexdump("page_buffer", page_buffer)
+    #print "the length is: ", retsz
     return page_buffer[0:retsz]
 
 
@@ -178,7 +180,7 @@ class DroboIOctl():
     io_hdr.dxfer_direction=sg_io_hdr.SG_DXFER_TO_DEV
     mcb=create_string_buffer(modepageblock)
     sense_buffer = create_string_buffer(32)
-    io_hdr.sbp=sense_buffer.raw
+    io_hdr.sbp=addressof(sense_buffer)
     io_hdr.status=99;
 
     page_buffer=create_string_buffer(sz)
@@ -186,7 +188,7 @@ class DroboIOctl():
     io_hdr.cmd_len = len(mcb)
     io_hdr.mx_sb_len = sizeof(sense_buffer)
     io_hdr.dxfer_len = sizeof(data2write)
-    io_hdr.dxferp = data2write.raw
+    io_hdr.dxferp = addressof(data2write)
     io_hdr.cmdp = mcb.raw
 
     #these are set by ioctl... initializing just in case.
@@ -206,11 +208,6 @@ class DroboIOctl():
  
     return i
 
-  #cdll.LoadLibrary("libc.so.6")
-  #libc = CDLL("libc.so.6")
-  #libc
-  #print libc.ioctl
-
 # unit testing...
 if __name__ == "__main__":
   import struct # only for unit testing...
@@ -220,9 +217,14 @@ if __name__ == "__main__":
   valid_mcb=struct.pack(">BBBBBBBBBB", 0x5a, 0, 0x3a, 1, 0, 0, 0, 0, 0x14, 0 )
   dmp = DroboIOctl(valid_device,1,1)
   print dmp.version()
-  hoho=dmp.get_sub_page(42,valid_mcb,0,4)
+  hoho=dmp.get_sub_page(20,valid_mcb,0,4)
   print "hoho is ", len(hoho), " bytes long"
-  #print struct.unpack("LH32s",hoho)
-  hexdump("hoho", hoho)
+  # the 4 byte header on the returned sense buffer:  (122, 1, 20)
+  # cfg:  (4, 16, 1099511557632)                                 
+
+  #hexdump("hoho", hoho)
+  fmt=">BBHBBBQBHH"
+  print struct.calcsize(fmt)
+  print struct.unpack(fmt,hoho)
   dmp.closefd()
 
