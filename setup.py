@@ -9,7 +9,7 @@ from distutils.core import setup, Extension
 setup (name = 'Drobo-utils',
        version = '1.0',
        description = 'Drobo Management Protocol io package',
-       py_modules=['Drobo','DroboGUI', 'DroboIOctl'],
+       py_modules=['Drobo','DroboGUI', 'DroboIOctl' ],
        scripts=['drobom', 'droboview'],
        data_files = [
                     ('share/pixmaps',             ['Drobo-Front-0000.gif'])

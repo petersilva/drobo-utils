@@ -2,7 +2,6 @@
 from ctypes import *
 from fcntl import ioctl
 import Drobo
-import sg_io_hdr
 
 def hexdump(label,data):
       i=0
@@ -14,6 +13,71 @@ def hexdump(label,data):
              print
              print "%s %03x:" % (label,i),
       print
+
+
+from ctypes import *
+
+
+class sgio(Structure):
+  """
+
+    do ioctl's using Linux generic SCSI interface.
+    all of this comes from /usr/include/scsi/sg.h 
+
+  """
+  SG_DXFER_TO_DEV=-2
+  SG_DXFER_FROM_DEV=-3
+  SG_IO = 0x2285
+  SG_GET_VERSION_NUM = 0x2282
+
+  _fields_ = [ ("interface_id", c_int ),
+    ("dxfer_direction", c_int),
+    ("cmd_len", c_ubyte),
+    ("mx_sb_len", c_ubyte),
+    ("iovec_count", c_ushort),
+    ("dxfer_len", c_int),
+    ("dxferp", c_char_p), # ought to be void...
+    ("cmdp", c_char_p),
+    ("sbp", c_char_p),
+    ("timeout", c_uint),
+    ("flags", c_uint),
+    ("pack_id", c_int),
+    ("usr_ptr", c_char_p), # ought to be void...
+    ("status", c_ubyte),
+    ("masked_status", c_ubyte),
+    ("msg_status", c_ubyte),
+    ("sb_len_wr", c_ubyte),
+    ("host_status", c_ushort),
+    ("driver_status", c_ushort),
+    ("resid", c_int),
+    ("duration", c_uint),
+    ("info", c_uint) ]
+
+
+  def __init__(self):
+     self.interface_id=ord('S')
+     self.dxfer_direction=0
+     self.cmd_len=0
+     self.mx_sb_len=0
+     self.iovec_count=0
+     self.dxfer_len=0
+     self.dxferp=None
+     self.cmdp=None
+     self.timeout=20000 # milliseconds
+     #self.timeout=4000 # milliseconds
+     self.flags=0
+     self.pack_id=0
+     self.usr_ptr=None
+     self.status=0
+     self.masked_status=0
+     self.msg_status=0
+     self.sb_len_wr=0
+     self.host_status=0
+     self.driver_status=0
+     self.resid=0
+     self.duration=0
+     self.info=0
+
 
 class DroboIOctl():
 
@@ -27,7 +91,7 @@ class DroboIOctl():
     
      """
      k=create_string_buffer(8) 
-     if ioctl(self.sg_fd, sg_io_hdr.SG_GET_VERSION_NUM, k) < 0 :
+     if ioctl(self.sg_fd, sgio.SG_GET_VERSION_NUM, k) < 0 :
         print "%s is not an sg device, or old sg driver\n" % char_dev_file
      num=struct.unpack("l",k) 
      return num
@@ -49,12 +113,12 @@ class DroboIOctl():
             debug : if 1,then print debugging output (lots of it.)
 
     """
-    io_hdr=sg_io_hdr()
+    io_hdr=sgio()
 
     if out:
-      io_hdr.dxfer_direction=sg_io_hdr.SG_DXFER_TO_DEV
+      io_hdr.dxfer_direction=sgio.SG_DXFER_TO_DEV
     else:
-      io_hdr.dxfer_direction=sg_io_hdr.SG_DXFER_FROM_DEV
+      io_hdr.dxfer_direction=sgio.SG_DXFER_FROM_DEV
 
     if self.debug & Drobo.DBG_HWDialog:
         hexdump("mcb", mcb)
@@ -75,7 +139,7 @@ class DroboIOctl():
     if self.debug & Drobo.DBG_HWDialog:
       print "4 before ioctl, sense_buffer_len=", io_hdr.mx_sb_len
 
-    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr)
+    i=ioctl(self.sg_fd, sgio.SG_IO, io_hdr)
 
     if i < 0:
         print "Drobo get_mode_page SG_IO ioctl error"
@@ -117,8 +181,8 @@ class DroboIOctl():
     """
     return None
 
-    io_hdr=sg_io_hdr()
-    io_hdr.dxfer_direction=sg_io_hdr.SG_DXFER_TO_DEV
+    io_hdr=sgio()
+    io_hdr.dxfer_direction=sgio.SG_DXFER_TO_DEV
     mcb=create_string_buffer(modepageblock)
     sense_buffer = create_string_buffer(32)
     io_hdr.sbp=addressof(sense_buffer)
@@ -140,7 +204,7 @@ class DroboIOctl():
     #PUT PUT PUT PUT PUT
     iohp = cast(pointer(io_hdr), c_void_ptr).value
     #PUT PUT PUT PUT PUT
-    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, iohp)
+    i=ioctl(self.sg_fd, sgio.SG_IO, iohp)
     #PUT PUT PUT PUT PUT
  
     if (i< 0) :
