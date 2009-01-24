@@ -320,9 +320,7 @@ class Drobo:
  
      if DEBUG & DBG_Simulation == 0:
         #self.fd=DroboDMP.openfd(self.char_dev_file,0,debugflags)
-        print "hi about to instantiate"
         self.fd=DroboIOctl.DroboIOctl(self.char_dev_file,0,debugflags)
-        print "hi back from ioctl constructor "
         if self.fd == None :
             raise DroboException
 
