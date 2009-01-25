@@ -17,12 +17,8 @@ COMPONENTS:
   droboview   - Graphical User interface to see how the Drobo is doing.
                 this is a bit like the ´dashboard´ app for other OS´s.
   drobom      - CLI script, accesses Drobo.py with no GUI stuff.
-  DroboGUI.py - implements GUI. uses Drobo.py for Drobo related stuff.
   Drobo.py   -- overall Drobo io manager, provides API & "python CLI"
-                uses DroboDMP.c to do raw io.
-  DroboDMP.c -- python module to perform the detailed drobo ioctls.
-                only platform specific stuff is in here...
-  setup.py --   python version of a Makefile
+                
 
 
 Getting a Snapshot:
