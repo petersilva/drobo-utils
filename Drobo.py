@@ -29,6 +29,7 @@ named COPYING in the root of the source directory tree.
 import fcntl, struct, socket, array, commands, time
 import exceptions
 import os, sys, re
+import types
 
 #only for fw download...
 import os.path
@@ -310,7 +311,11 @@ class Drobo:
      if DEBUG & DBG_Instantiation :
         print '__init__ '
 
-     self.char_dev_file = chardevs[0]
+     if type(chardevs) is types.ListType:
+        self.char_dev_file = chardevs[0]
+     else:
+        self.char_dev_file = chardevs
+
      self.char_devs = chardevs
      #self.fd=-1
      self.fd=None
