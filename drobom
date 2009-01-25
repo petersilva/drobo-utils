@@ -146,6 +146,9 @@ def info(d,choices):
   if debug & Drobo.DBG_Chatty:
     print '---------------------------------------------------------'
 
+def update(pct):
+  print "write is %2d%% done." % ( pct )
+
 
 # Mainline...
 
