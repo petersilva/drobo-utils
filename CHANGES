@@ -5,7 +5,7 @@
   * as of fw 1.3.0, put of settings page works, changing the name.
   * added 'name' command, to name Drobo. (functionality of Sync)
   * corrected detection logic, which depended on formerly immutable name. 
-
+    (affects fw >= 1.3.0)
 
 0.4.0 
   * IMPORTANT: firmware 1.3.0 support added.  Earlier drobo-utils 

@@ -31,4 +31,7 @@ QA Test checklist prior to release:
     ext3
    ....
 
+   1.9 with fw >= 1.30
+     drobom name 
+     drobom info...
 
