@@ -78,8 +78,10 @@ DBG_Simulation = 0x80
 
 
 
+#for generic SCSI IO details...
 #import DroboDMP
 import DroboIOctl
+
 
 class DroboException(exceptions.Exception):
   """  If there is a problem accessing the Drobo, this exception is raised.
@@ -313,7 +315,6 @@ class Drobo:
      #self.fd=-1
      self.fd=None
      self.features = []    
-
      self.transactionID=random.randint(1,MAX_TRANSACTION)
 
      self.relaystart=0
@@ -548,6 +549,7 @@ class Drobo:
     payloadlen=struct.calcsize(payload)
     if NewName==None:
     	NewName=self.GetSubPageSettings()[2]
+
     buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, payloadlen, now, 0 , NewName )
     sblen=len(buffer)
 

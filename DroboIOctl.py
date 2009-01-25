@@ -165,50 +165,64 @@ class DroboIOctl():
     return page_buffer[0:retsz]
 
 
-  def put_sub_page(self, modepageblock, data2write, DEBUG ):
+  def put_sub_page(self, mcb, buffer, DEBUG ):
     """
 
      ioctl to write using a sub-page to the Drobo.
      required arguments:
 	modepageblock - 
-        data2write
+        buffer
         DEBUG
 
      return the number of bytes written.
     """
-    return None
 
     io_hdr=sg_io_hdr()
+
     io_hdr.dxfer_direction=sg_io_hdr.SG_DXFER_TO_DEV
-    mcb=create_string_buffer(modepageblock)
-    sense_buffer = create_string_buffer(32)
-    io_hdr.sbp=addressof(sense_buffer)
     io_hdr.status=99;
 
-    page_buffer=create_string_buffer(sz)
-
     io_hdr.cmd_len = len(mcb)
-    io_hdr.mx_sb_len = sizeof(sense_buffer)
-    io_hdr.dxfer_len = sizeof(data2write)
+    io_hdr.cmdp = mcb
+
+    sense_buffer = create_string_buffer(32)
+    io_hdr.mx_sb_len = len(sense_buffer)
+    io_hdr.sbp=addressof(sense_buffer)
+
+    size = len(buffer)
+    data2write = create_string_buffer(buffer,size)
+    io_hdr.dxfer_len = size 
     io_hdr.dxferp = addressof(data2write)
-    io_hdr.cmdp = mcb.raw
 
     #these are set by ioctl... initializing just in case.
     io_hdr.sb_len_wr=0;
     io_hdr.resid=0;
     io_hdr.status=0;
 
-    #PUT PUT PUT PUT PUT
-    iohp = cast(pointer(io_hdr), c_void_ptr).value
-    #PUT PUT PUT PUT PUT
-    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, iohp)
-    #PUT PUT PUT PUT PUT
+    #iohp = cast(pointer(io_hdr), c_void_ptr).value
+
+    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr)
  
+    if self.debug & Drobo.DBG_HWDialog:
+      print "put_sub_page, 5 after ioctl, result=", i
+      print "status: ", io_hdr.status
+      print "driver_status: ", io_hdr.driver_status
+      print "host_status: ", io_hdr.host_status
+      print "sb_len_wr: ", io_hdr.sb_len_wr
+      print "resid: ",  io_hdr.resid
+
     if (i< 0) :
        print " get_mode_page SG_IO ioctl error"
        return None
  
-    return i
+    if (io_hdr.status != 0 ) and (io_hdr != 2) :
+        print "oh no! io_hdr status is: %x\n" %  io_hdr.status
+        return None
+ 
+    if io_hdr.resid > 0:
+        size = size - io_hdr.resid
+
+    return size
 
 # unit testing...
 if __name__ == "__main__":

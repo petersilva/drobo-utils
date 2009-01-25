@@ -146,6 +146,9 @@ def info(d,choices):
   if debug & Drobo.DBG_Chatty:
     print '---------------------------------------------------------'
 
+def update(pct):
+  print "write is %2d%% done." % ( pct )
+
 
 # Mainline...
 
@@ -170,14 +173,13 @@ for o, a in opts:
         if o in ("-c", "--command"):
 	    cmd = a
         elif o in ("-d", "--device"):
-            #try:
-            d=Drobo.Drobo( [ a ], debugflags=debug)
-	    sys.exit() # FIXME...
-            #except:
-            #  print "failed to open %s as a drobo" % a
-            #  if getuid() != 0:
-            #    print"I see you are not root... probably just permissions .. try again as root."
-            #  sys.exit()
+            try:
+              d=Drobo.Drobo( [ a ], debugflags=debug)
+            except:
+              print "failed to open %s as a drobo" % a
+              if getuid() != 0:
+                print"I see you are not root... probably just permissions .. try again as root."
+              sys.exit()
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
