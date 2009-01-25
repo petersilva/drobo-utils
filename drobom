@@ -174,7 +174,7 @@ for o, a in opts:
 	    cmd = a
         elif o in ("-d", "--device"):
             try:
-              d=Drobo.Drobo( [ a ], debugflags=debug)
+              d=Drobo.Drobo( a , debugflags=debug)
             except:
               print "failed to open %s as a drobo" % a
               if getuid() != 0:
