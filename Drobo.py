@@ -1264,56 +1264,6 @@ class Drobo:
          return ( 0,0,0 )
 
 
-def hierdevlist():
-  """
-  return a list of attached Drobo devices, like so
-
-  [ [lun0, lun1, lun2], [lun0, lun1, lun2] ]
-
-  run sg_scan, sample output line: 
-  /dev/sdh: scsi41 channel=0 id=0 lun=0 [em]
-    TRUSTED   Mass Storage      1.00 [rmb=0 cmdq=0 pqual=0 pdev=0x0]
-
-
-  """
-  c = commands.getstatusoutput("sg_scan -i /dev/sd?")
-  if c[0] != 0:
-     print "problem running sg_scan: %s" % c[1]
-     print "make sure sg3_utils is installed."
-     return []
-
-  if c[1][0:8] == 'sg_scan:' :
-     print "problem running sg_scan: %s" % c[1]
-     return []
-
-  alldev=[]
-  lastdev=''
-  devluns=[]
-  isdrobo=False
-  even=0
-  for l in c[1].split("\n"):
-    if even:
-       isdrobo = ( re.split("[ \t]*",l)[1] == "TRUSTED" )
-       if thisdev==lastdev:
-          devluns.append(charfile) 
-       else:
-          if isdrobo:
-            alldev.append(devluns)
-          devluns=[charfile]
-       lastdev=thisdev
-       even=0
-
-    else:
-       (c1, bus, channel, id, lun, emulation ) = l.split(' ')
-       charfile=c1.strip(':')
-       thisdev=bus+channel+id
-       even=1
-
-  if isdrobo:
-    alldev.append(devluns)
-  alldev=alldev[1:]
-  return alldev
-
 
 def DiscoverLUNs(debugflags=0):
     """ find all Drobo LUNs accessible to this user on this system. 
@@ -1327,7 +1277,8 @@ def DiscoverLUNs(debugflags=0):
        return [ [ "/dev/sdb", "/dev/sdc" ], [ "/dev/sdd" ] ]
 
     devices=[]
-    for potential in hierdevlist():
+
+    for potential in DroboIOctl.drobolunlist():
        if ( DEBUG & DBG_Detection ):
              print "trying: ", potential
        try: 

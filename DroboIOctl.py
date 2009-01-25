@@ -2,6 +2,7 @@
 from ctypes import *
 from fcntl import ioctl
 import Drobo
+import struct
 
 def hexdump(label,data):
       i=0
@@ -79,7 +80,7 @@ class sg_io_hdr(Structure):
 
 class DroboIOctl():
 
-  def __init__(self,char_dev_file,readwrite,debugflags):
+  def __init__(self,char_dev_file,readwrite=1,debugflags=1):
      self.char_dev_file=char_dev_file
      self.sg_fd=open(char_dev_file,'w')
      self.debug=debugflags
@@ -126,7 +127,7 @@ class DroboIOctl():
      mcb=struct.pack("6B", 0x12, 0, 0, 0, hoholen, 0 )
      
      # len ought to be 96
-     hoho=dmp.get_sub_page(hoholen,mcb,0,4)
+     hoho=self.get_sub_page(hoholen,mcb,0,4)
      (dunno1,vendor,dunno2) = struct.unpack(fmt,hoho)
 
      return ( host, channel, id, lun, vendor )
@@ -263,6 +264,56 @@ class DroboIOctl():
 
     return size
 
+import os
+
+def drobolunlist():
+    """
+      return a list of attached Drobo devices, like so
+
+       [ [lun0, lun1, lun2], [lun0, lun1, lun2] ]
+
+      inspired by sg_scan.c (part of sg3_utils), sample output line:
+        /dev/sdh: scsi41 channel=0 id=0 lun=0 [em]
+        TRUSTED   Mass Storage      1.00 [rmb=0 cmdq=0 pqual=0 pdev=0x0]
+
+      whose logic is encapsulated in the idenfityLUN call.
+    """
+
+
+    devdir="/dev"
+    devices=[]
+    lundevs=[]
+    previousdev=""
+    p=os.listdir(devdir)
+    p.sort() # to ensure luns in ascending order.
+    for potential in p:
+       if ( potential[0:2] == "sd" and len(potential) == 3 ):
+          dev_file= devdir + '/' + potential
+          try:
+              pdio = DroboIOctl( dev_file )
+              id = pdio.identifyLUN()
+          except:
+              pdio.closefd()
+              continue
+          thisdev="%02d%02d%02d" % (id[0], id[1], id[2])
+          if id[4][0:7] == "TRUSTED":  # you have a Drobo!
+             if thisdev == previousdev :  # multi-lun drobo...
+                lundevs.append( dev_file )
+             else:
+                if lundevs == [] :
+                   lundevs=[ dev_file ]
+                else:
+                   devices.append(lundevs)
+                   lundevs=[]        
+
+          previousdev=thisdev
+          pdio.closefd()
+
+    if lundevs != []:
+      devices.append(lundevs)
+
+    return devices
+
 # unit testing...
 if __name__ == "__main__":
   import struct # only for unit testing...
@@ -270,7 +321,7 @@ if __name__ == "__main__":
   #valid mcb: 5a 00 3a 01 00 00 00 00 14 00
 
   valid_mcb=struct.pack(">BBBBBBBBBB", 0x5a, 0, 0x3a, 1, 0, 0, 0, 0, 0x14, 0 )
-  dmp = DroboIOctl(valid_device,1,1)
+  dmp = DroboIOctl(valid_device)
   print "version", dmp.version()
   print "identifyLUN", dmp.identifyLUN()
   print "doing a sub_page"
@@ -284,3 +335,7 @@ if __name__ == "__main__":
   print struct.unpack(fmt,hoho)
   dmp.closefd()
 
+  print 'hunt...'
+  print drobolunlist() 
+  
+  
