@@ -1,5 +1,9 @@
 QA Test checklist prior to release:
 
+   1.0 Review Documentation
+	-- Revision dates in index.html, README.txt, TODO.txt
+	-- Set version to pre-release one.
+        -- build packages with pre-release version id.
    1.1 drobom status... check for accuracy.
    1.2 drobom settime
    1.3 drobom status... check for accuracy.
@@ -35,3 +39,4 @@ QA Test checklist prior to release:
      drobom name 
      drobom info...
 
+   2.0 Re-build packages with final release id.
