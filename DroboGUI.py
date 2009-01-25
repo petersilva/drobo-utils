@@ -73,6 +73,8 @@ class DroboAbout(QtGui.QWidget):
 
   with contributions from: Chris Atlee (chris@atlee.ca), Brad Guillory, <withheld@spammenot.norge> 
   and inspiration from: Joe Krahn
+
+  and thanks for DRI for putting up the Bounty!
         """ , self)
         self.setMinimumSize(240, 240)
         self.quit = QtGui.QPushButton('Quit',self)
