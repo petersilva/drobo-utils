@@ -313,10 +313,11 @@ class Drobo:
 
      if type(chardevs) is types.ListType:
         self.char_dev_file = chardevs[0]
+        self.char_devs = chardevs
      else:
         self.char_dev_file = chardevs
+        self.char_devs = [ chardevs ]
 
-     self.char_devs = chardevs
      #self.fd=-1
      self.fd=None
      self.features = []    
