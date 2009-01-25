@@ -2,9 +2,7 @@
 # Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 # named COPYING in the root of the source directory tree.
 
-from distutils.core import setup, Extension
-
-#module1 = Extension('DroboDMP', sources = ['DroboDMP.c'])
+from distutils.core import setup
 
 setup (name = 'Drobo-utils',
        version = '1.0',

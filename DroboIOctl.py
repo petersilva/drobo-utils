@@ -26,6 +26,7 @@ class sg_io_hdr(Structure):
   SG_DXFER_FROM_DEV=-3
   SG_IO = 0x2285
   SG_GET_VERSION_NUM = 0x2282
+ 
 
   _fields_ = [ ("interface_id", c_int ),
     ("dxfer_direction", c_int),
@@ -97,6 +98,44 @@ class DroboIOctl():
      self.sg_fd.close()
      pass
 
+  def identifyLUN(self):
+     """
+      printf("%s: scsi%d channel=%d id=%d lun=%d", file_namep, host_no,
+               (my_idlun.dev_id >> 16) & 0xff, my_idlun.dev_id & 0xff,
+               (my_idlun.dev_id >> 8) & 0xff);
+     """
+     SCSI_IOCTL_GET_IDLUN = 0x5382
+     SCSI_IOCTL_GET_BUS_NUMBER = 0x5386
+
+     fmt=">bbbbl"
+     idlun = create_string_buffer(struct.calcsize(fmt))
+     i= ioctl( self.sg_fd, SCSI_IOCTL_GET_IDLUN, addressof(idlun))
+     if i < 0:
+        print "Drobo get_mode_page SG_IO ioctl error"
+        return None
+ 
+     (channel, lun, id, host, host_unique_id ) = struct.unpack(fmt, idlun) 
+
+
+     #print "%s: scsi%d channel=%d id=%d lun=%d" % ( self.char_dev_file, host, \
+     #      channel, id, lun )
+
+     #bog standard inquiry mcb
+     fmt="8s32s48s"
+     hoholen=struct.calcsize(fmt)
+     mcb=struct.pack("6B", 0x12, 0, 0, 0, hoholen, 0 )
+     
+     # len ought to be 96
+     hoho=dmp.get_sub_page(hoholen,mcb,0,4)
+     (dunno1,vendor,dunno2) = struct.unpack(fmt,hoho)
+
+     return ( host, channel, id, lun, vendor )
+
+
+  
+
+
+
   def get_sub_page(self, sz, mcb, out, DEBUG):
     """
 
@@ -138,10 +177,6 @@ class DroboIOctl():
 
     i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr)
 
-    if i < 0:
-        print "Drobo get_mode_page SG_IO ioctl error"
-        return None
- 
     if self.debug & Drobo.DBG_HWDialog:
       print "5 after ioctl, result=", i
       print "status: ", io_hdr.status
@@ -150,6 +185,10 @@ class DroboIOctl():
       print "sb_len_wr: ", io_hdr.sb_len_wr
       print "resid: ",  io_hdr.resid
 
+    if i < 0:
+        print "Drobo get_mode_page SG_IO ioctl error"
+        return None
+ 
     if (io_hdr.status != 0 ) and (io_hdr != 2) :
         print "oh no! io_hdr status is: %x\n" %  io_hdr.status
         return None
@@ -227,14 +266,15 @@ class DroboIOctl():
 # unit testing...
 if __name__ == "__main__":
   import struct # only for unit testing...
-  valid_device="/dev/sdf"
+  valid_device="/dev/sdg"
   #valid mcb: 5a 00 3a 01 00 00 00 00 14 00
 
   valid_mcb=struct.pack(">BBBBBBBBBB", 0x5a, 0, 0x3a, 1, 0, 0, 0, 0, 0x14, 0 )
   dmp = DroboIOctl(valid_device,1,1)
-  print dmp.version()
+  print "version", dmp.version()
+  print "identifyLUN", dmp.identifyLUN()
+  print "doing a sub_page"
   hoho=dmp.get_sub_page(20,valid_mcb,0,4)
-  print "hoho is ", len(hoho), " bytes long"
   # the 4 byte header on the returned sense buffer:  (122, 1, 20)
   # cfg:  (4, 16, 1099511557632)                                 
 
