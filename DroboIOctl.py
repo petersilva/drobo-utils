@@ -110,7 +110,7 @@ class DroboIOctl():
 
      fmt=">bbbbl"
      idlun = create_string_buffer(struct.calcsize(fmt))
-     i= ioctl( self.sg_fd, SCSI_IOCTL_GET_IDLUN, addressof(idlun))
+     i= ioctl( self.sg_fd, SCSI_IOCTL_GET_IDLUN, idlun)
      if i < 0:
         print "Drobo get_mode_page SG_IO ioctl error"
         return None
@@ -266,7 +266,7 @@ class DroboIOctl():
 
 import os
 
-def drobolunlist():
+def drobolunlist(debugflags=0):
     """
       return a list of attached Drobo devices, like so
 
@@ -286,17 +286,26 @@ def drobolunlist():
     previousdev=""
     p=os.listdir(devdir)
     p.sort() # to ensure luns in ascending order.
+       
     for potential in p:
        if ( potential[0:2] == "sd" and len(potential) == 3 ):
+          if debugflags & Drobo.DBG_Detection:
+             print "examining: ", potential
+
           dev_file= devdir + '/' + potential
           try:
               pdio = DroboIOctl( dev_file )
               id = pdio.identifyLUN()
           except:
+              if debugflags & Drobo.DBG_Detection:
+                   print "rejected: failed to identify LUN"
+
               pdio.closefd()
               continue
           thisdev="%02d%02d%02d" % (id[0], id[1], id[2])
           if id[4][0:7] == "TRUSTED":  # you have a Drobo!
+             if debugflags & Drobo.DBG_Detection:
+                print "found a Drobo"
              if thisdev == previousdev :  # multi-lun drobo...
                 lundevs.append( dev_file )
              else:
@@ -305,6 +314,10 @@ def drobolunlist():
                 else:
                    devices.append(lundevs)
                    lundevs=[]        
+
+          else:
+              if debugflags & Drobo.DBG_Detection:
+                   print "rejected: not from DRI"
 
           previousdev=thisdev
           pdio.closefd()

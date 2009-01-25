@@ -562,7 +562,7 @@ class Drobo:
     """
        SetLunSize - Sets the maximum LUN size to 'tb' terabytes
 
-       status:  Broken!  always sets LUNSIZE to 16TB
+       status:  works with no issues!
     """
     if (DEBUG & DBG_Chatty):
        print 'set lunsize to %d TiB' % tb
@@ -1278,7 +1278,7 @@ def DiscoverLUNs(debugflags=0):
 
     devices=[]
 
-    for potential in DroboIOctl.drobolunlist():
+    for potential in DroboIOctl.drobolunlist(DEBUG):
        if ( DEBUG & DBG_Detection ):
              print "trying: ", potential
        try: 

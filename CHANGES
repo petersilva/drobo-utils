@@ -1,6 +1,6 @@
 0.4.1
   * Multiple LUN detection now done properly, should work better 
-    with multiple LUNS and multiple Drobos.  new dependency: sg3-utils 
+    with multiple LUNS and multiple Drobos.  
   * added modular info printing with csv list of outputs.
   * as of fw 1.3.0, put of settings page works, changing the name.
   * added 'name' command, to name Drobo. (functionality of Sync)

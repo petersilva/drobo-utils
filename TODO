@@ -19,27 +19,10 @@ gnats:
   help pages?
 
 review print statements:
-  commands are now perhaps too verbose by default.
-   -- modify to ease parsing, add verbosity option to get current level.
   should they write to stderr?
 
 
 STANDARD menu entries for droboview...
-
-MULTIPLE LUN support:
-  ON multiple Drobos with a single LUN:
-        That is the assumed case.  In that case, when you invoke ./droboview,
-        it will start up one GUI per Drobo.
-
-  ON MULTIPLE LUNS on a single Drobo:
-        Currently it will start up one GUI per LUN, which will get confusing.
-
-        Don´t know how to tell when two ways to get at a single drobo are
-        the same one.  Serial number?
-
-        cannot test this configuration.  anyone want to send me a couple
-        of terabytes?
-
 
 Better STATUS progress reporting:
    -- the block count is there, but heuristics for determining timing suck.
@@ -48,10 +31,8 @@ Better STATUS progress reporting:
       ntfs it took hours for the led indicators to drop from 70% to 0.
       It should say something about what is going on.
 
-
 Documentation Dialogs:
    -- maybe a help window.
-
 
 LIVELIER GUI:
    -- have status queries proceed asynchronously from the GUI.
@@ -66,9 +47,6 @@ Re-design the whole darn thing.
 
    of interest:
    -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
-
-
-use ctypes to replace the C stub...
 
 
 Revision date: 2008/12/27
