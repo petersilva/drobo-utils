@@ -276,9 +276,10 @@ elif cmd == "shutdown":
    
 elif cmd == "status":
    c=d.GetSubPageCapacity()
+   n=d.GetSubPageSettings()
    if c[2] > 0 :
       pfull = 100 * ((c[1]+1.0)/c[2])
-      print "%s %02d%% full - %s" % ( ':'.join(d.char_devs), pfull, d.GetSubPageStatus() )
+      print "%s (%s) %02d%% full - %s" % ( ':'.join(d.char_devs), n[2], pfull, d.GetSubPageStatus() )
    else:
       print "firmware too old to report capacity properly... or the drobo is empty..."
 
