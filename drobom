@@ -291,10 +291,17 @@ for u in l:
      n=d.GetSubPageSettings()
      if c[2] > 0 :
          pfull = 100 * ((c[1]+1.0)/c[2])
-         print "%s %s (%s) %02d%% full - %s" % ( ':'.join(d.char_devs), \
-		':'.join(d.DiscoverMounts()), n[2], pfull, d.GetSubPageStatus() )
      else:
          print "firmware too old to report capacity properly... or the drobo is empty..."
+         pfull = -1
+
+     m=':'.join(d.DiscoverMounts())
+     if m == "":
+       m="-"
+     if n[2] == "":
+       n[2] = "-"
+     print "%s %s %s %02d%% full - %s" % ( ':'.join(d.char_devs), m, n[2], \
+          pfull, d.GetSubPageStatus() )
 
   elif cmd == "time":
      settings=d.GetSubPageSettings()
