@@ -7,6 +7,7 @@ import time
 import getopt
 import string
 from posix import getuid
+import types
 
 toprint = [ "config", "capacity", "protocol", "settings", "slots", "firmware", "status", "options", "luns" ]
 
@@ -137,7 +138,9 @@ def printluns(d):
 def info(d,choices):
   if debug & Drobo.DBG_Chatty:
     print '---------------------------------------------------------'
-    print 'Info about Drobo ' + d.char_dev_file
+    print 'Info about Drobo ' ,
+    print '   Name:', d.GetSubPageSettings()[2],
+    print '      Devices:', ':'.join(d.char_devs)
     print '---------------------------------------------------------'
 
   for c in choices:
@@ -156,30 +159,24 @@ if len(sys.argv) == 1:
   usage()
   sys.exit()
 
-d=None
+device=None
 cmd=None
 #default is chatty
 debug=1
 
 try:
-        opts, args = getopt.getopt(sys.argv[1:], \
-            "c:d:hv:V", \
-            ["command=", "device=", "help", "verbosity=", "version"])
+   opts, args = getopt.getopt(sys.argv[1:], "c:d:hv:V", \
+       ["command=", "device=", "help", "verbosity=", "version"])
 except getopt.GetoptError, err:
-        usage()
-        sys.exit(2)
+   usage()
+   sys.exit(2)
+
 
 for o, a in opts:
         if o in ("-c", "--command"):
 	    cmd = a
         elif o in ("-d", "--device"):
-            try:
-              d=Drobo.Drobo( a , debugflags=debug)
-            except:
-              print "failed to open %s as a drobo" % a
-              if getuid() != 0:
-                print"I see you are not root... probably just permissions .. try again as root."
-              sys.exit()
+	    device=a
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
@@ -197,111 +194,127 @@ if cmd==None :
      sys.exit()
   cmd=args[0]
 
-if d == None:
-  l=Drobo.DiscoverLUNs(debugflags=debug)
-  if cmd == 'list':
+if 1:
+   l=Drobo.DiscoverLUNs(debug)
+else:
+   print "failed to discover LUNS"
+   if getuid() != 0:
+      print"I see you are not root... probably just permissions .. try again as root."
+   sys.exit()
 
-     print ' '.join(map(lambda x: ':'.join(x) , l ))
+if len(l) < 1:
+   print "No Drobo discovered, is one connected?"
+   sys.exit()
 
-     if ( getuid() != 0 ) and (len(l) < 1):
-        print 'probably should try again as root'
-     sys.exit()
-  elif len(l) > 1:
-     print "More than one Drobo connected, please pick one: " + str(l) 
-     sys.exit()
-  elif len(l) < 1:
-     if getuid() != 0:
-       print "No Drobo found: try again using root."
-     else:
-       print "No Drobo discovered, is one connected?"
-     sys.exit()
-  else:
-     d = Drobo.Drobo( l[0], debugflags=debug )
+# find the requested Drobo...
+match=False
+if device != None:
+   for i in l:
+      if type(i) == types.ListType:
+         for j in i:
+            if device in j:
+               l=[i]
+               match=True
+      elif device in i:
+         l=[i]
+         match=True
 
-#assert d is a valid drobo object...
+if device != None and not match:
+   print "given device: %s, is not a Drobo" % d
+   sys.exit()
+ 
+if cmd == 'list':
+   print ' '.join(map(lambda x: ':'.join(x) , l ))
+   sys.exit()
 
+if debug & Drobo.DBG_Detection:
+   print "found ", l
+for u in l:
+  d=Drobo.Drobo(u,debug)
+  #assert d is a valid drobo object...
 
-if cmd == "blink":
-   d.Blink() 
-   
-elif cmd == "diag":
-   f=d.dumpDiagnostics()
-   print "diagnostics in ", f
+  if cmd == "blink":
+     d.Blink() 
 
-elif cmd == 'fwcheck':
-   tuple=d.PickLatestFirmware()
-   print tuple[3]
+  elif cmd == "diag":
+     f=d.dumpDiagnostics()
+     print "diagnostics in ", f
 
-elif cmd == 'fwload':
-   if d.PickFirmware(args[1]):
-     d.writeFirmware(update)
+  elif cmd == 'fwcheck':
+     tuple=d.PickLatestFirmware()
+     print tuple[3]
+
+  elif cmd == 'fwload':
+     if d.PickFirmware(args[1]):
+       d.writeFirmware(update)
      d.Sync()
 
-elif cmd == 'fwupgrade':
-   if d.updateFirmwareRepository():
-     d.writeFirmware(update)
-     d.Sync()
+  elif cmd == 'fwupgrade':
+     if d.updateFirmwareRepository():
+       d.writeFirmware(update)
+       d.Sync()
 
-elif cmd == 'info':
-   if len(args) > 1:
-     toprint=args[1].split(',')
-   info(d,toprint)
+  elif cmd == 'info':
+     if len(args) > 1:
+       toprint=args[1].split(',')
+     info(d,toprint)
 
-elif cmd == "name": 
-  d.Sync(args[1])          
+  elif cmd == "name": 
+    d.Sync(args[1])          
 
-elif cmd == "setlunsize": 
-   lunsize=int(args[1])
+  elif cmd == "setlunsize": 
+     lunsize=int(args[1])
 
-   if lunsize > 16 or lunsize < 1:
+     if lunsize > 16 or lunsize < 1:
         print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
         sys.exit()
  
-   if lunsize != 8 and lunsize != 8 and lunsize != 4 and lunsize != 2 and lunsize != 1:
+     if lunsize != 8 and lunsize != 8 and lunsize != 4 and lunsize != 2 and lunsize != 1:
         print 'lun size needs to be a power of 2 TiB, %d is invalid' % lunsize
         sys.exit()
 
-   if args[2] == 'PleaseEraseMyData':
+     if args[2] == 'PleaseEraseMyData':
         print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
         d.SetLunSize(lunsize)
         print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
-   else:
+     else:
         print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
 
-elif cmd == "settime": 
-  d.Sync()          
+  elif cmd == "settime": 
+     d.Sync()          
 
-elif cmd == "shutdown":
-   d.Standby() 
+  elif cmd == "shutdown":
+     d.Standby() 
    
-elif cmd == "status":
-   c=d.GetSubPageCapacity()
-   n=d.GetSubPageSettings()
-   if c[2] > 0 :
-      pfull = 100 * ((c[1]+1.0)/c[2])
-      print "%s (%s) %02d%% full - %s" % ( ':'.join(d.char_devs), n[2], pfull, d.GetSubPageStatus() )
-   else:
-      print "firmware too old to report capacity properly... or the drobo is empty..."
+  elif cmd == "status":
+     c=d.GetSubPageCapacity()
+     n=d.GetSubPageSettings()
+     if c[2] > 0 :
+         pfull = 100 * ((c[1]+1.0)/c[2])
+         print "%s %s (%s) %02d%% full - %s" % ( ':'.join(d.char_devs), \
+		':'.join(d.DiscoverMounts()), n[2], pfull, d.GetSubPageStatus() )
+     else:
+         print "firmware too old to report capacity properly... or the drobo is empty..."
 
-elif cmd == "time":
-  settings=d.GetSubPageSettings()
-  print "Drobo says it is:", time.ctime(settings[0])
+  elif cmd == "time":
+     settings=d.GetSubPageSettings()
+     print "Drobo says it is:", time.ctime(settings[0])
 
-elif cmd == "view":
-  import sys,subprocess
-  try: 
-    from PyQt4 import QtGui
-    from PyQt4 import QtCore
-    from DroboGUI import DroboGUI
-  except:
-    print "QT support missing, no GUI possible"
+  elif cmd == "view":
+     import sys,subprocess
+     try: 
+       from PyQt4 import QtGui
+       from PyQt4 import QtCore
+       from DroboGUI import DroboGUI
+     except:
+       print "QT support missing, no GUI possible"
 
-  # fire up a GUI for the given LUN, stays foreground...
-  app = QtGui.QApplication(sys.argv)
-  tb = DroboGUI(d)
-  tb.show()
-  app.exec_()
+     # fire up a GUI for the given LUN, stays foreground...
+     app = QtGui.QApplication(sys.argv)
+     tb = DroboGUI(d)
+     tb.show()
+     app.exec_()
 
-else:
-  usage()
-  print "Unknown Command: ", cmd
+  else:
+     usage()
+     print "Unknown Command: ", cmd
