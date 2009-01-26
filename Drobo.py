@@ -48,11 +48,11 @@ VERSION = 'running trunk at: ' + time.ctime(time.time())
 
 # set to non-zero to increase verbosity of library functions.
 DEBUG = 0
-# It's a bit field, to debug the DroboDMP layer set bit3 (ie. 0x08)
+# It's a bit field, 
 DBG_Chatty = 0x01 
 DBG_HWDialog = 0x02
 DBG_Instantiation = 0x04
-DBG_DMP = 0x08 # C-layer...  not used here...
+#DBG_DMP = 0x08 # C-layer...  not used here...
 DBG_Detection = 0x10
 DBG_General = 0x20 
 
@@ -61,26 +61,7 @@ DBG_General = 0x20
 # non-drobos.  So do not activate unless you read what the code does first.
 DBG_Simulation = 0x80
 
-#
-# FIXME: if installed with "python setup.py install" then this 
-# insert is not needed.  This is to be able to test it before 
-# installation. best to remove this once installed.
-# this might be considered a security issue as it is...
-#
-# on kubuntu hardy:
-#sys.path.insert(1, os.path.normpath('build/lib.linux-i686-2.5') )
-#on Debian Lenny, it's the same except 2.4... 
-#on a Droboshare... who knows?
-
-#m = re.compile("lib.*")
-#for l in os.listdir("build"):
-#    if m.match(l) :
-#        sys.path.insert(1, os.path.normpath("build/" + l ))
-
-
-
 #for generic SCSI IO details...
-#import DroboDMP
 import DroboIOctl
 
 
@@ -311,6 +292,8 @@ class Drobo:
      if DEBUG & DBG_Instantiation :
         print '__init__ '
 
+     self.fd=None
+
      if type(chardevs) is types.ListType:
         self.char_dev_file = chardevs[0]
         self.char_devs = chardevs
@@ -318,15 +301,12 @@ class Drobo:
         self.char_dev_file = chardevs
         self.char_devs = [ chardevs ]
 
-     #self.fd=-1
-     self.fd=None
      self.features = []    
      self.transactionID=random.randint(1,MAX_TRANSACTION)
 
      self.relaystart=0
  
      if DEBUG & DBG_Simulation == 0:
-        #self.fd=DroboDMP.openfd(self.char_dev_file,0,debugflags)
         self.fd=DroboIOctl.DroboIOctl(self.char_dev_file,0,debugflags)
         if self.fd == None :
             raise DroboException
@@ -352,12 +332,6 @@ class Drobo:
         if DEBUG & DBG_Detection:
             print "settings: ", set
 
-        #if ( set[2] != 'TRUSTED DATA' ) and ( set[2] != 'Drobo disk pack'):
-        #    if DEBUG & DBG_Detection:
-        #      print "%s set[2] is: %s, should be either \'TRUSTED DATA\' or \'Drobo disk pack\'" % ( self.char_dev_file, set[2] )
-        #    raise DroboException
-
-        # assuming you get past the first barrier...
         fw=self.GetSubPageFirmware()
         if ( len(fw) < 8 ) and (len(fw[7]) < 5):
             if DEBUG & DBG_Detection:
@@ -375,11 +349,13 @@ class Drobo:
 
  
   def __del__(self):
+
      if DEBUG & DBG_Instantiation :
         print '__del__ '
 
-     if (self.fd >0):
+     if self.fd != None :
            self.fd.closefd()
+
      self.fd=None
 
 
@@ -462,7 +438,7 @@ class Drobo:
 
   def __getsubpage(self,sub_page,pack): 
     """ Retrieve Sub page from drobo char device.
-        uses a DroboDMP extension in C to run the raw ioctl.
+        uses DroboIOctl class to run the raw ioctl.
 
         sub_page: selection code from DMP Spec...
         pack: the pattern of fields in the subpage...
@@ -599,16 +575,11 @@ class Drobo:
         STATUS: command itself works, no issues.... only light tests so far.
                 still testing umount code.
     """
-    mounts=open("/etc/mtab")
-    dlen=len(self.char_dev_file)
-    toumount=[]
-    for l in mounts.readlines():
-       fields=l.split()
-       if fields[0][0:dlen] == self.char_dev_file:
-          toumount.append(fields[1])
-
+    toumount = self.DiscoverMounts()
     if len(toumount) > 0:
        for i in toumount:
+           if DEBUG & DBG_Chatty:
+              print "initiating umount command for: ", i
            umresult=os.system("umount " + i )
            if umresult != 0:
                 return
@@ -1269,7 +1240,20 @@ class Drobo:
      except:
          return ( 0,0,0 )
 
-
+  def DiscoverMounts(self):
+    """
+        return the list of mounted file systems using the unit.
+    """
+    mounts=open("/etc/mtab")
+    dlen=len(self.char_dev_file)
+    filesystems=[]
+    for l in mounts.readlines():
+       fields=l.split()
+       for i in self.char_devs:
+          if fields[0][0:dlen] == i:
+             filesystems.append(fields[1])
+    mounts.close()
+    return filesystems
 
 def DiscoverLUNs(debugflags=0):
     """ find all Drobo LUNs accessible to this user on this system. 
@@ -1287,14 +1271,11 @@ def DiscoverLUNs(debugflags=0):
     for potential in DroboIOctl.drobolunlist(DEBUG):
        if ( DEBUG & DBG_Detection ):
              print "trying: ", potential
-       try: 
-              fw=[]
-              d = Drobo( potential,debugflags=debugflags )
-	      devices.append(potential)
 
+       try: 
+          d = Drobo( potential,debugflags=debugflags )
+	  devices.append(potential)
        except:
  	      pass
               
-       else:
-	  pass
     return devices

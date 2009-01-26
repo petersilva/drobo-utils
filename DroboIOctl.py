@@ -96,7 +96,9 @@ class DroboIOctl():
      return num
 
   def closefd(self):
-     self.sg_fd.close()
+     if self.sg_fd > 0:
+        self.sg_fd.close()
+     self.sg_fd=-1
      pass
 
   def identifyLUN(self):
@@ -289,31 +291,39 @@ def drobolunlist(debugflags=0):
        
     for potential in p:
        if ( potential[0:2] == "sd" and len(potential) == 3 ):
-          if debugflags & Drobo.DBG_Detection:
-             print "examining: ", potential
-
           dev_file= devdir + '/' + potential
-          try:
+          if debugflags & Drobo.DBG_Detection:
+             print "examining: ", dev_file
+             pdio = DroboIOctl( dev_file )
+          else:
+            try:
               pdio = DroboIOctl( dev_file )
-              id = pdio.identifyLUN()
-          except:
+            except:
               if debugflags & Drobo.DBG_Detection:
                    print "rejected: failed to identify LUN"
-
-              pdio.closefd()
               continue
+          try:
+            id = pdio.identifyLUN()
+          except:
+            if debugflags & Drobo.DBG_Detection:
+                   print "rejected: failed to identify LUN"
+            pdio.closefd()
+            continue
+
           thisdev="%02d%02d%02d" % (id[0], id[1], id[2])
           if id[4][0:7] == "TRUSTED":  # you have a Drobo!
              if debugflags & Drobo.DBG_Detection:
                 print "found a Drobo"
              if thisdev == previousdev :  # multi-lun drobo...
+                if debugflags & Drobo.DBG_Detection:
+                    print "appending to lundevs..."
                 lundevs.append( dev_file )
              else:
-                if lundevs == [] :
-                   lundevs=[ dev_file ]
-                else:
-                   devices.append(lundevs)
-                   lundevs=[]        
+	        if lundevs != []:
+                     devices.append(lundevs)
+                if debugflags & Drobo.DBG_Detection:
+                       print "appending new lundevs to devices:", devices
+                lundevs=[dev_file]        
 
           else:
               if debugflags & Drobo.DBG_Detection:
@@ -321,10 +331,12 @@ def drobolunlist(debugflags=0):
 
           previousdev=thisdev
           pdio.closefd()
-
+    
     if lundevs != []:
-      devices.append(lundevs)
+       devices.append(lundevs)
 
+    if debugflags & Drobo.DBG_Detection:
+        print "returning list: ", devices
     return devices
 
 # unit testing...
