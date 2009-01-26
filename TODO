@@ -1,9 +1,12 @@
 
 in no particular order:
 
+revamp documentation for 0.5.0... simplified.
+
 BUGS: 
   when running two fw uploads, the second one will not run easily.
   need to wait for transaction to timeout...  perhaps randomize id?
+  did randomization, did not change anything...
 
   partition types do not appear to be correctly displayed...
    some confusion between NTFS vs. EXT3  no obvious ill effect.
