@@ -31,8 +31,8 @@ Getting a Snapshot:
 
 REQUIREMENTS:
 
-drobo-utils was developed on pre-release version of Kubuntu Hardy Heron.
-Any similarly recent distro ought to do.
+drobo-utils was developed on pre-release version of Kubuntu (Hardy Heron &
+Intrepid Ibex) Any similarly recent distro ought to do.
 
 To get drobo-utils running, you need packages something like (these are
 ubuntu packages, names may vary on other distros):
@@ -43,7 +43,6 @@ essential:
                               the newest distros.
   libsgutils1-dev -- ioctl support.
   python-dev      -- to build DroboDMP extension.
-  sg3-utils	  -- generic scsi utilities, used for detection.
 
 options:
   gtksudo or kdesudo - searches on startup for one or the other.
@@ -75,7 +74,7 @@ On ubuntu, it would typically look like so:
 
 If you have received a pre-built binary package,then you only need the first line.
 If you want to build from source, then you need the second line.  The third line
-just has useful optional tools.
+just has useful optional tools.  
 
 On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' and
 some of the package names will change.  A typical difference is that packages for developers
@@ -85,71 +84,21 @@ by debian derived ones.
 here is an exmple from fedora 7 (courtesy of help4death on the google group):
 
 % yum install python
-% yum install sg3_utils
 % yum install PyQt4
 % yum install python-devel
 % yum install libsgutils.so.1
 % yum install sg3_utils-devel 
 
+NOTE: X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  the package should work fine on headless servers using only the command line.
+
 
 INSTALL:
+You can install pre-build packages from various download sites, or
+you can just download the source, and try running from your home directory...
+
+Try before you buy:
 Assuming you have all of the above parts, you should be able to just do:
 
-	python setup.py build
-
-which on my system looks like this:
-alu% python ./setup.py build
-running build
-running build_py
-creating build
-creating build/lib.linux-i686-2.5
-copying Drobo.py -> build/lib.linux-i686-2.5
-copying DroboGUI.py -> build/lib.linux-i686-2.5
-running build_ext
-building 'DroboDMP' extension
-creating build/temp.linux-i686-2.5
-gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC -I/usr/include/python2.5 -c DroboDMP.c -o build/temp.linux-i686-2.5/DroboDMP.o
-gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions build/temp.linux-i686-2.5/DroboDMP.o -o build/lib.linux-i686-2.5/DroboDMP.so
-running build_scripts
-creating build/scripts-2.5
-copying and adjusting drobom -> build/scripts-2.5
-copying and adjusting droboview -> build/scripts-2.5
-changing mode of build/scripts-2.5/drobom from 644 to 755
-changing mode of build/scripts-2.5/droboview from 644 to 755
-alu%   
-
-It should create a build/lib<something> sub-directory.  It will also
-compile DroboDMP.c and put the result in a shared object object library 
-in that directory.   The normal package wants to find the libraries
-in system installed places.  If you want to test things without
-installing, then you can do either:
-
-Look in Drobo.py, and uncomment these lines:
-
-#m = re.compile("lib.*")
-#for l in os.listdir("build"):
-#    if m.match(l) :
-#        sys.path.insert(1, os.path.normpath("build/" + l ))
-
-This is fine for testing, but will only work if invoked
-from the directory containg the drobo-utils files.  Once
-installed using 'install'...
-
-	python setup.py install
-
-or a built package, these lines are not needed.
-
-Another way to enable testing without installing is to:
-
-C-ish shells:
-setenv PYTHONPATH `pwd`/build/lib.linux*
-
-Bournish shells:
-export PYTHONPATH=`pwd`/build/lib.linux*
-
-If all has gone well, you can kick the tires 
-by starting it up with: 
-         
         ./drobom status 
 
 see if something sensible happens... on my system with a drobo
@@ -182,6 +131,12 @@ which should start a GUI for each drobo attached to your machine, that
 you have permission to access (depends on the setup, usually USB devices 
 on desktops are accessible to users, so you can see them.  
 
+if you are happy running
+	python setup.py install
+
+If all has gone well, you can kick the tires 
+by starting it up with: 
+         
 
 Setup Drobo with Linux:
 
