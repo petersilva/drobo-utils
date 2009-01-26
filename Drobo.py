@@ -579,7 +579,7 @@ class Drobo:
     if len(toumount) > 0:
        for i in toumount:
            if DEBUG & DBG_Chatty:
-              print "initiating umount command for: ", i
+              print "unmounting: ", i
            umresult=os.system("umount " + i )
            if umresult != 0:
                 return
