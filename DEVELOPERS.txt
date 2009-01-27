@@ -10,20 +10,43 @@ This software is copyright under GPL.  See near end file for details...
 Random useful bits for developers.  (aka notes to myself ;-)
 
  
-dpkg vs. Python Install
+Getting an SVN Snapshot
 -----------------------
-   the dpkg stuff in notdebian puts stuff in /usr/sbin while setup.py puts things in /usr/bin.  
-   python install does not install man pages either, which the dpkg takes care of.
-   The libs are placed differently too.  haven't reviewed for other conflicts, least 
-   confusing to use one or the other method on a system.  
-   (if you do python install, then dpkg --purge drobo-utils)
 
-   There doesn't seem to be a distutils way to remove a package.
-   I just do an installation, then manually remove the files it puts it.
+If you are told 'it is svn', and you want it now::
+
+ # svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk mine
+ # cd mine                 # go into the source directory you downloaded
+ # ./drobom status         # try it out...
+ # python setup.py install # install it in system places...
+ # drobom status           # try it out...
+
+The 'setup.py' script is a convention from the distutils python packaging system.  distutils installation is slightly different from installation from packages.  
+There doesn't seem to be a distutils way to remove a package. touch all
+the files, do an installation, then manually remove the files it installed.
+
+If moving between packaging methods, check out the next 
+section.
+
+
+
+Dpkg vs. Python Install
+-----------------------
+
+drobo-utils has been picked up for inclusion in debian.  The "real" packaging 
+for debian packages is kept in a separate tree, and maintained by debian 
+developers.  In the drobo-utils' tree, there is a directory (called notdebian)
+for building local packages for debian and ubuntu that isn't what is used 
+for the distros.  
+
+The dpkg stuff in notdebian puts stuff in /usr/sbin while setup.py puts things in /usr/bin.  Python install does not install man pages either, which the dpkg takes care of.  The libs are placed differently too.  haven't reviewed for other conflicts, least confusing to use one or the other method on a system.  
+
+(if you do distutils install, then remove the debian package via: dpkg --purge drobo-utils)
 
 
 Making a Release
 ----------------
+
   1 - make a branch
    svn copy https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<branch>
 
@@ -34,49 +57,46 @@ Making a Release
   3 - Build packages for testing & Install them. (see separate recipe.)
 
   4 - Run QA.
-   typically make a branch for each release.  Record results of release tests in the branch (QA.txt)
-   as new tests are created, modify QA.txt on trunk for to keep references for the next release.
+   Record results of release tests in the branch (QA.txt) As new tests are created, modify QA.txt on trunk for to keep references for the next release.
 
 
 
 Building Debian & Ubuntu Packages
 ---------------------------------
 
-   assumes you have installed the Build dependencies::
+assumes you have installed the Build dependencies::
 
-   # obtain a fresh tree with no svn cruft to just build a package:
-   % svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<version>
-
-   % mv trunk drobo-utils-<version>
-   % cd drobo-utils-<version>
-
-   % ln -s notdebian debian     # real debian packages use another debian/ tree.
-   % chmod 755 notdebian/rules  # I dunno why the permissions are wrong...
+ # obtain a fresh tree with no svn cruft to just build a package:
+ % svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<version>
+ % mv trunk drobo-utils-<version>
+ % cd drobo-utils-<version>
+ % ln -s notdebian debian     # real debian packages use another debian/ tree.
+ % chmod 755 notdebian/rules  # I dunno why the permissions are wrong...
 
 
-   # this debian/ config is just for non-distro packages.
+ # this debian/ config is just for non-distro packages.
    # builds for debian and Ubuntu.
 
-   % dpkg-buildpackage -rfakeroot
-   % cd ..
-   # rename it for whatever distro is appropriate...
-   % mv drobo_utils_0.3.3-1_i386 --> droboutils_0.3.3-1_i386_ubunutuIntrepid.deb
+ % dpkg-buildpackage -rfakeroot
+ % cd ..
+ # rename it for whatever distro is appropriate...
+ % mv drobo_utils_0.3.3-1_i386 --> droboutils_0.3.3-1_i386_ubunutuIntrepid.deb
 
-   # rebuild the source tar because it will have the 'debian' link in it.
-   % cd drobo-utils-0.99.9
-   % rm debian
-   % cd ..
-   % tar -czvf drobo-utils-0.3.3-1.tgz drobo-utils-0.99.9
+ # rebuild the source tar because it will have the 'debian' link in it.
+ % cd drobo-utils-0.99.9
+ % rm debian
+ % cd ..
+ % tar -czvf drobo-utils-0.3.3-1.tgz drobo-utils-0.99.9
 
-   apply QA tests. as per QA.txt recording results there.
+apply QA tests. as per QA.txt recording results there.
 
 
 Updating Documentation
 ----------------------
 
- update the web site:
+update the web site:
 
-  scp README.html <user>,drobo-utils@web.sourceforge.net:htdocs
+ % scp README.html <user>,drobo-utils@web.sourceforge.net:htdocs
 
 
 Administrivia

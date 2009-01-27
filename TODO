@@ -1,7 +1,6 @@
 
 in no particular order:
 
-revamp documentation for 0.5.0... simplified.
 
 BUGS: 
   when running two fw uploads, the second one will not run easily.
