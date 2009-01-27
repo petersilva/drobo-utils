@@ -27,13 +27,7 @@ ubuntu packages, names may vary on other distros):
 essential::
   python      -- interpreter for python language
   python-qt4  -- python-qt4... This is actually a new version only in the newest distros.
-
-options::
-  gtksudo or kdesudo - searches on startup for one or the other.
-           if neither are around, then get a graphical sudo of you choice
-	   and add it to the search list at the end of DroboGUI.__init__ 
-  parted   for >= 2TB file systems, need GPT support.
-           just use fdisk  for smaller stuff.
+  parted      -- partitioner, usually included with the distro.
 
 To get a complete list, it is best to use a shell window to grep in the 
 Debian package control file (which defines what the dependencies are for the
@@ -52,33 +46,31 @@ INSTALLING pre-requisites
 
 On ubuntu, it would typically look like so: Open a shell window. Enter the following package installation commands::
 
- % sudo aptitude install python-qt4 libsgutils1 
- % sudo aptitude install debhelper python2.5-dev, libc6-dev libsgutils1-dev 
- % sudo aptitude install parted kdesudo
+ % sudo aptitude install python-qt4 parted 
+ % sudo aptitude install debhelper python2.5-dev
+ % sudo aptitude install python-docutils
 
-If you have received a pre-built binary package,then you only need the first line.
-If you want to build from source, then you need the second line.  The third line
-just has useful optional tools.  
+If you have received a pre-built binary package,then you only need the 
+first line.  If you want to build from source, then you need the second line.  
+The third line install what you need to build documentation.
 
-On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' and
-some of the package names will change.  A typical difference is that packages for developers
-have the -devel suffix on Redhat derived distributions, instead of the -dev favoured
-by debian derived ones.
+On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' 
+and some of the package names will change.  A typical difference is that 
+packages for developers have the -devel suffix on Redhat derived 
+distributions, instead of the -dev favoured by debian derived ones.
 
 here is an example from fedora 7 (courtesy of help4death on the google group)::
 
  % yum install python
  % yum install PyQt4
  % yum install python-devel
- % yum install libsgutils.so.1
- % yum install sg3_utils-devel 
 
 NOTE: X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  the package should work fine on headless servers using only the command line.
 
 
 Install From Package
 --------------------
-Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830">http://sourceforge.net/project/showfiles.php?group_id=222830 
+Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
 where current packages are available.  If you are running Ubuntu 8.10 on a 
 intel platform, then there is a pre-built binary ready for you.  Normally, 
 development occurs on the trunk of the svn tree.  After a given trunk has 
