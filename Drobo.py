@@ -1,26 +1,21 @@
 """
-
-  This module is used to get configuration data 
-  from a Data Robotics Inc. "Drobo" storage unit.
+The Drobo module is used to get configuration data 
+from a Data Robotics Inc. "Drobo" storage unit.
   
-  Information here is based on the:
+The ways of querying the unit are derived mostly from:
         DROBO Management Protocol Specification Rev. A.0 03/08
 
-  referred herein as 'DMP Spec'
-  droboprotocoldefs.h is the other source of info.  They conflict. A lot.
-  referred to in here as dmp.h
+referred herein as 'DMP Spec'.  Another source of data was the
+droboprotocoldefs.h file (referred to as dmp.h).  The last source 
+of information is what the device actually does.  Many inconsistencies 
+were identified.  ERRATA is used to identify when a conflict was apparent.
 
-  This program is copyright (C) 2008 Peter Silva. All Rights Reserved.
-  (Peter.A.Silva@gmail.com)
+tested with firmware: 1.0.3 and later...
 
-  ( Drobo is a trademark of Data Robotics Inc. )
-
-  search for ERRATA for the stuff that confused me...
-
-  was tested with firmware: 1.0.3 and now using 1.1.1
+( Drobo is a trademark of Data Robotics Inc. )
 
 copyright:
-Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
 Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 named COPYING in the root of the source directory tree.
 
@@ -73,18 +68,6 @@ class DroboException(exceptions.Exception):
 
   def __str__(self):
      print " problem accessing a Drobo"
-
-
-#def hexstr(hexstring): 
-#    """ convert an array into a string representing hex...  """
-#
-#    i=0
-#    for c in hexstring:
-#       if ( i % 8 ) == 0:
-#          print "\n%02x -" % i,
-#       print "%02x" % ord(c),
-#       i=i+1
-#    print
 
 def _ledstatus(n):
     """ return colors decoded, given numeric slot status 
