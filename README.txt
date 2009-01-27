@@ -27,8 +27,6 @@ ubuntu packages, names may vary on other distros):
 essential::
   python      -- interpreter for python language
   python-qt4  -- python-qt4... This is actually a new version only in the newest distros.
-  libsgutils1-dev -- ioctl support.
-  python-dev      -- to build DroboDMP extension.
 
 options::
   gtksudo or kdesudo - searches on startup for one or the other.
@@ -42,8 +40,8 @@ Debian package control file (which defines what the dependencies are for the
 build system)::
 
  peter@pepino% grep Depend debian/control
- Build-Depends: debhelper (>= 5), python2.5-dev, libc6-dev, libsgutils1-dev
- Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, libsgutils1
+ Build-Depends: debhelper (>= 5), python2.5-dev, 
+ Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, 
  peter@pepino%      
  peter@pepino% grep Recommend debian/control
  Recommends: parted, gparted, kdesudo, gtksudo
