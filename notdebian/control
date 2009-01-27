@@ -8,8 +8,8 @@ Standards-Version: 3.8.0
 
 Package: drobo-utils
 Architecture: any
-Recommends: parted, gparted, kdesudo, gtksudo, python-qt4
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, libsgutils1, sg3-utils
+Recommends: parted, python-qt4
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
 Description: manage data robotics storage units (drobos)
  Python gui, cli, and api providing the "Dashboard" functionality.
  If you fire up droboview, it should look pretty familiar to those who 
