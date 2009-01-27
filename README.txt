@@ -258,13 +258,8 @@ might have a look at some kernel settings:
 make sure that scsi_mod kernel module is loaded, make 
 sure /sys/module/scsi_mod/parameters/max_luns is > 1.
 
-drobo-utils is untested with multiple LUNS.  starting up droboview 
-will probably spawn a GUI for each LUN, so you may end up seeing double...
-
-Probably not a good idea to run two GUI's for a single drobo.  the GUI
-polls continuously for changes to the device, and that might interfere
-if you try to, say, upgrade the firmware, with the other GUI.
-
+droboview will start up one GUI per drobo, regardless of the number
+of LUNS.  If asked to format, all LUNS for the device will be formatted.
 
 
 ON LUNSIZES >= 2TB:
@@ -366,33 +361,7 @@ Caveats:
 
 Building debian & ubuntu packages:
 
-   (assumes you have installed the Build dependencies...)
-
-   #obtain a fresh tree with no svn cruft...
-
-   svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk drobo-utils-0.3.3
-   cd drobo-utils-0.3.3
-
-   ln -s notdebian debian     # real debian packages use another debian/ tree.
-   chmod 755 notdebian/rules  # I dunno why the permissions are wrong...
-   vi notdebian/changelog     # if you want...
-
-   # this debian/ config is just for non-distro packages.
-   # builds for debian and Ubuntu.
-
-   dpkg-buildpackage -rfakeroot
-   cd ..
-   # rename it for whatever distro is appropriate...
-   mv drobo_utils_0.3.3-1_i386 --> droboutils_0.3.3-1_i386_ubunutuIntrepid.deb
-
-   # rebuild the source tar because it will have the 'debian' link in it.
-   cd drobo-utils-0.99.9
-   rm debian
-   cd ..
-   tar -czvf drobo-utils-0.3.3-1.tgz drobo-utils-0.99.9
-
-
-   
+   See DEVELOPERS.txt
 
 
 Firmware Compatibility:
