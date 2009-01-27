@@ -26,6 +26,10 @@ def usage():
    print "\ncommand is one of: "
    print "\tblink\tidentify the drobo by making the lights blink"
    print "\tdiag\tdump diagnostics file into /tmp directory"
+   print "\tformat\tPrepares a script to format LUNS from a device. Arguments:"
+   print "\t\t<fstype>\tfile system type.  One of: ext3,ntfs,FAT32"
+   print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you really mean it"
+   print "\t\tNote: After execution, there is a script in /tmp. Upto you to run it."
    print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
    print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
    print "\t\t<fwimage>\tthe firmware file to load."
@@ -229,6 +233,7 @@ if cmd == 'list':
 
 if debug & Drobo.DBG_Detection:
    print "found ", l
+
 for u in l:
   d=Drobo.Drobo(u,debug)
   #assert d is a valid drobo object...
@@ -239,6 +244,20 @@ for u in l:
   elif cmd == "diag":
      f=d.dumpDiagnostics()
      print "diagnostics in ", f
+
+  elif cmd == "format":
+     if len(args) < 3 :
+        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+        sys.exit()
+
+     if args[2] != 'PleaseEraseMyData':
+        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+        sys.exit()
+
+     print 'You asked nicely, so I will format %s as you requested' % args[1]
+     d.format_script(args[1])
+     print 'OK, I built the script but nothing is erased yet...'
+     print 'If you are really sure, go ahead and do: sh /tmp/fmtscript'
 
   elif cmd == 'fwcheck':
      tuple=d.PickLatestFirmware()
@@ -273,12 +292,17 @@ for u in l:
         print 'lun size needs to be a power of 2 TiB, %d is invalid' % lunsize
         sys.exit()
 
-     if args[2] == 'PleaseEraseMyData':
-        print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
-        d.SetLunSize(lunsize)
-        print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
-     else:
+     if len(args) < 3 :
         print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+        sys.exit()
+
+     if args[2] != 'PleaseEraseMyData':
+        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+        sys.exit()
+
+     print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
+     d.SetLunSize(lunsize)
+     print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
 
   elif cmd == "settime": 
      d.Sync()          

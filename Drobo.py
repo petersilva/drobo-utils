@@ -399,34 +399,36 @@ class Drobo:
      else:
          ptype='gpt' 
 
-     fd.write( "parted %s mklabel %s\n" % (self.char_dev_file, ptype) )
+     for cd in self.char_devs:
+        fd.write( "parted %s mklabel %s\n" % (cd, ptype) )
 
-     # there is a bit of a race condition creating the partition special file.
-     # the parted print gives a little time before starting the mkfs, to ensure
-     # file is there...
+        # there is a bit of a race condition creating the partition special file.
+        # the parted print gives a little time before starting the mkfs, to ensure
+        # file is there...
 
-     if fstype == 'ext3': 
-         # -m 0 -- Drobo takes care of complaining when near the size limit.
-         #         little point in complaining early, pretending you have less space.
-         # ^resize_inode -- Drobo makes the file system much bigger than the actual space
-         #       available ( >= 2TB ) , so it doesn't make sense to allow space for future
-         #       inode expansion beyond that.  only makes sense in LVM, that's why this
-         #       option is 'off' (the '^' at the beginning.)
-         # sparse_super -- there are lots too many superblock copies made by default.
-         #       safe enough with fewer.
-         fd.write( "parted %s mkpart ext2 0 100%%\n" % self.char_dev_file )
-         fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
-         fd.write( 'mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1\n' % self.char_dev_file )
-     elif fstype == 'ntfs':
-         fd.write( "parted %s mkpart ntfs 0 100%%\n" % self.char_dev_file )
-         fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
-         fd.write( 'mkntfs -f -L Drobo01  %s1\n' % self.char_dev_file )
-     elif fstype == 'FAT32':
-         fd.write( "parted %s mkpart primary fat32 0 100%%\n" % self.char_dev_file )
-         fd.write( "parted %s print; sleep 5\n" % self.char_dev_file )
-         fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % self.char_dev_file )
-     else:
-         print 'unsupported  partition type %s, sorry...' % fstype
+        if fstype == 'ext3': 
+            # -m 0 -- Drobo takes care of complaining when near the size limit.
+            #         little point in complaining early, pretending you have less space.
+            # ^resize_inode -- Drobo makes the file system much bigger than the actual space
+            #       available ( >= 2TB ) , so it doesn't make sense to allow space for future
+            #       inode expansion beyond that.  only makes sense in LVM, that's why this
+            #       option is 'off' (the '^' at the beginning.)
+            # sparse_super -- there are lots too many superblock copies made by default.
+            #       safe enough with fewer.
+            fd.write( "parted %s mkpart ext2 0 100%%\n" % cd )
+            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( 'mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1\n' % cd )
+        elif fstype == 'ntfs':
+            fd.write( "parted %s mkpart ntfs 0 100%%\n" % cd )
+            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( 'mkntfs -f -L Drobo01  %s1\n' % cd )
+        elif fstype == 'FAT32':
+            fd.write( "parted %s mkpart primary fat32 0 100%%\n" % cd )
+            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % cd )
+        else:
+            print 'unsupported  partition type %s, sorry...' % fstype
+
      fd.close()
      os.chmod(format_script,0700)
 
@@ -549,6 +551,11 @@ class Drobo:
     if (DEBUG & DBG_Chatty):
        print 'set lunsize to %d TiB' % tb
 
+    if not self.umount():
+       if (DEBUG & DBG_Chatty):
+          print 'cannot free up Drobo to set lunsize'
+       return
+
     buffer=struct.pack( ">l", tb )
     sblen=len(buffer)
 
@@ -575,16 +582,8 @@ class Drobo:
         STATUS: command itself works, no issues.... only light tests so far.
                 still testing umount code.
     """
-    toumount = self.DiscoverMounts()
-    if len(toumount) > 0:
-       for i in toumount:
-           if DEBUG & DBG_Chatty:
-              print "unmounting: ", i
-           umresult=os.system("umount " + i )
-           if umresult != 0:
-                return
-
-    self.__issueCommand(0x0d)
+    if self.umount():
+      self.__issueCommand(0x0d)
 
 
   def GetDiagRecord(self,diagcode,decrypt=0):
@@ -1239,6 +1238,21 @@ class Drobo:
          return ( o[0], o[1], o[4] >>7 )
      except:
          return ( 0,0,0 )
+
+  def umount(self):
+    """
+       umount all file systems using the given Drobo.
+       return true on success, false on failure.
+    """
+    toumount = self.DiscoverMounts()
+    if len(toumount) > 0:
+       for i in toumount:
+           if DEBUG & DBG_Chatty:
+              print "unmounting: ", i
+           umresult=os.system("umount " + i )
+           if umresult != 0:
+                return False
+    return True
 
   def DiscoverMounts(self):
     """
