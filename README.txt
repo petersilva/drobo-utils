@@ -1,35 +1,22 @@
-This software is copyright under GPL.  See near end file for details...
-
-WHAT IS THIS?
+==================
+Drobo Utils README
+==================
 
 Drobo-utils is a set of linux tools to query and manage Data Robotics
-Drobo storage systems.   If you fire up droboview, it should look pretty
+Drobo storage systems.  If you fire up droboview, it should look pretty
 familiar to those who have seen the dashboard on other operating systems. 
 Droboview is built on a little programmer interface which can be installed 
 on the system and used by other applications as well.
 
 For experienced Linux hands, there is a command line interface, drobom,
-which offers the same functionality as droboview.
+which offers the same functionality as droboview.   For real hackers, fire
+up a python interpreter, 'import Drobo', help(Drobo), and you are off to 
+the races...
 
+.. contents::
 
-COMPONENTS:
-
-  droboview   - Graphical User interface to see how the Drobo is doing.
-                this is a bit like the ´dashboard´ app for other OS´s.
-  drobom      - CLI script, accesses Drobo.py with no GUI stuff.
-  Drobo.py   -- overall Drobo io manager, provides API & "python CLI"
-                
-
-
-Getting a Snapshot:
-
-   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
-
-   For commit access, you need a sourceforge user account.
-
- 
-
-REQUIREMENTS:
+REQUIREMENTS
+------------
 
 drobo-utils was developed on pre-release version of Kubuntu (Hardy Heron &
 Intrepid Ibex) Any similarly recent distro ought to do.
@@ -37,14 +24,13 @@ Intrepid Ibex) Any similarly recent distro ought to do.
 To get drobo-utils running, you need packages something like (these are
 ubuntu packages, names may vary on other distros):
 
-essential:
+essential::
   python      -- interpreter for python language
-  python-qt4  -- python-qt4... This is actually a new version only in 
-                              the newest distros.
+  python-qt4  -- python-qt4... This is actually a new version only in the newest distros.
   libsgutils1-dev -- ioctl support.
   python-dev      -- to build DroboDMP extension.
 
-options:
+options::
   gtksudo or kdesudo - searches on startup for one or the other.
            if neither are around, then get a graphical sudo of you choice
 	   and add it to the search list at the end of DroboGUI.__init__ 
@@ -53,24 +39,24 @@ options:
 
 To get a complete list, it is best to use a shell window to grep in the 
 Debian package control file (which defines what the dependencies are for the
-build system):
+build system)::
 
-peter@pepino% grep Depend debian/control
-Build-Depends: debhelper (>= 5), python2.5-dev, libc6-dev, libsgutils1-dev
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, libsgutils1
-peter@pepino%      
-peter@pepino% grep Recommend debian/control
-Recommends: parted, gparted, kdesudo, gtksudo
-peter@pepino% 
+ peter@pepino% grep Depend debian/control
+ Build-Depends: debhelper (>= 5), python2.5-dev, libc6-dev, libsgutils1-dev
+ Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, libsgutils1
+ peter@pepino%      
+ peter@pepino% grep Recommend debian/control
+ Recommends: parted, gparted, kdesudo, gtksudo
+ peter@pepino% 
 
-INSTALLING pre-requisites.:  
-On ubuntu, it would typically look like so:
+INSTALLING pre-requisites  
+-------------------------
 
-	open a shell window. Enter the following package installation commands:
+On ubuntu, it would typically look like so: Open a shell window. Enter the following package installation commands::
 
-        % sudo aptitude install python-qt4 libsgutils1 
-        % sudo aptitude install debhelper python2.5-dev, libc6-dev libsgutils1-dev 
-	% sudo aptitude install parted kdesudo
+ % sudo aptitude install python-qt4 libsgutils1 
+ % sudo aptitude install debhelper python2.5-dev, libc6-dev libsgutils1-dev 
+ % sudo aptitude install parted kdesudo
 
 If you have received a pre-built binary package,then you only need the first line.
 If you want to build from source, then you need the second line.  The third line
@@ -81,32 +67,45 @@ some of the package names will change.  A typical difference is that packages fo
 have the -devel suffix on Redhat derived distributions, instead of the -dev favoured
 by debian derived ones.
 
-here is an exmple from fedora 7 (courtesy of help4death on the google group):
+here is an example from fedora 7 (courtesy of help4death on the google group)::
 
-% yum install python
-% yum install PyQt4
-% yum install python-devel
-% yum install libsgutils.so.1
-% yum install sg3_utils-devel 
+ % yum install python
+ % yum install PyQt4
+ % yum install python-devel
+ % yum install libsgutils.so.1
+ % yum install sg3_utils-devel 
 
 NOTE: X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  the package should work fine on headless servers using only the command line.
 
 
+Install From Package
+--------------------
+Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830">http://sourceforge.net/project/showfiles.php?group_id=222830 
+where current packages are available.  If you are running Ubuntu 8.10 on a 
+intel platform, then there is a pre-built binary ready for you.  Normally, 
+development occurs on the trunk of the svn tree.  After a given trunk has 
+passed release QA, it will be copied to a branch for maintenance.  So 
+all the branches are stable versions, trunk is live.  If need to work from 
+source, so you can either download a .tar.gz package from sourceforge,
+or get any version, including the bleeding edge latest &amp; greatest via subversion.
+
+
 INSTALL:
 You can install pre-build packages from various download sites, or
-you can just download the source, and try running from your home directory...
+you can also download a source package, and run it from your home directory.
 
 Try before you buy:
-Assuming you have all of the above parts, you should be able to just do:
+Assuming you have all of the above parts, in the directory where you
+downloaded the source, you should be able to just do::
 
-        ./drobom status 
+         ./drobom status 
 
 see if something sensible happens... on my system with a drobo
-the following happens:
+the following happens::
 
-% ./drobom status
-/dev/sdz 100% full - ['Red alert', 'Bad disk', 'No redundancy']
-%
+ % ./drobom status
+ /dev/sdz /drobo01 100% full ( ['Red alert', 'Bad disk', 'No redundancy'], 0 )
+ %
 
 Note: drive changed to sdz to avoid copy/paste errors.
 
@@ -123,22 +122,22 @@ which will cause it to print out a list of the commands available
 through the command line interface.
 
 Once the command line stuff that is working, and assuming you have python-qt4 
-installed, try:
+installed, try::
 
-	./droboview
+ % ./droboview
 
 which should start a GUI for each drobo attached to your machine, that
 you have permission to access (depends on the setup, usually USB devices 
 on desktops are accessible to users, so you can see them.  
 
-if you are happy running
-	python setup.py install
+if you are happy with the package, then you can install it into system places with::
 
-If all has gone well, you can kick the tires 
-by starting it up with: 
+ % python setup.py install
+
          
 
-Setup Drobo with Linux:
+Setup Drobo with Linux
+----------------------
 
 One can use the Format tab of the GUI to partition the device
 and create a single file system for a given LUN.  
@@ -149,100 +148,116 @@ is in progress,and you have to wait until it finishes.  Have not
 determined a method to monitor progress yet.  other file systems are
 much more quickly created, so less of an issue.
 
-I actually prefer to use the system tools, as described below:
+I actually prefer to use the system tools manually, as described below:
 
-Drobos with firmware 1.1.1 or later work fine under linux with ext3.
+Drobos with firmware 1.1.1 or later work well under linux with ext3.
 You can, of course set up an NTFS or HPS+ or FAT32 if you really want,
 but it seems actively counter-intuitive on Linux.  Have not tested
 HPS, but ntfs-3g worked fine initially.  However, unless you are
 going to physically move the disk to between systems, the native (ext3) 
 format has many advantages.  The ´coffee is hot´ disclaimer is 
-necessary at this point:
+necessary at this point::
 
-WARNING: THE FOLLOWING 4 LINES WILL ERASE ALL DATA ON YOUR DROBO!
-WARNING: NO, IT WILL NOT ASK ANY QUESTIONS!
-WARNING: ASK YOURSELF, before you start: ARE YOU SURE? 
-WARNING: AFTER THE SECOND LINE, YOU ARE TOAST.
-WARNING: BEST TO BACKUP YOUR DATA BEFOREHAND...
+ WARNING: THE FOLLOWING 4 LINES WILL ERASE ALL DATA ON YOUR DROBO!
+ WARNING: NO, IT WILL NOT ASK ANY QUESTIONS!
+ WARNING: ASK YOURSELF, before you start: ARE YOU SURE? 
+ WARNING: AFTER THE SECOND LINE, YOU ARE TOAST.
+ WARNING: BEST TO BACKUP YOUR DATA BEFOREHAND...
 
-if you didn't use the GUI, Here is what you have to type:
-parted -i /dev/sdz 
-mklabel gpt
-mkpart ext2 0 100%
-quit
+If you didn't use the GUI, Here is what you have to type::
+
+ # drobom -d /dev/sdz format ext3 PleaseEraseMyData
+ You asked nicely, so I will format ext3 as you requested
+ if you are really sure, go ahead and do: sh /tmp/fmtscript
+
+ # cat /tmp/fmtscript
+ #!/bin/sh
+ parted /dev/sdz mklabel gpt
+ parted /dev/sdz mkpart ext2 0 100%
+ parted /dev/sdz print; sleep 5
+ mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdz1
+
 
 The above sets up the drobo as one big partition, with a label that says
 it ought to contain an ext2 file system.  If you want an NTFS file system,
 then write ´ntfs´ in place of ext2.  The next step is to add the file
-system into the partition.  while the above step was instantaneous, the step 
-below takes a while, just have a little patience, it´ll be fine.
+system into the partition.  while parted's are instantaneous, the mke2fs 
+takes a while, just have a little patience, it´ll be fine.
 
-From the Doboshare forums, building a file system:
-
-mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode  /dev/sdz1
+ sh -x /tmp/fmtscript
 
 (If you want an ntfs file system, then mkntfs -f -L Drobo01 /dev/sdz1 
-ought to work too... )
-On my system the process looked like this:
+ought to work too... ) 
 
--------------------
-root@alu:~# parted -i /dev/sdz
-GNU Parted 1.7.1
-Using /dev/sdz
-Welcome to GNU Parted! Type 'help' to view a list of commands.
-(parted) mklabel gpt
-(parted) mkpart ext2 0 100%
-(parted) quit
-root@alu:~# fdisk /dev/sdz
-GNU Fdisk 1.0
-Copyright (C) 1998 - 2006 Free Software Foundation, Inc.
-This program is free software, covered by the GNU General Public License.
+On my system the process looked like this::
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ root@alu:~# parted -i /dev/sdz
+ GNU Parted 1.7.1
+ Using /dev/sdz
+ Welcome to GNU Parted! Type 'help' to view a list of commands.
+ (parted) mklabel gpt
+ (parted) mkpart ext2 0 100%
+ (parted) quit
+ root@alu:~# fdisk /dev/sdz
+ GNU Fdisk 1.0
+ Copyright (C) 1998 - 2006 Free Software Foundation, Inc.
+ This program is free software, covered by the GNU General Public License.
+ 
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ 
+ Using /dev/sdz
+ Command (m for help): p
+ 
+ Disk /dev/sdz: 2199 GB, 2199020382720 bytes
+ 255 heads, 63 sectors/track, 267349 cylinders
+ Units = cylinders of 16065 * 512 = 8225280 bytes
+ 
+    Device Boot      Start         End      Blocks   Id  System
+ /dev/sdz1               1      267350  2147488843   83  Linux
+ Command (m for help): q
+ root@alu:~# mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdz1
+ mke2fs 1.40.8 (13-Mar-2008)
+ Filesystem label=Drobo01
+ OS type: Linux
+ Block size=4096 (log=2)
+ Fragment size=4096 (log=2)
+ 8388608 inodes, 536870886 blocks
+ 0 blocks (0.00%) reserved for the super user
+ First data block=0
+ 16384 block groups
+ 32768 blocks per group, 32768 fragments per group
+ 512 inodes per group
+ Superblock backups stored on blocks:
+         32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+         4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
+         102400000, 214990848, 512000000
+ 
+ Writing inode tables: done
+ Creating journal (32768 blocks): done
+ Writing superblocks and filesystem accounting information: done
+ 
+ This filesystem will be automatically checked every 26 mounts or
+ 180 days, whichever comes first.  Use tune2fs -c or -i to override.
+ root@alu:~#
+ root@alu:~# mount /dev/sdz1 /mnt
 
-Using /dev/sdz
-Command (m for help): p
 
-Disk /dev/sdz: 2199 GB, 2199020382720 bytes
-255 heads, 63 sectors/track, 267349 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
+Getting an svn Snapshot
+-----------------------
 
-   Device Boot      Start         End      Blocks   Id  System
-/dev/sdz1               1      267350  2147488843   83  Linux
-Command (m for help): q
-root@alu:~# mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdz1
-mke2fs 1.40.8 (13-Mar-2008)
-Filesystem label=Drobo01
-OS type: Linux
-Block size=4096 (log=2)
-Fragment size=4096 (log=2)
-8388608 inodes, 536870886 blocks
-0 blocks (0.00%) reserved for the super user
-First data block=0
-16384 block groups
-32768 blocks per group, 32768 fragments per group
-512 inodes per group
-Superblock backups stored on blocks:
-        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
-        4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
-        102400000, 214990848, 512000000
+If you are told 'it is svn', and you want it now...
 
-Writing inode tables: done
-Creating journal (32768 blocks): done
-Writing superblocks and filesystem accounting information: done
+   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
 
-This filesystem will be automatically checked every 26 mounts or
-180 days, whichever comes first.  Use tune2fs -c or -i to override.
-root@alu:~#
-root@alu:~# mount /dev/sdz1 /mnt
+Then install from source (
+For commit access, you need a sourceforge user account.
 
--------------------
-
-NOTES:
+ 
 
 Multiple LUNS
+-------------
 
 LUN is a 'Logical UNit', from SCSI terminology, when RAID units became
 too large for support in the past, and were sub-divided to present 
@@ -258,7 +273,7 @@ might have a look at some kernel settings:
 make sure that scsi_mod kernel module is loaded, make 
 sure /sys/module/scsi_mod/parameters/max_luns is > 1.
 
-droboview will start up one GUI per drobo, regardless of the number
+Droboview will start up one GUI per drobo, regardless of the number
 of LUNS.  If asked to format, all LUNS for the device will be formatted.
 
 
@@ -283,89 +298,92 @@ ON LUNSIZES >= 2TB:
 
 
 
-Firmware manipulation:
-   The line mode interface has two commands to deal with firmware,
-   fwcheck will tell you if an upgrade is required.
-   fwupgrade will do the work.  It takes a few minutes, and prints 
-   a status you you can see how it is progressing.  have patience.
+Firmware Manipulation
+---------------------
+The line mode interface has two commands to deal with firmware,
+fwcheck will tell you if an upgrade is required.  Fwupgrade 
+will do the work.  It takes a few minutes, and prints a status 
+you you can see how it is progressing.  Have patience::
 
-   Before you start, please any file systems using the Drobo so
-   that one is free to re-start it once the firmware is loaded.
+ root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom fwupgrade
+ 
+ validateFirmware start...
+ Magic number validated. Good.
+ 484 + 2937552 = 2938036 length validated. Good.
+ CRC from header: 4260378881, calculated using python zlib crc32: 398201869
+ yeah, the header CRCs do not match. For now they never do ... ignoring it.
+ CRC for body from header: 1852877921, calculated: 1852877921
+ 32 bit Cyclic Redundancy Check correct. Good.
+ validateFirmware successful...
+ writeFirmware: i=484, start=484, last=2938036 fw length= 488
+ .
+ wrote  32768  bytes... total: 33252
+ wrote  32768  bytes... total: 66020
+ .
+ .
+ .
+ wrote  32768  bytes... total: 2720228
+ wrote  32768  bytes... total: 2752996
+ wrote  32768  bytes... total: 2785764
+ wrote  32768  bytes... total: 2818532
+ wrote  32768  bytes... total: 2851300
+ wrote  32768  bytes... total: 2884068
+ wrote  32768  bytes... total: 2916836
+ wrote  21200  bytes... total: 2938036
+ writeFirmware Done.  i=2938036, len=2938036
+ root@pepino:/home/peter/drobo/drobo-utils/trunk# 
 
-root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom fwupgrade
+when it's done, you can check if it worked using::
 
-   validateFirmware start...
-Magic number validated. Good.
-484 + 2937552 = 2938036 length validated. Good.
-CRC from header: 4260378881, calculated using python zlib crc32: 398201869
-yeah, the header CRCs do not match. For now they never do ... ignoring it.
-CRC for body from header: 1852877921, calculated: 1852877921
-32 bit Cyclic Redundancy Check correct. Good.
-validateFirmware successful...
-writeFirmware: i=484, start=484, last=2938036 fw length= 488
+ root@pepino# drobom status
+ /dev/sdf - 00% full - (['New firmware installed'], 0)
 
-wrote  32768  bytes... total: 33252
-wrote  32768  bytes... total: 66020
-	.
-	.
-	.
-wrote  32768  bytes... total: 2720228
-wrote  32768  bytes... total: 2752996
-wrote  32768  bytes... total: 2785764
-wrote  32768  bytes... total: 2818532
-wrote  32768  bytes... total: 2851300
-wrote  32768  bytes... total: 2884068
-wrote  32768  bytes... total: 2916836
-wrote  21200  bytes... total: 2938036
-writeFirmware Done.  i=2938036, len=2938036
-root@pepino:/home/peter/drobo/drobo-utils/trunk# 
+If the status is like that, then do::
 
-   when it's done, you can check if it worked using:
+ root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom standby
 
-   root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom status
-   /dev/sdf 00% full - ['New firmware installed']
-
-   If the status is like that, then do:
-
-   root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom standby
-
-   lights will flash etc... wait until Drobo goes dark.
-   Wait another five seconds, then un-plug the USB / connector.
+lights will flash etc... wait until Drobo goes dark.
+Wait another five seconds, then un-plug the USB / connector.
    
-   Plug it back in, and wait 10 seconds.
-   it should start up with the latest firmware available for your drobo.
+Plug it back in, and wait 10 seconds.
+it should start up with the latest firmware available for your drobo.
    
-
-   The drobom commands, like DRI's dashboard, will normally
-   get the latest and greatest firmware and upgrade.  If you have
-   the need, you can load arbitrary firmware from the CLI with
-   fwload command.
+The drobom commands, like DRI's dashboard, will normally
+get the latest and greatest firmware and upgrade.  If you have
+the need, you can load arbitrary firmware from the CLI with
+fwload command.
 
 
    
-Caveats:
-   droboview isn't suited to run continuously for long periods, 
-   as it has a memory leak...  total foot print starts out at 32M
-   with a 15 MB resident set size, of which 10 MB are shared, so only 
-   about 4M of real memory consumed.   but the RSS grows at about 
-   2MB/hour.
+CAVEATS
+-------
 
-   29m  11m S    1  2.9   9:44.50 droboview
+droboview isn't suited to run continuously for long periods, 
+as it has a memory leak...  total foot print starts out at 32M
+with a 15 MB resident set size, of which 10 MB are shared, so only 
+about 4M of real memory consumed.   but the RSS grows at about 
+2MB/hour.
 
-   best to restart it daily, or use it when necessary, but not leave it
-   on for days.
+  29m  11m S    1  2.9   9:44.50 droboview
 
-   After you resize luns, droboview gets confused, you need to exit and
-   restart.
+best to restart it daily, or use it when necessary, but not leave it
+on for days.
+
+After you resize luns, droboview gets confused, you need to exit and
+restart.
 
 
-Building debian & ubuntu packages:
+Building debian & ubuntu packages
+---------------------------------
 
    See DEVELOPERS.txt
 
 
-Firmware Compatibility:
-  If your Drobo has firmware version:
+Firmware Compatibility
+----------------------
+
+  Drobo has been tested with every old firmware version. Any Drobo should
+  be upgradable to modern firmware using the dashboard.
 
    NOTE: really need at least 1.1.1 to use Linux & ext3.
          just use the tools to upgrade your firmware ASAP.
@@ -387,15 +405,30 @@ Firmware Compatibility:
 
          - firmware prior to here deals badly with ext3.
 
-   1.1.1 - works without issues.
+   1.1.1 - 1.2.4 works without issues. 
+           ('name' not supported by firmware)
 
-   1.1.2 - works without issues.
+   1.3.0 - works without issues.
 
 
-Revision date: 2008/08/10
+Credits
+-------
+
+who did what::
+
+ Peter Silva:    wrote most all of it.
+ Chris Atlee:    the proper debian packaging. 
+ Brad Guillory:  some help with diagnostics and patches.
+ Joe Krahn:      lots of inspiration.
+
+
+Administrivia
+-------------
+
+Revision date: 2009/01/22
 
 copyright:
 
-Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
 Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 named COPYING in the root of the source directory tree.
