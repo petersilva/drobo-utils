@@ -2,14 +2,13 @@
   * replaced DroboDMP C extension by DroboIOctl python class.  no need
     for architecture dependent packages. this also means you can just 
     try it out straight after download, no need to install anything.
-    much easier.
+    much easier. fewer build dependencies as well.
   * device detection completely re-written.  It works better now.
   * Now displays mount points where it makes sense to do so.
   * status command output better/different. shows all devices and mount points
     for each drobo.
   * full Multiple LUN support.    should do what is expected.
   * full multiple Drobo support.  should do what is expected.
-  * tested with multiple devices, now generally works in all cases.
   * added modular info printing with csv list of outputs.
   * firmware 1.3.0, has enabled formerly broken functionality which
     name makes the sync command rename every drobo to 'hi there'.
@@ -17,6 +16,8 @@
   * added 'name' command, to name Drobo. (functionality of Sync)
   * corrected detection logic, which depended on formerly immutable name. 
     (affects fw >= 1.3.0) now use same mechanisms as sg_scan from sg3_utils.
+  * documentation moved into restructured text. now shows up on the web.
+    web site and documntation now consistent.
 
 0.4.0 Release: 2008/12/28
   * IMPORTANT: firmware 1.3.0 support added.  Earlier drobo-utils 

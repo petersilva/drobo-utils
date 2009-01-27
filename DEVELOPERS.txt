@@ -94,6 +94,11 @@ apply QA tests. as per QA.txt recording results there.
 Updating Documentation
 ----------------------
 
+use the restructured text tools (from the python-docutils package.)
+to build things using:
+ % make doc
+
+Have a look at Makefile for how that works.
 update the web site:
 
  % scp README.html <user>,drobo-utils@web.sourceforge.net:htdocs
