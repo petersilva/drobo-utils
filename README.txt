@@ -18,7 +18,7 @@ the races...
 REQUIREMENTS
 ------------
 
-drobo-utils was developed on pre-release version of Kubuntu (Hardy Heron &
+Drobo-utils was developed on pre-release version of Kubuntu (Hardy Heron &
 Intrepid Ibex) Any similarly recent distro ought to do.
 
 To get drobo-utils running, you need packages something like (these are
@@ -34,12 +34,9 @@ Debian package control file (which defines what the dependencies are for the
 build system)::
 
  peter@pepino% grep Depend debian/control
- Build-Depends: debhelper (>= 5), python2.5-dev, 
- Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, 
+ Build-Depends: debhelper (>= 5), python2.5-dev, python-docutils
+ Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, parted
  peter@pepino%      
- peter@pepino% grep Recommend debian/control
- Recommends: parted, gparted, kdesudo, gtksudo
- peter@pepino% 
 
 INSTALLING pre-requisites  
 -------------------------
@@ -71,11 +68,10 @@ NOTE: X or QT is missing, it will only disable the GUI.  Line mode will work wit
 Install From Package
 --------------------
 Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
-where current packages are available.  If you are running Ubuntu 8.10 on a 
-intel platform, then there is a pre-built binary ready for you.  Normally, 
-development occurs on the trunk of the svn tree.  After a given trunk has 
-passed release QA, it will be copied to a branch for maintenance.  So 
-all the branches are stable versions, trunk is live.  If need to work from 
+where current packages are available.  Normally, development occurs on the trunk 
+of the svn tree.  to start a release, it will be copied to a branch for maintenance.  
+After a given branch has passed release QA, the release occurs.
+So all the branches are stable versions, trunk is live.  If need to work from 
 source, so you can either download a .tar.gz package from sourceforge,
 or get any version, including the bleeding edge latest &amp; greatest via subversion.
 
@@ -237,13 +233,7 @@ On my system the process looked like this::
 Getting an svn Snapshot
 -----------------------
 
-If you are told 'it is svn', and you want it now...
-
-   svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk
-
-Then install from source (
-For commit access, you need a sourceforge user account.
-
+See DEVELOPERS.txt
  
 
 Multiple LUNS
@@ -345,8 +335,8 @@ fwload command.
 
 
    
-CAVEATS
--------
+KNOWN BUGS
+----------
 
 droboview isn't suited to run continuously for long periods, 
 as it has a memory leak...  total foot print starts out at 32M
