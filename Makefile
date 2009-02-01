@@ -1,6 +1,11 @@
 #!/usr/bin/make -f
 
+build:
+	python setup.py build
+
 clean:
+	-python setup.py clean
+	-find . -name "*\.pyc" -delete
 	-rm CHANGES.html DEVELOPERS.html README.html
 	-rm -rf build*
 
@@ -12,13 +17,6 @@ doc:
 # Uncomment this to turn on verbose mode.
 
 PKGNAME := drobo-utils
-
-build:
-	python setup.py build
-
-clean:
-	python setup.py clean
-	find . -name "*\.pyc" -delete
 
 install: build
 	python setup.py install_lib -d /usr/lib/python/site-packages; 

@@ -1,12 +1,23 @@
 
 in no particular order:
 
+Name command support in GUI
+
+Alerting...
+	.. SMTP forwarder:
+        .. address 
+        .. authentication.? u+p
+	.. 
 
 BUGS: 
   when running two fw uploads, the second one will not run easily.
   need to wait for transaction to timeout...  perhaps randomize id?
   did randomization, did not change anything...
 
+Alerting
+	-- save config...
+
+STANDARD menu entries for droboview...
   partition types do not appear to be correctly displayed...
    some confusion between NTFS vs. EXT3  no obvious ill effect.
 

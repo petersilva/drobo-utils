@@ -35,8 +35,10 @@ QA Test checklist prior to release:
     ext3
    ....
 
-   1.9 with fw >= 1.30
+   1.9 drobom diags # verify that dumping diagnostics still works...
+
+   2.0 with fw >= 1.30
      drobom name 
      drobom info...
 
-   2.0 Re-build packages with final release id.
+   3.0 Re-build packages with final release id.
