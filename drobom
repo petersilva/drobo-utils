@@ -245,7 +245,7 @@ for u in l:
   elif cmd == "diag":
      f=d.dumpDiagnostics()
      print "diagnostics in ", f
-     if args[1] = "print":
+     if args[1] == "print":
        f=open( f ) 
        data = f.read()
        key = ord(data[0]) ^ 0x2d
