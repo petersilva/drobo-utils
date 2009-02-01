@@ -33,6 +33,13 @@ identify the drobo by making the lights blink
 diag
 dump diagnostics file into /tmp directory
 .TP
+diagprint <diagdumpfile>
+print diagnostics file to standard output
+.sp
+.br
+<diagdumpfile>
+the diagnostic dump file to print.
+.TP
 fwcheck query drobo.com for updates to firmware for the given Drobo
 fwload  load a specific firmware for the given Drobo. Arguments:
 .sp
@@ -74,7 +81,7 @@ status
 report how is the Drobo doing
 .SS
 device
-raw block device of a drobo. If not given, it will be searched for.
+raw block device of a drobo (i.e. /dev/sdz) . If not given, assumes all attached drobos.
 .SH AUTHOR
 This manual page was written by Chris AtLee <chris@atlee.ca> for the Debian
 project (but may be used by others).
