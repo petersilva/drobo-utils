@@ -13,13 +13,30 @@ which offers the same functionality as droboview.   For real hackers, fire
 up a python interpreter, 'import Drobo', help(Drobo), and you are off to 
 the races...
 
+Those worried about safety of using this software should know:  it was 
+developed with assistance from the vendor (Digital Robotics Inc.), and 
+in every case, based on vendor documentation, and with at least encouragement,
+if not outright support.  For each release, a QA.txt file is built, demonstrating
+the functionality tests run.  Of interest is that there are multiple checksum
+verification built into the firmware upgrade functionality.  It is next to 
+impossible to brick a drobo using the tools.  Drobo-utils verifies 
+firmware checksums before attempting to upload the image to the device, and 
+the device checks the firmware against the checksums as well.  New firmware 
+is loaded into an alternate location from the currently active one, and 
+if activation of the new firmware fails, the drobo will simply boot the old one.  
+ 
+On the other hand, common sense rules do apply.  Setting the LUN size, or 
+re-formatting a Drobo will erase all your data whether you do it on Linux or 
+any other operating system.  These are power tools, and they can do some 
+damage to your data if used without proper care.
+
 .. contents::
 
 REQUIREMENTS
 ------------
 
-Drobo-utils was developed on pre-release version of Kubuntu (Hardy Heron &
-Intrepid Ibex) Any similarly recent distro ought to do.
+Drobo-utils was developed on pre-release version of Kubuntu (Hardy, Intrepid, 
+and now Jaunty) Any similarly recent distro ought to do.
 
 To get drobo-utils running, you need packages something like (these are
 ubuntu packages, names may vary on other distros):
@@ -239,9 +256,9 @@ See DEVELOPERS.txt
 Multiple LUNS
 -------------
 
-LUN is a 'Logical UNit', from SCSI terminology, when RAID units became
-too large for support in the past, and were sub-divided to present 
-smaller units the operating system.  The default LUNSIZE on Drobos 
+LUN is an abbreviation of 'Logical UNit'. The origin of the term is SCSI terminology.
+When RAID units became too large for support in the past, and were sub-divided 
+to present smaller units the operating system.  The default LUNSIZE on Drobos 
 is 2 TiB (adjustable using the tools.) If more disk space (after 
 allowing for parity/redundancy) than LUNSIZE is installed in a 
 unit, Drobo will show a second (or even third) LUN.  Each LUN 

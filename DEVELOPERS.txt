@@ -59,6 +59,14 @@ Making a Release
   4 - Run QA.
    Record results of release tests in the branch (QA.txt) As new tests are created, modify QA.txt on trunk for to keep references for the next release.
 
+Quality Assurance (QA.txt)
+-------------------------
+
+QA.txt is a quality assurance log.  The version on the trunk of the releases indicates 
+the QA procedure to be applied to the next version during the release process.  Since 
+a branch is created for each release, the version of QA.txt acts as a quality log 
+for that release.  so one can do an svn checkout, or svn export to get the quality 
+log for any release (QA.txt introduce in version 0.4.0)
 
 
 Building Debian & Ubuntu Packages

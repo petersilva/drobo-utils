@@ -25,7 +25,8 @@ def usage():
    print " -V, --version\treport version of drobo-utils."
    print "\ncommand is one of: "
    print "\tblink\tidentify the drobo by making the lights blink"
-   print "\tdiag\tdump diagnostics file into /tmp directory"
+   print "\tdiag [ print ]\tdump diagnostics file into /tmp directory"
+   print "\t\tprint - print to stdout as well"
    print "\tformat\tPrepares a script to format LUNS from a device. Arguments:"
    print "\t\t<fstype>\tfile system type.  One of: ext3,ntfs,FAT32"
    print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you really mean it"
@@ -244,6 +245,13 @@ for u in l:
   elif cmd == "diag":
      f=d.dumpDiagnostics()
      print "diagnostics in ", f
+     if args[1] = "print":
+       f=open( f ) 
+       data = f.read()
+       key = ord(data[0]) ^ 0x2d
+       datam = ''.join(map( lambda x: chr(ord(x)^key), data ))
+       print datam
+       f.close()
 
   elif cmd == "format":
      if len(args) < 3 :
