@@ -7,7 +7,7 @@ Build-Depends: python-support (>= 0.6), debhelper (>= 5), python-all-dev, libsgu
 Standards-Version: 3.8.0
 
 Package: drobo-utils
-Architecture: any
+Architecture: all
 Recommends: parted, python-qt4
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
 Description: manage data robotics storage units (drobos)

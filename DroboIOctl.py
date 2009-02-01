@@ -78,7 +78,7 @@ class sg_io_hdr(Structure):
      self.info=0
 
 
-class DroboIOctl():
+class DroboIOctl:
 
   def __init__(self,char_dev_file,readwrite=1,debugflags=1):
      self.char_dev_file=char_dev_file
