@@ -1,0 +1,3 @@
+To use droboview, the graphical interface for managing drobos, make sure that
+you have installed python-qt4 and gparted.  These are part of the "Suggested"
+dependencies, but some users may not have installed them intially.

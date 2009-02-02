@@ -1,0 +1,4 @@
+This package needs to repack the upstream tarball in order to remove the
+debian/ directory from it; to obtain the tarball used from this package, run:
+
+    debian/rules get-orig-source
