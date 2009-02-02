@@ -10,28 +10,40 @@ This software is copyright under GPL.  See near end file for details...
 Random useful bits for developers.  (aka notes to myself ;-)
 
  
-Getting an SVN Snapshot
------------------------
+Getting an SVN Source Snapshot
+------------------------------
 
-If you are told 'it is svn', and you want it now::
+Sometimes, when there are issues, the correction gets checked in, but there hasn't
+been time to do a full release process.  If you really need the fix, then your
+only option is to get it from svn.  If you are told 'it is svn', that refers to 
+the subversion source code management system, and the server for that is at 
+sourceforge.net.  If you want it now::
 
  # svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk mine
  # cd mine                 # go into the source directory you downloaded
  # ./drobom status         # try it out...
  # python setup.py install # install it in system places...
  # drobom status           # try it out...
+ # svn update              # get any changes made since the svn co was done.
+ # python setup.py install # install the changes in system places.
 
-The 'setup.py' script is a convention from the distutils python packaging system.  distutils installation is slightly different from installation from packages.  
-There doesn't seem to be a distutils way to remove a package. touch all
-the files, do an installation, then manually remove the files it installed.
+To get a any stable version, just replace trunk in the svn  'branches/<version>'
+where a version is something like r0_4_0.  When you use svn to get a tree,
+subversion keeps copies of metadata to be able to track changes.  If you want 
+a copy that is contains no svn cruft, then use 'export' instead of 'co'.
 
-If moving between packaging methods, check out the next 
-section.
-
+If moving between downloaded packages and source installs, check out the next 
+section for gotchas.
 
 
 Dpkg vs. Python Install
 -----------------------
+
+The 'setup.py' script, mentioned in the previous section, is a convention  
+from the distutils python packaging system.  distutils installation is slightly 
+different from installation from packages.  There doesn't seem to be a 
+distutils way to remove a package. touch all the files, do an installation, then 
+manually remove the files it installed.
 
 drobo-utils has been picked up for inclusion in debian.  The "real" packaging 
 for debian packages is kept in a separate tree, and maintained by debian 
@@ -60,7 +72,7 @@ Making a Release
    Record results of release tests in the branch (QA.txt) As new tests are created, modify QA.txt on trunk for to keep references for the next release.
 
 Quality Assurance (QA.txt)
--------------------------
+--------------------------
 
 QA.txt is a quality assurance log.  The version on the trunk of the releases indicates 
 the QA procedure to be applied to the next version during the release process.  Since 
@@ -104,6 +116,7 @@ Updating Documentation
 
 use the restructured text tools (from the python-docutils package.)
 to build things using:
+
  % make doc
 
 Have a look at Makefile for how that works.

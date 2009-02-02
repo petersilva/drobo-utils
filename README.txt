@@ -28,7 +28,12 @@ if activation of the new firmware fails, the drobo will simply boot the old one.
 On the other hand, common sense rules do apply.  Setting the LUN size, or 
 re-formatting a Drobo will erase all your data whether you do it on Linux or 
 any other operating system.  These are power tools, and they can do some 
-damage to your data if used without proper care.
+damage to your data if used without proper care.  For example, the reliability 
+of any storage unit does not reduce the need for backups it only makes doing them 
+easier. A Drobo is an excellent place to put backups, but not a substitute for 
+them.  Backups are the only way to address error 18 (the number of inches in 
+front of the keyboard the source of the issue lies.) and no storage unit can 
+protect against fire or flood.
 
 .. contents::
 
@@ -43,8 +48,10 @@ ubuntu packages, names may vary on other distros):
 
 essential::
   python      -- interpreter for python language
-  python-qt4  -- python-qt4... This is actually a new version only in the newest distros.
   parted      -- partitioner, usually included with the distro.
+
+for the GUI:
+  python-qt4  -- the python bindings for version 4 of the QT toolkit
 
 To get a complete list, it is best to use a shell window to grep in the 
 Debian package control file (which defines what the dependencies are for the
@@ -52,7 +59,7 @@ build system)::
 
  peter@pepino% grep Depend debian/control
  Build-Depends: debhelper (>= 5), python2.5-dev, python-docutils
- Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt4, parted
+ Depends: ${shlibs:Depends}, ${misc:Depends}, parted
  peter@pepino%      
 
 INSTALLING pre-requisites  
@@ -79,34 +86,36 @@ here is an example from fedora 7 (courtesy of help4death on the google group)::
  % yum install PyQt4
  % yum install python-devel
 
-NOTE: X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  the package should work fine on headless servers using only the command line.
+NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  the package should work fine on headless servers using only the command line.
 
 
 Install From Package
 --------------------
 Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
-where current packages are available.  Normally, development occurs on the trunk 
-of the svn tree.  to start a release, it will be copied to a branch for maintenance.  
-After a given branch has passed release QA, the release occurs.
-So all the branches are stable versions, trunk is live.  If need to work from 
-source, so you can either download a .tar.gz package from sourceforge,
-or get any version, including the bleeding edge latest &amp; greatest via subversion.
+where current packages are available.  after downloading a .deb, it is simply a matter of:
+
+  dpkg -i drobo-utils-<version>.deb
+
+done!
+
+Install from Source
+-------------------
+
+See DEVELOPER.txt
 
 
-INSTALL:
-You can install pre-build packages from various download sites, or
-you can also download a source package, and run it from your home directory.
+Try it Out
+----------
 
-Try before you buy:
 Assuming you have all of the above parts, in the directory where you
 downloaded the source, you should be able to just do::
 
-         ./drobom status 
+         drobom status 
 
 see if something sensible happens... on my system with a drobo
 the following happens::
 
- % ./drobom status
+ % drobom status
  /dev/sdz /drobo01 100% full ( ['Red alert', 'Bad disk', 'No redundancy'], 0 )
  %
 
@@ -120,22 +129,18 @@ No Drobo discovered, is one connected?
 
 Try to start up drobom from the root account. (sudo drobom..., or 
 sudo bash, or su - ) To get all kinds of information on your drobo, 
-try './drobom info.'  You can then invoke it with no arguments at all 
+try 'drobom info.'  You can then invoke it with no arguments at all 
 which will cause it to print out a list of the commands available 
 through the command line interface.
 
 Once the command line stuff that is working, and assuming you have python-qt4 
 installed, try::
 
- % ./droboview
+ % droboview
 
 which should start a GUI for each drobo attached to your machine, that
 you have permission to access (depends on the setup, usually USB devices 
 on desktops are accessible to users, so you can see them.  
-
-if you are happy with the package, then you can install it into system places with::
-
- % python setup.py install
 
          
 
@@ -295,9 +300,13 @@ ON LUNSIZES >= 2TB:
 
 
 
-Firmware Manipulation
----------------------
-The line mode interface has two commands to deal with firmware,
+Firmware Upgrades
+-----------------
+
+It's pretty self-explanatory in the GUI.  the first time you press the
+Update button, it checks to see if a new firmware is available.  If it
+there is newer firmware, it offer to upgrade, with suitable prompts. 
+Similarly, the line mode interface has two commands to deal with firmware,
 fwcheck will tell you if an upgrade is required.  Fwupgrade 
 will do the work.  It takes a few minutes, and prints a status 
 you you can see how it is progressing.  Have patience::
