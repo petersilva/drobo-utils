@@ -1,0 +1,28 @@
+Source: drobo-utils
+Section: python
+Priority: extra
+Maintainer: Peter Silva <Peter.A.Silva@gmail.com>
+Uploaders: Chris AtLee <chris@atlee.ca>
+Build-Depends: debhelper (>= 5), python
+Build-Depends-Indep: python-support (>= 0.6)
+Standards-Version: 3.8.0
+Homepage: http://drobo-utils.sourceforge.net
+XS-Python-Version: all
+
+Package: drobo-utils
+Architecture: all
+Recommends: parted, sudo
+Suggests: gparted, python-qt4
+Depends: ${misc:Depends}, ${python:Depends}, python-ctypes
+XB-Python-Version: ${python:Versions}
+Description: manage data robotics storage units (drobos)
+ Provides utilities for managing Data Robotics storage units, also known as
+ "Drobos".  Drobos are external hard drive enclosures that connect to your PC
+ via USB or Firewire and provide RAID-like features.  Drobos provide automatic
+ data redundancy, hotswappable drive bays, and the size of the RAID can be
+ easily expanded.  Different sized hard drives can be mixed on the same Drobo.
+ See http://drobo.com for more information.
+ .
+ This package provides a command line interface for managing a Drobo, as well
+ as a graphical dashboard interface.  To enable the graphical interface, please
+ be sure to install the suggested python-qt4 package, as well as gparted.

@@ -1,0 +1,3 @@
+version=3
+opts=dversionmangle=s/\+repack// \
+  http://sf.net/drobo-utils/drobo-utils_(.+)\.tar\.gz debian debian/uscan-repack.sh
