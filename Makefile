@@ -23,4 +23,6 @@ install: build
 	python setup.py install_data -d /usr/share/$(PKGNAME)
 	python setup.py install_scripts -d /usr/sbin
 
-
+release:
+	./make_tarball.sh
+	debuild -i

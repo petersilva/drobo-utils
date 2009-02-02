@@ -5,7 +5,7 @@
 from distutils.core import setup
 
 setup (name = 'Drobo-utils',
-       version = '1.0',
+       version = '0.5.0',
        description = 'Drobo Management Protocol io package',
        py_modules=['Drobo','DroboGUI', 'DroboIOctl' ],
        scripts=['drobom', 'droboview'],

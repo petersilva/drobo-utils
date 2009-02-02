@@ -5,63 +5,54 @@
 #export DH_VERBOSE=1
 
 PKGNAME := drobo-utils
-PYVERS=$(shell pyversions -vs)
 
 build: build-stamp
-build-stamp: $(PYVERS:%=build-python%-stamp)
-	touch $@
 
-build-python%-stamp:
-	python$* setup.py build
+build-stamp:
+	dh_testdir
+	python setup.py build
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f *-stamp
-
+	python setup.py clean --all
 	[ ! -d build ] || rm -rf build
-
-	python setup.py clean
-
 	find . -name "*\.pyc" -delete
-
-	dh_clean 
+	dh_clean *-stamp
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-
-	for py in $(PYVERS); do \
-		python$$py setup.py install_lib -d $(CURDIR)/debian/$(PKGNAME)/usr/lib/python$$py/site-packages; \
-	done
+	python setup.py install_lib -d $(CURDIR)/debian/$(PKGNAME)/usr/share/python-support/$(PKGNAME)
+	find $(CURDIR)/debian/$(PKGNAME) -name "*\.pyc" -delete
 	python setup.py install_data -d $(CURDIR)/debian/$(PKGNAME)/usr/share/$(PKGNAME)
 	python setup.py install_scripts -d $(CURDIR)/debian/$(PKGNAME)/usr/sbin
 	for s in $(CURDIR)/debian/$(PKGNAME)/usr/sbin/*; do \
 	    sed -i '1s,#!.*python.*,#!/usr/bin/python,' $$s; \
 	done
 
-binary-indep: build install
+binary-arch:
 
-binary-arch: build install
+binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs 
+	dh_installchangelogs CHANGES.txt
 	dh_installdocs
-	dh_installexamples
 	dh_pysupport
-	dh_strip
 	dh_installman
 	dh_compress 		-X.py
 	dh_fixperms
 	dh_installdeb
-	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
 
 binary: binary-arch binary-indep
+
+get-orig-source:
+	uscan --verbose --rename --repack --force-download
 
 .PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure
