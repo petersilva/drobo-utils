@@ -346,7 +346,7 @@ when it's done, you can check if it worked using::
 
 If the status is like that, then do::
 
- root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom standby
+ root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom shutdown
 
 lights will flash etc... wait until Drobo goes dark.
 Wait another five seconds, then un-plug the USB / connector.
