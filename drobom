@@ -44,7 +44,7 @@ def usage():
    print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
    print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you really mean it"
    print "\t\tNote: After execution, Drobo reboots, wait a few minutes before accessing again"
-   print "\tshutdown\tshutdown drobo (DRI calls this 'standby' ... umount first!)"
+   print "\tshutdown\tshutdown drobo (DRI calls this 'standby' ... shutdown also umounts.)"
    print "\tstatus\treport how is the Drobo doing"
    print "\tview\tstart up a management dashboard GUI"
 
