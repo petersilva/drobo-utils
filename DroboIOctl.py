@@ -167,13 +167,15 @@ class DroboIOctl:
 
     sense_buffer = create_string_buffer(64)
     self.mx_sb_len = len(sense_buffer)
-    io_hdr.sbp=addressof(sense_buffer)
+    #io_hdr.sbp=addressof(sense_buffer)
+    io_hdr.sbp=cast(sense_buffer,c_char_p)
     io_hdr.sb_len_wr = 0 # initialize just in case...
 
     
     page_buffer=create_string_buffer(sz)
     io_hdr.dxfer_len = sz
-    io_hdr.dxferp = addressof(page_buffer)
+    #io_hdr.dxferp = addressof(page_buffer)
+    io_hdr.dxferp = cast(page_buffer,c_char_p)
 
     if self.debug & Drobo.DBG_HWDialog:
       print "4 before ioctl, sense_buffer_len=", io_hdr.mx_sb_len
@@ -229,12 +231,14 @@ class DroboIOctl:
 
     sense_buffer = create_string_buffer(32)
     io_hdr.mx_sb_len = len(sense_buffer)
-    io_hdr.sbp=addressof(sense_buffer)
+    #io_hdr.sbp=addressof(sense_buffer)
+    io_hdr.sbp=cast(sense_buffer,c_char_p)
 
     size = len(buffer)
     data2write = create_string_buffer(buffer,size)
     io_hdr.dxfer_len = size 
-    io_hdr.dxferp = addressof(data2write)
+    #io_hdr.dxferp = addressof(data2write)
+    io_hdr.dxferp = cast(data2write,c_char_p)
 
     #these are set by ioctl... initializing just in case.
     io_hdr.sb_len_wr=0;
