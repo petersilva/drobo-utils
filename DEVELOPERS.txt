@@ -127,6 +127,9 @@ Administrivia
 -------------
 
 Revision date: 2008/12/27
+$LastChangedDate$
+$Rev$
+
 
 copyright:
 
