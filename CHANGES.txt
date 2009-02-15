@@ -1,5 +1,6 @@
 0.5.1
   * ddiag.c becomes drobom diagprint
+  * catlee fixes the packagin again. 
 
 0.5.0 2009/01/30
   * replaced DroboDMP C extension by DroboIOctl python class.  no need

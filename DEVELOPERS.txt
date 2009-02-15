@@ -47,11 +47,9 @@ manually remove the files it installed.
 
 drobo-utils has been picked up for inclusion in debian.  The "real" packaging 
 for debian packages is kept in a separate tree, and maintained by debian 
-developers.  In the drobo-utils' tree, there is a directory (called notdebian)
-for building local packages for debian and ubuntu that isn't what is used 
-for the distros.  
+developers.  
 
-The dpkg stuff in notdebian puts stuff in /usr/sbin while setup.py puts things in /usr/bin.  Python install does not install man pages either, which the dpkg takes care of.  The libs are placed differently too.  haven't reviewed for other conflicts, least confusing to use one or the other method on a system.  
+The debian/ setup puts stuff in /usr/sbin while setup.py puts things in /usr/bin.  Python install does not install man pages either, which the dpkg takes care of.  The libs are placed differently too.  haven't reviewed for other conflicts, least confusing to use one or the other method on a system.  
 
 (if you do distutils install, then remove the debian package via: dpkg --purge drobo-utils)
 
@@ -63,8 +61,9 @@ Making a Release
    svn copy https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<branch>
 
   2 - Stamp the branch with version 
-   vi notdebian/changelog     # review version tags for accuracy and consistency.
-   vi Drobo.py                # edit VERSION
+   vi debian/changelog     # review version tags for accuracy and consistency.
+   vi setup.py 		   # edit version
+   vi Drobo.py             # edit VERSION
 
   3 - Build packages for testing & Install them. (see separate recipe.)
 
@@ -90,8 +89,7 @@ assumes you have installed the Build dependencies::
  % svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<version>
  % mv trunk drobo-utils-<version>
  % cd drobo-utils-<version>
- % ln -s notdebian debian     # real debian packages use another debian/ tree.
- % chmod 755 notdebian/rules  # I dunno why the permissions are wrong...
+ % chmod 755 debian/rules  # I dunno why the permissions are wrong...
 
 
  # this debian/ config is just for non-distro packages.
