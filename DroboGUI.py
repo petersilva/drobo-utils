@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
+#Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
 #Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 #named COPYING in the root of the source directory tree.
 #
