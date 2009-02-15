@@ -126,9 +126,8 @@ update the web site:
 Administrivia
 -------------
 
-Revision date: 2008/12/27
-$LastChangedDate$
-$Rev$
+ $LastChangedDate$
+ $Rev$
 
 
 copyright:
