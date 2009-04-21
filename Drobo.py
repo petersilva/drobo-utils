@@ -575,7 +575,7 @@ class Drobo:
 
 	STATUS: works fine.
 
-        decryption reported to be XOR of 165, 0xa5... not added yet.
+        decryption done in drobom (look at diagprint)
     """
     if DEBUG & DBG_Chatty:
       print "Dumping Diagnostics..."
