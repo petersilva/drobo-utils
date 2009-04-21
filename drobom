@@ -293,12 +293,8 @@ for u in l:
   elif cmd == "setlunsize": 
      lunsize=int(args[1])
 
-     if lunsize > 16 or lunsize < 1:
-        print 'lun size needs to be between 1 and 16 TiB, %d is invalid' % lunsize
-        sys.exit()
- 
-     if lunsize != 16 and lunsize != 8 and lunsize != 4 and lunsize != 2 and lunsize != 1:
-        print 'lun size needs to be a power of 2 TiB, %d is invalid' % lunsize
+     if lunsize not in (1, 2, 4, 8, 16):
+        print 'lun size needs to be 1, 2, 4, 8, or 16 TiB; %d is invalid' % lunsize
         sys.exit()
 
      if len(args) < 3 :
