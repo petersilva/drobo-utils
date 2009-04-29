@@ -6,7 +6,7 @@ import Drobo
 import time
 import getopt
 import string
-from posix import getuid
+import os
 import types
 
 toprint = [ "config", "capacity", "protocol", "settings", "slots", "firmware", "status", "options", "luns" ]
@@ -199,16 +199,13 @@ if cmd==None :
      sys.exit()
   cmd=args[0]
 
-if 1:
-   l=Drobo.DiscoverLUNs(debug)
-else:
-   print "failed to discover LUNS"
-   if getuid() != 0:
-      print"I see you are not root... probably just permissions .. try again as root."
+if os.geteuid() != 0:
+   print "Please try again as root."
    sys.exit()
 
-if len(l) < 1:
-   print "No Drobo discovered, is one connected?"
+l = Drobo.DiscoverLUNs(debug)
+if not l:
+   print "No Drobos discovered"
    sys.exit()
 
 # find the requested Drobo...
