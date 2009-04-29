@@ -294,18 +294,17 @@ def drobolunlist(debugflags=0):
     p.sort() # to ensure luns in ascending order.
        
     for potential in p:
-       if ( potential[0:2] == "sd" and len(potential) == 3 ):
-          dev_file= devdir + '/' + potential
-          if debugflags & Drobo.DBG_Detection:
-             print "examining: ", dev_file
-             pdio = DroboIOctl( dev_file )
-          else:
-            try:
-              pdio = DroboIOctl( dev_file )
-            except:
-              if debugflags & Drobo.DBG_Detection:
-                   print "rejected: failed to identify LUN"
-              continue
+       if potential.startswith("sd") and len(potential) == 3:
+          dev_file = devdir + '/' + potential
+          try:
+            if debugflags & Drobo.DBG_Detection:
+              print "examining: ", dev_file
+            pdio = DroboIOctl( dev_file )
+          except:
+            if debugflags & Drobo.DBG_Detection:
+              print "rejected: failed to identify LUN"
+            continue
+
           try:
             id = pdio.identifyLUN()
           except:
@@ -315,7 +314,7 @@ def drobolunlist(debugflags=0):
             continue
 
           thisdev="%02d%02d%02d" % (id[0], id[1], id[2])
-          if id[4][0:7] == "TRUSTED":  # you have a Drobo!
+          if id[4].startswith("TRUSTED"):  # you have a Drobo!
              if debugflags & Drobo.DBG_Detection:
                 print "found a Drobo"
              if thisdev == previousdev :  # multi-lun drobo...
