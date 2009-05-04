@@ -63,11 +63,11 @@ import DroboIOctl
 class DroboException(exceptions.Exception):
   """  If there is a problem accessing the Drobo, this exception is raised.
   """
-  def __init__(self):
-     return
+  def __init__(self, msg="Unknown"):
+      self.msg = msg
 
   def __str__(self):
-     print " problem accessing a Drobo"
+     print "Problem accessing a Drobo: " + self.msg
 
 def _ledstatus(n):
     """ return colors decoded, given numeric slot status 
