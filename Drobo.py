@@ -982,7 +982,7 @@ class Drobo:
      if DEBUG & DBG_Simulation:
 	return (4, 16, 2199023250944)
 
-     result=self.__getsubpage( 0x01, 'BBBQBHH'  )
+     result=self.__getsubpage( 0x01, 'BBBQ'  )
      return ( result[0], result[2], result[3]*512 )
 
   def GetSubPageCapacity(self):
