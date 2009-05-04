@@ -27,7 +27,10 @@ class sg_io_hdr(Structure):
   SG_DXFER_FROM_DEV=-3
   SG_IO = 0x2285
   SG_GET_VERSION_NUM = 0x2282
- 
+
+  # see include/scsi/scsi.h for more values
+  SAM_STAT_GOOD = 0x00
+  SAM_STAT_CHECK_CONDITION = 0x02
 
   _fields_ = [ ("interface_id", c_int ),
     ("dxfer_direction", c_int),
@@ -191,12 +194,10 @@ class DroboIOctl:
       print "resid: ",  io_hdr.resid
 
     if i < 0:
-        print "Drobo get_mode_page SG_IO ioctl error"
-        return None
+        raise IOError("Drobo get_mode_page SG_IO ioctl error")
  
-    if (io_hdr.status != 0 ) and (io_hdr != 2) :
-        print "oh no! io_hdr status is: %x\n" %  io_hdr.status
-        return None
+    if io_hdr.status != io_hdr.SAM_STAT_GOOD:
+        raise IOError("io_hdr status is: %x" % io_hdr.status)
 
     if io_hdr.resid > 0:
        retsz = sz - io_hdr.resid
