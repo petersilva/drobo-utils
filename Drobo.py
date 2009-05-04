@@ -451,15 +451,13 @@ class Drobo:
 
     cmdout = self.fd.get_sub_page(paklen, modepageblock,0, DEBUG)
 
-    if ( len(cmdout) == paklen ):
-      result = struct.unpack(mypack, cmdout)
-      if DEBUG & DBG_HWDialog :
-          print 'the 4 byte header on the returned sense buffer: ', result[0:3]
-          #print 'result is: ', result[3:]
-      return result[3:]
-    else:
-      raise DroboException
+    if len(cmdout) != paklen:
+      raise DroboException("cmdout is unexpected length")
 
+    result = struct.unpack(mypack, cmdout)
+    if DEBUG & DBG_HWDialog :
+        print '4 byte returned sense buffer header: 0x%x, 0x%x, 0x%x' % result[:3]
+    return result[3:]
 
   def __transactionNext(self):
     """ Increment the transaction member for some modeSelect pages.
