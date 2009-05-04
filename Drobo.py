@@ -422,11 +422,11 @@ class Drobo:
      
 
   def __getsubpage(self,sub_page,pack): 
-    """ Retrieve Sub page from drobo char device.
-        uses DroboIOctl class to run the raw ioctl.
+    """Retrieve Sub page from drobo block device.
+       Uses DroboIOctl class to run the raw ioctl.
 
-        sub_page: selection code from DMP Spec...
-        pack: the pattern of fields in the subpage...
+       sub_page: selection code from DMP Spec...
+       pack: the pattern of fields in the subpage...
 
        returns: a list unpacked according to the  structure 
 
