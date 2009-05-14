@@ -106,14 +106,8 @@ def printsettings(d):
 def printslots(d):
   slotinfo=d.GetSubPageSlotInfo()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query slotinfo result:  number of slots:'
-    print slotinfo[0]
-    print slotinfo[1]
-    print slotinfo[2]
-    print slotinfo[3]
-    print
-  else:
-    print slotinfo
+    print 'query slotinfo result:  number of slots:', d.slot_count
+  print slotinfo
   
 def printfirmware(d):
   firmware=d.GetSubPageFirmware()

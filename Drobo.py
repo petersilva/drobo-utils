@@ -298,6 +298,9 @@ class Drobo:
         # for some reason under ubuntu intrepid, start getting responses of all bits set.
         # need some ways to spot a real drobo.  
         cfg = self.GetSubPageConfig()
+
+        #Side effect: Config, sets self.slot_count...
+
         if DEBUG & DBG_Detection:
             print "cfg: ", cfg
 
@@ -306,7 +309,7 @@ class Drobo:
               print "%s length of cfg is: %d, should be 3" % (self.char_dev_file, len(cfg))
 	    raise DroboException 
 
-        if ( cfg[0] >= 4 ): 
+        if ( self.slot_count < 4 ): 
             if DEBUG & DBG_Detection:
               print "%s cfg[0] = %s, should >= 4. All Drobos have at least 4 slots" % (self.char_dev_file, cfg[0])
 	    raise DroboException # Assert: All Drobo have 4 slots.
@@ -980,9 +983,11 @@ class Drobo:
      # SlotCount, Reserved, MaxLuns, MaxLunSz, Reserved, unused, unused 
 
      if DEBUG & DBG_Simulation:
+        self.slot_count = 4
 	return (4, 16, 2199023250944)
 
      result=self.__getsubpage( 0x01, 'BBBQ'  )
+     self.slot_count = result[0]
      return ( result[0], result[2], result[3]*512 )
 
   def GetSubPageCapacity(self):
@@ -1007,7 +1012,14 @@ class Drobo:
        return ( (0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), (1, 750156374016, 0, 'green', 'WDC WD7500AAKS-00RBA0', 'WDC WD7500AAKS-0'), (2, 0, 0, _ledstatus(random.randint(0,6)), '', ''), (3, 0, 0, 'gray', '', ''))
 
      slotrec='HBQQB32s16sL'
-     r = self.__getsubpage( 0x03, 'B' + slotrec+slotrec+slotrec+slotrec )
+
+     i = 0
+     pattern='B'
+     while ( i < self.slot_count ): 
+        pattern += slotrec
+        i +=1
+ 
+     r = self.__getsubpage( 0x03, pattern )
 
      l=[]
      j=0
@@ -1268,8 +1280,8 @@ def DiscoverLUNs(debugflags=0):
              print "trying: ", potential
 
        try: 
-          d = Drobo( potential,debugflags=debugflags )
-	  devices.append(potential)
+              d = Drobo( potential, DEBUG )
+              devices.append(potential)
        except:
  	      pass
               
