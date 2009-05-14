@@ -306,9 +306,9 @@ class Drobo:
               print "%s length of cfg is: %d, should be 3" % (self.char_dev_file, len(cfg))
 	    raise DroboException 
 
-        if ( cfg[0] != 4 ): 
+        if ( cfg[0] >= 4 ): 
             if DEBUG & DBG_Detection:
-              print "%s cfg[0] = %s, should be 4. All Drobos have 4 slots" % (self.char_dev_file, cfg[0])
+              print "%s cfg[0] = %s, should >= 4. All Drobos have at least 4 slots" % (self.char_dev_file, cfg[0])
 	    raise DroboException # Assert: All Drobo have 4 slots.
  
         set=self.GetSubPageSettings()
