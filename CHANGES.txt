@@ -4,6 +4,7 @@
 
 
 0.5.1
+  * drobopro support added (thanks to lemonizer on the google group!)
   * ddiag.c becomes drobom diagprint
   * catlee fixes the packagin again. 
 
