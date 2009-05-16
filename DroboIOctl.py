@@ -138,10 +138,6 @@ class DroboIOctl:
      return ( host, channel, id, lun, vendor )
 
 
-  
-
-
-
   def get_sub_page(self, sz, mcb, out, DEBUG):
     """
 
@@ -303,7 +299,7 @@ def drobolunlist(debugflags=0):
             pdio = DroboIOctl( dev_file )
           except:
             if debugflags & Drobo.DBG_Detection:
-              print "rejected: failed to identify LUN"
+              print "rejected: failed to construct LUN pdio"
             continue
 
           try:
@@ -313,6 +309,9 @@ def drobolunlist(debugflags=0):
                    print "rejected: failed to identify LUN"
             pdio.closefd()
             continue
+
+          if debugflags & Drobo.DBG_Detection:
+             print "id: ", id
 
           thisdev="%02d%02d%02d" % (id[0], id[1], id[2])
           if id[4].startswith("TRUSTED"):  # you have a Drobo!
@@ -331,7 +330,7 @@ def drobolunlist(debugflags=0):
 
           else:
               if debugflags & Drobo.DBG_Detection:
-                   print "rejected: not from DRI"
+                   print "rejected: vendor is %s (not from DRI)" % id[4]
 
           previousdev=thisdev
           pdio.closefd()
