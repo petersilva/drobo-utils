@@ -4,6 +4,8 @@
 
 
 0.5.1
+  * added Name display to main display. Easier to tell which Drobo is which.
+  * added mount point display to space used tool tip.
   * replaced fixed dimensions in GUI with layouts, should look better.
   * added ability to detect un-documented feature bit settings.
   * drobopro support added (thanks to lemonizer on the google group!)
