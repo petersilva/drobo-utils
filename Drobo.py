@@ -551,6 +551,10 @@ class Drobo:
     self.__transactionNext()
 
 
+  def SlotCount(self):
+    self.GetSubPageConfig()
+    return self.slot_count
+
   def Blink(self):
     """ asks the Drobo nicely to blink it's lights. aka. Identification 
         If you happen to have five in a row (drool), you can know which is which.
@@ -983,8 +987,8 @@ class Drobo:
      # SlotCount, Reserved, MaxLuns, MaxLunSz, Reserved, unused, unused 
 
      if DEBUG & DBG_Simulation:
-        self.slot_count = 4
-	return (4, 16, 2199023250944)
+        self.slot_count = 8
+	return (8, 16, 2199023250944)
 
      result=self.__getsubpage( 0x01, 'BBBQ'  )
      self.slot_count = result[0]
@@ -1009,7 +1013,16 @@ class Drobo:
               colours if there is flashing going on.
      """
      if DEBUG & DBG_Simulation:
-       return ( (0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), (1, 750156374016, 0, 'green', 'WDC WD7500AAKS-00RBA0', 'WDC WD7500AAKS-0'), (2, 0, 0, _ledstatus(random.randint(0,6)), '', ''), (3, 0, 0, 'gray', '', ''))
+       return ( 
+             (0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), 
+             (1, 750156374016, 0, 'green', 'WDC WD7500AAKS-00RBA0', 'WDC WD7500AAKS-0'), 
+             (2, 0, 0, _ledstatus(random.randint(0,6)), '', ''), 
+             (3, 0, 0, 'gray', '', ''),
+             (0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), 
+             (1, 750156374016, 0, 'green', 'WDC WD7500AAKS-00RBA0', 'WDC WD7500AAKS-0'), 
+             (2, 0, 0, _ledstatus(random.randint(0,6)), '', ''), 
+             (3, 0, 0, 'gray', '', '')
+       )
 
      slotrec='HBQQB32s16sL'
 
