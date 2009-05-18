@@ -67,8 +67,6 @@ class DroboAbout(QtGui.QWidget):
         self.main = QtGui.QLabel("""
   drobo-utils: software to manage a Drobo storage unit from Data Robotics International Corp.
   Winner of the Data Robotics Bounty 2008 for a linux dashboard!  
-  Home page:  http://drobo-utils.sourceforge.net
-
   Version: """ + Drobo.VERSION + """ 
   Copyright 2008 Peter Silva ( Peter.A.Silva@gmail.com )
   license: General Public License (GPL) v3
@@ -79,11 +77,49 @@ class DroboAbout(QtGui.QWidget):
   and thanks for DRI for putting up the Bounty!
         """ , self)
         al.addWidget(self.main)
-        self.quit = QtGui.QPushButton('Quit',self)
+        self.quit = QtGui.QPushButton('Dismiss',self)
         al.addWidget(self.quit)
         self.connect(self.quit, QtCore.SIGNAL('clicked()'), 
                 self.hide)
  
+class DroboManual(QtGui.QWidget):
+   def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.setMinimumSize(500, 440)
+        al = QtGui.QVBoxLayout(self)
+
+        try:
+          readmefile = open("README.html")
+          readme = readmefile.read()
+          readmefile.close()
+        except:
+          readme = "Documentation not found"
+
+        self.main = QtGui.QTextEdit(readme, self )
+        al.addWidget(self.main)
+        self.quit = QtGui.QPushButton('Dismiss',self)
+        al.addWidget(self.quit)
+        self.connect(self.quit, QtCore.SIGNAL('clicked()'), 
+                self.hide)
+
+class DroboDevManual(QtGui.QWidget):
+   def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.setMinimumSize(500, 400)
+        al = QtGui.QVBoxLayout(self)
+
+        try:
+          devreadmefile = open("DEVELOPERS.html")
+          readme = devreadmefile.read()
+          devreadmefile.close()
+        except:
+          readme = "Documentation not found"
+
+        self.main = QtGui.QTextEdit(readme, self )
+        al.addWidget(self.main)
+        self.quit = QtGui.QPushButton('Dismiss',self)
+        al.addWidget(self.quit)
+        self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
 
 
 class DroboGUI(QtGui.QMainWindow):
@@ -504,9 +540,20 @@ class DroboGUI(QtGui.QMainWindow):
         file = menubar.addMenu('&File')
         file.addAction(exit)
 
+        help = menubar.addMenu('&Help')
+
+        manual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Read Me', self)
+        self.manualdialog = DroboManual()
+        help.addAction(manual)
+        self.connect(manual, QtCore.SIGNAL('triggered()'), self.manualdialog.show)
+
+        devmanual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'For Developers', self)
+        self.devmanualdialog = DroboDevManual()
+        help.addAction(devmanual)
+        self.connect(devmanual, QtCore.SIGNAL('triggered()'), self.devmanualdialog.show)
+
         about = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'About DroboView', self)
         self.aboutdialog = DroboAbout()
-        help = menubar.addMenu('&Help')
         help.addAction(about)
         self.connect(about, QtCore.SIGNAL('triggered()'), self.aboutdialog.show)
 
