@@ -3,7 +3,7 @@ Section: python
 Priority: extra
 Maintainer: Peter Silva <Peter.A.Silva@gmail.com>
 Uploaders: Chris AtLee <chris@atlee.ca>
-Build-Depends: debhelper (>= 5), python
+Build-Depends: debhelper (>= 5), python, groff, python-docutils
 Build-Depends-Indep: python-support (>= 0.6)
 Standards-Version: 3.8.0
 Homepage: http://drobo-utils.sourceforge.net
