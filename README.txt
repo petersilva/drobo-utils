@@ -13,28 +13,6 @@ which offers the same functionality as droboview.   For real hackers, fire
 up a python interpreter, 'import Drobo', help(Drobo), and you are off to 
 the races...
 
-Those worried about safety of using this software should know:  it was 
-developed with assistance from the vendor (Digital Robotics Inc.), and 
-in every case, based on vendor documentation, and with at least encouragement,
-if not outright support.  For each release, a QA.txt file is built, demonstrating
-the functionality tests run.  Of interest is that there are multiple checksum
-verification built into the firmware upgrade functionality.  It is next to 
-impossible to brick a drobo using the tools.  Drobo-utils verifies 
-firmware checksums before attempting to upload the image to the device, and 
-the device checks the firmware against the checksums as well.  New firmware 
-is loaded into an alternate location from the currently active one, and 
-if activation of the new firmware fails, the drobo will simply boot the old one.  
- 
-On the other hand, common sense rules do apply.  Setting the LUN size, or 
-re-formatting a Drobo will erase all your data whether you do it on Linux or 
-any other operating system.  These are power tools, and they can do some 
-damage to your data if used without proper care.  For example, the reliability 
-of any storage unit does not reduce the need for backups it only makes doing them 
-easier. A Drobo is an excellent place to put backups, but not a substitute for 
-them.  Backups are the only way to address error 18 (the number of inches in 
-front of the keyboard the source of the issue lies.) and no storage unit can 
-protect against fire or flood.
-
 .. contents::
 
 REQUIREMENTS
@@ -61,6 +39,31 @@ build system)::
  Build-Depends: debhelper (>= 5), python2.5-dev, python-docutils
  Depends: ${shlibs:Depends}, ${misc:Depends}, parted
  peter@pepino%      
+
+SAFETY
+------
+
+Those worried about safety of using this software should know:  it was 
+developed with assistance from the vendor (Digital Robotics Inc.), and 
+in every case, based on vendor documentation, and with at least encouragement,
+if not outright support.  For each release, a QA.txt file is built, demonstrating
+the functionality tests run.  There are multiple checksum verifications built 
+into the firmware upgrade process, so it is next to impossible to brick a drobo 
+using the tools.  Drobo-utils verifies firmware checksums before attempting 
+to upload the image to the device, and the device checks the firmware against 
+the checksums as well.  New firmware is loaded into an alternate location 
+from the currently active one, and if activation of the new firmware fails, 
+the drobo will simply boot the old one.  
+ 
+On the other hand, common sense rules do apply.  Setting the LUN size, or 
+re-formatting a Drobo will erase all your data whether you do it on Linux or 
+any other operating system.  These are power tools, and they can do some 
+damage to your data if used without proper care.  For example, the reliability 
+of any storage unit does not reduce the need for backups it only makes doing them 
+easier. A Drobo is an excellent place to put backups, but not a substitute for 
+them.  Backups are the only way to address error 18 (the number of inches in 
+front of the keyboard the source of the issue lies.) and no storage unit can 
+protect against fire or flood.
 
 INSTALLING pre-requisites  
 -------------------------

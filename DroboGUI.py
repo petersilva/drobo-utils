@@ -83,44 +83,31 @@ class DroboAbout(QtGui.QWidget):
                 self.hide)
  
 class DroboManual(QtGui.QWidget):
-   def __init__(self, parent=None):
+   def __init__(self, manual, parent=None):
         QtGui.QWidget.__init__(self, parent)
+        
         self.setMinimumSize(500, 440)
         al = QtGui.QVBoxLayout(self)
 
+        dirs=[ '/usr/local/share/drobo-utils-doc', '/usr/share/drobo-utils/share/drobo-utils-doc', '.' ]
+        readme=""
         try:
-          readmefile = open("README.html")
+#         i=0
+#         while (i < 3 ) and (readme == "") :
+#          try:
+          readmefile = open(dirs[2] + "/" + manual)
           readme = readmefile.read()
           readmefile.close()
+#          i++
+#
         except:
-          readme = "Documentation not found"
-
-        self.main = QtGui.QTextEdit(readme, self )
-        al.addWidget(self.main)
-        self.quit = QtGui.QPushButton('Dismiss',self)
-        al.addWidget(self.quit)
-        self.connect(self.quit, QtCore.SIGNAL('clicked()'), 
-                self.hide)
-
-class DroboDevManual(QtGui.QWidget):
-   def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
-        self.setMinimumSize(500, 400)
-        al = QtGui.QVBoxLayout(self)
-
-        try:
-          devreadmefile = open("DEVELOPERS.html")
-          readme = devreadmefile.read()
-          devreadmefile.close()
-        except:
-          readme = "Documentation not found"
+          readme = "Documentation %s not found" % manual
 
         self.main = QtGui.QTextEdit(readme, self )
         al.addWidget(self.main)
         self.quit = QtGui.QPushButton('Dismiss',self)
         al.addWidget(self.quit)
         self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
-
 
 class DroboGUI(QtGui.QMainWindow):
     """ GUI for a single Drobo, start one for each drobo.
@@ -236,7 +223,6 @@ class DroboGUI(QtGui.QMainWindow):
         devtablayout.setColumnStretch(1,1)
         devtablayout.setVerticalSpacing(4)
 
-        print devtablayout.verticalSpacing()
         self.Device.id = QtGui.QPushButton('Unknown Drobo', self.Device)
         self.Device.id.setCheckable(False)
         self.Device.id.setStyleSheet( "QWidget { background-color: white }" )
@@ -543,12 +529,17 @@ class DroboGUI(QtGui.QMainWindow):
         help = menubar.addMenu('&Help')
 
         manual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Read Me', self)
-        self.manualdialog = DroboManual()
+        self.manualdialog = DroboManual("README.html")
         help.addAction(manual)
         self.connect(manual, QtCore.SIGNAL('triggered()'), self.manualdialog.show)
 
         devmanual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'For Developers', self)
-        self.devmanualdialog = DroboDevManual()
+        self.devmanualdialog = DroboManual("DEVELOPERS.html")
+        help.addAction(devmanual)
+        self.connect(devmanual, QtCore.SIGNAL('triggered()'), self.devmanualdialog.show)
+
+        devmanual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Change log', self)
+        self.devmanualdialog = DroboManual("CHANGES.html")
         help.addAction(devmanual)
         self.connect(devmanual, QtCore.SIGNAL('triggered()'), self.devmanualdialog.show)
 
