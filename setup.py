@@ -13,6 +13,8 @@ setup (name = 'Drobo-utils',
                     ('share/pixmaps',             ['Drobo-Front-0000.gif']),
                     ('share/drobo-utils-doc',             ['README.html']),
                     ('share/drobo-utils-doc',             ['DEVELOPERS.html']),
+                    ('share/drobo-utils-doc',             ['drobom.html']),
+                    ('share/drobo-utils-doc',             ['droboview.html']),
                     ('share/drobo-utils-doc',             ['CHANGES.html'])
                     ]
 
