@@ -207,7 +207,7 @@ if cmd==None :
      sys.exit()
   cmd=args[0]
 
-if os.geteuid() != 0:
+if (os.geteuid() != 0) and (debug & Drobo.DBG_Simulation == 0):
    print "Please try again as root."
    sys.exit()
 
