@@ -81,9 +81,6 @@ class DroboAbout(QtGui.QWidget):
         al.addWidget(self.main)
         self.quit = QtGui.QPushButton('Quit',self)
         al.addWidget(self.quit)
-        #self.quit.setCheckable(False)
-        #self.quit.setMinimumWidth(200)
-        #self.quit.move(-30,-100)
         self.connect(self.quit, QtCore.SIGNAL('clicked()'), 
                 self.hide)
  
@@ -156,15 +153,6 @@ class DroboGUI(QtGui.QMainWindow):
           self.Device.slot[i][0].setToolTip(luntooltip)
 	  i=i+1
 
-        i=0
-        while i < self.drobo.SlotCount() :
-          self.Device.slot[i][0].setMinimumWidth(mnw)
-	  i=i+1
-
-        self.Device.fullbar.setMinimumWidth(mnw+20)
-        self.Device.id.setMinimumWidth(mnw+20)
-	#self.tab.setGeometry(QtCore.QRect(0,27,mnw+40,300))
-
         c=self.drobo.GetSubPageConfig()
         self.Format.lunsize =  _toTiB(c[2])
 
@@ -210,12 +198,15 @@ class DroboGUI(QtGui.QMainWindow):
         devtablayout=QtGui.QGridLayout(self.Device)
         devtablayout.setColumnStretch(0,9)
         devtablayout.setColumnStretch(1,1)
+        devtablayout.setVerticalSpacing(4)
+
+        print devtablayout.verticalSpacing()
         self.Device.id = QtGui.QPushButton('Unknown Drobo', self.Device)
         self.Device.id.setCheckable(False)
         self.Device.id.setStyleSheet( "QWidget { background-color: white }" )
         #self.Device.id.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
 
-        devtablayout.addWidget(self.Device.id,0,0,1,-1,QtCore.Qt.AlignLeft)
+        devtablayout.addWidget(self.Device.id,0,0,1,-1)
      
         self.Device.slot = [ [ '', '' ], [ '', '' ], [ '', '' ], [ '', '' ],
                              [ '', '' ], [ '', '' ], [ '', '' ], [ '', '' ]  ]
@@ -225,20 +216,21 @@ class DroboGUI(QtGui.QMainWindow):
           slotlayout=QtGui.QHBoxLayout()
           self.Device.slot[i][0] = QtGui.QPushButton('uninitialized - 0000GB', self.Device)
           self.Device.slot[i][0].setCheckable(False)
-          self.Device.slot[i][0].setMinimumWidth(200)
+          #self.Device.slot[i][0].setMinimumWidth(200)
           self.Device.slot[i][0].setStyleSheet( "QWidget { background-color: white }" )
-          devtablayout.addWidget(self.Device.slot[i][0],i+1,0,1,1,QtCore.Qt.AlignLeft)
+          self.Device.slot[i][0].setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
+          devtablayout.addWidget(self.Device.slot[i][0],i+1,0,1,1)
           self.Device.slot[i][1] = QtGui.QWidget(self.Device)
           self.Device.slot[i][1].setMinimumWidth(10)
           self.Device.slot[i][1].setMinimumHeight(30)
 
-          devtablayout.addWidget(self.Device.slot[i][1],i+1,1,1,1,QtCore.Qt.AlignLeft)
+          devtablayout.addWidget(self.Device.slot[i][1],i+1,1,1,1)
           devtablayout.setRowMinimumHeight(i+1,10)
           i=i+1
 
         self.Device.fullbar = QtGui.QProgressBar(self.Device)
         self.Device.fullbar.setMinimumWidth(230)
-        devtablayout.addWidget(self.Device.fullbar,i+1,0,1,2,QtCore.Qt.AlignLeft)
+        devtablayout.addWidget(self.Device.fullbar,i+1,0,1,-1)
         self.connect(self.Device.fullbar, QtCore.SIGNAL('focusInEvent()'), 
 		self.__StatusBar_space)
 
@@ -261,8 +253,6 @@ class DroboGUI(QtGui.QMainWindow):
             self.fmt_process = subprocess.Popen( format_script )
             p = self.Format.Formatbutton.palette()
             p.setColor( QtGui.QPalette.Button, QtCore.Qt.red )
-
-
 
 
     def FormatLUN(self):
@@ -327,20 +317,19 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.Format.header = QtGui.QLabel("WARNING: Format erases whole Drobo", self.Format)
         self.Format.header.setStyleSheet( "QWidget { color: red }" )
-        self.Format.header.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
-        flay.addWidget(self.Format.header,0,0,1,2,QtCore.Qt.AlignLeft)
+        #self.Format.header.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
+        flay.addWidget(self.Format.header,0,0,1,2)
 
         self.Format.lunsztitle = QtGui.QLabel("Maximum LUN size:", self.Format)
-        flay.addWidget(self.Format.lunsztitle,1,0,1,1,QtCore.Qt.AlignLeft)
+        flay.addWidget(self.Format.lunsztitle,1,0,1,1)
         self.Format.lunsztitle.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed )
 
         self.Format.lunszlcd = QtGui.QLCDNumber(2, self.Format)
-        flay.addWidget(self.Format.lunszlcd,1,1,1,1,QtCore.Qt.AlignLeft)
+        flay.addWidget(self.Format.lunszlcd,1,1,1,1)
 
         self.Format.horizontalSlider = QtGui.QSlider(self.Format)
-        #self.Format.horizontalSlider.setGeometry(QtCore.QRect(x,y,w,h))
         self.Format.horizontalSlider.setMinimumWidth(w)
-        flay.addWidget(self.Format.horizontalSlider,2,0,1,2,QtCore.Qt.AlignLeft)
+        flay.addWidget(self.Format.horizontalSlider,2,0,1,2)
         self.Format.horizontalSlider.setMaximum(4)
         self.Format.horizontalSlider.setMinimum(0)
         self.Format.horizontalSlider.setSingleStep(1)
@@ -366,7 +355,7 @@ class DroboGUI(QtGui.QMainWindow):
             self.Format.ext3.setStyleSheet( "QWidget { color: gray }" )
             self.Format.ext3.setText('Ext3 disabled (missing mke2fs)')
 
-        flay.addWidget(self.Format.ext3,3,0,1,-1,QtCore.Qt.AlignLeft)
+        flay.addWidget(self.Format.ext3,3,0,1,-1)
 
         self.Format.msdos = QtGui.QRadioButton("FAT32 MS - Disk Operating System", self.Format)
         #self.Format.msdos.setStyleSheet( "QWidget { color: gray }" )
@@ -376,10 +365,10 @@ class DroboGUI(QtGui.QMainWindow):
             self.Format.msdos.setStyleSheet( "QWidget { color: gray }" )
             self.Format.msdos.setText('FAT32 disabled (missing mkdosfs)')
 
-        flay.addWidget(self.Format.msdos,4,0,1,-1,QtCore.Qt.AlignLeft)
+        flay.addWidget(self.Format.msdos,4,0,1,-1)
 
         self.Format.ntfs = QtGui.QRadioButton("NTFS -- Windows NT/XP/Vista", self.Format)
-        flay.addWidget(self.Format.ntfs,5,0,1,-1,QtCore.Qt.AlignLeft)
+        flay.addWidget(self.Format.ntfs,5,0,1,-1)
 
         mkfs = commands.getoutput("which mkntfs")
         if ( mkfs == "" ): 
@@ -389,7 +378,7 @@ class DroboGUI(QtGui.QMainWindow):
 
 
         self.Format.Formatbutton = QtGui.QPushButton('Format (Erases All Data!)       ', self.Format)
-        flay.addWidget(self.Format.Formatbutton,6,0,1,-1,QtCore.Qt.AlignLeft)
+        flay.addWidget(self.Format.Formatbutton,6,0,1,-1)
 
         self.tab.addTab(self.Format, "Format")
 
@@ -438,8 +427,7 @@ class DroboGUI(QtGui.QMainWindow):
         #
         self.Tools.Standbybutton = QtGui.QPushButton('Shutdown', self.Tools)
         self.Tools.Standbybutton.setCheckable(False)
-        #self.Tools.Standbybutton.move(x,y)
-        tlay.addWidget(self.Tools.Standbybutton,0,0,1,1,QtCore.Qt.AlignLeft)
+        tlay.addWidget(self.Tools.Standbybutton,0,0,1,1)
 
         self.connect(self.Tools.Standbybutton, QtCore.SIGNAL('clicked()'), 
                 self.drobo.Standby)
@@ -448,7 +436,7 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.Tools.Blinkybutton = QtGui.QPushButton('Blink Lights', self.Tools)
         self.Tools.Blinkybutton.setCheckable(False)
-        tlay.addWidget(self.Tools.Blinkybutton,0,1,1,1,QtCore.Qt.AlignLeft)
+        tlay.addWidget(self.Tools.Blinkybutton,0,1,1,1)
 
         self.connect(self.Tools.Blinkybutton, QtCore.SIGNAL('clicked()'), 
                 self.drobo.Blink)
@@ -456,33 +444,33 @@ class DroboGUI(QtGui.QMainWindow):
         self.Tools.Renamebutton = QtGui.QPushButton('Rename', self.Tools)
         self.Tools.Renamebutton.setStyleSheet( "QWidget { color: gray }" )
         self.Tools.Renamebutton.setCheckable(False)
-        tlay.addWidget(self.Tools.Renamebutton,1,0,1,1,QtCore.Qt.AlignLeft)
+        tlay.addWidget(self.Tools.Renamebutton,1,0,1,1)
         
         self.Tools.Updatebutton = QtGui.QPushButton('Update', self.Tools)
-        tlay.addWidget(self.Tools.Updatebutton,1,1,1,1,QtCore.Qt.AlignLeft)
+        tlay.addWidget(self.Tools.Updatebutton,1,1,1,1)
 
         self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
 
         Registerbutton = QtGui.QPushButton('Register', self.Tools)
         Registerbutton.setStyleSheet( "QWidget { color: gray }" )
         Registerbutton.setCheckable(False)
-        tlay.addWidget(Registerbutton,2,0,1,1,QtCore.Qt.AlignLeft)
+        tlay.addWidget(Registerbutton,2,0,1,1)
 
         Diagbutton = QtGui.QPushButton('Diagnostics', self.Tools)
         Diagbutton.setCheckable(False)
-        tlay.addWidget(Diagbutton,2,1,1,1,QtCore.Qt.AlignLeft)
+        tlay.addWidget(Diagbutton,2,1,1,1)
 
         self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), 
                 self.__diags)
 
         self.Tools.progress = QtGui.QProgressBar(self.Tools)
-        #self.Tools.progress.setGeometry(x, y, 180, 25)
         self.Tools.progress.setMinimumWidth(2*w)
-        tlay.addWidget(self.Tools.progress,3,0,1,1,QtCore.Qt.AlignLeft)
+        tlay.addWidget(self.Tools.progress,3,0,1,2)
+        self.Tools.progress.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed )
         self.Tools.progress.setValue( 0 )
 
         self.Tools.comment = QtGui.QLabel("Press 'Update' to look for updates", self.Tools)
-        tlay.addWidget(self.Tools.comment,4,0,1,2,QtCore.Qt.AlignLeft)
+        tlay.addWidget(self.Tools.comment,4,0,1,2)
 
         normal = self.Tools.Updatebutton.palette().color( QtGui.QPalette.Button )
 
@@ -502,8 +490,7 @@ class DroboGUI(QtGui.QMainWindow):
         self.color = QtGui.QColor(0, 0, 0) 
         QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('MacStyle'))
 
-        #self.setGeometry(300, 100, 350, 260)
-        self.setMinimumSize(320, 350)
+        self.setMinimumSize(300, 350)
         self.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
         self.setWindowTitle('DroboView')
         self.setWindowIcon(QtGui.QIcon(':Drobo-Front-0000.gif'))
@@ -513,9 +500,7 @@ class DroboGUI(QtGui.QMainWindow):
         exit.setStatusTip('Exit application')
         self.connect(exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
 
-        #mlay = QtGui.QVBoxLayout(self)
         menubar = self.menuBar()
-        #self.addWidget(menubar)
         file = menubar.addMenu('&File')
         file.addAction(exit)
 
@@ -526,12 +511,9 @@ class DroboGUI(QtGui.QMainWindow):
         self.connect(about, QtCore.SIGNAL('triggered()'), self.aboutdialog.show)
 
         self.tab = QtGui.QTabWidget(self)
-        #self.setCentralWidget(self.tab)
-        #self.addWidget(self.tab)
+        self.setCentralWidget(self.tab)
         self.tab.setMinimumWidth(300)
         self.tab.setMinimumHeight(300)
-	self.tab.setGeometry(QtCore.QRect(0,27,300,300))
-        #self.tab.setObjectName("tabs")
         
 	self.__initDeviceTab()
 	self.__initToolTab()
