@@ -200,7 +200,7 @@ def _partscheme(n):
    if (n == 3):
      return "GPT"
    
-def _unitfeatures(n):
+def _unitfeatures(norig):
     """ return a list of features supported by a unit
     
         STATUS: working.
@@ -211,33 +211,24 @@ def _unitfeatures(n):
                    what is supported.  It should be just LUNINFO2
          etc...			
     """
+    n=norig
+    feature_map = [ ( 0x001, 'NO_AUTO_REBOOT' ), ( 0x0002, 'NO_FAT32_FORMAT' ),
+       ( 0x0004, 'USED_CAPACITY_FROM_HOST' ), ( 0x0008, 'DISKPACKSTATUS' ),
+       ( 0x0010, 'ENCRYPT_NOHEADER' ), ( 0x0020, 'CMD_STATUS_QUERIABLE' ),
+       ( 0x0040, 'VARIABLE_LUN_SIZE_1_16' ), ( 0x0080, 'PARTITION_LUN_GPT_MBR' ),
+       ( 0x0100, 'FAT32_FORMAT_VOLNAME' ), ( 0x0200, 'SUPPORTS_DROBOSHARE' ),
+       ( 0x0400, 'SUPPORTS_NEW_LUNINFO2' ), ( 0x0800, 'feature x0800' ),
+       ( 0x2000, 'feature x2000 ' ), 
+       ( 0x80000000, 'SUPPORTS_SINGLE_LUN_FORMAT' ), ( 0x40000000, 'SUPPORTS_VOLUME_RENAME' ) ]
     f = []
-    if ( n & 0x0001 ):
-       f.append( 'NO_AUTO_REBOOT' )
-    if ( n & 0x0002 ):
-       f.append( 'NO_FAT32_FORMAT' )
-    if ( n & 0x0004 ):
-       f.append( 'USED_CAPACITY_FROM_HOST' )
-    if ( n & 0x0008 ):
-       f.append( 'DISKPACKSTATUS' )
-    if ( n & 0x0010 ):
-       f.append( 'ENCRYPT_NOHEADER' )
-    if ( n & 0x0020 ):
-       f.append( 'CMD_STATUS_QUERIABLE' )
-    if ( n & 0x0040 ):
-       f.append( 'VARIABLE_LUN_SIZE_1_16' )
-    if ( n & 0x0080 ):
-       f.append( 'PARTITION_LUN_GPT_MBR' )
-    if ( n & 0x0100 ):
-       f.append( 'FAT32_FORMAT_VOLNAME' )
-    if ( n & 0x0300 ):
-       f.append( 'SUPPORTS_DROBOSHARE' )
-    if ( n & 0x0400 ):
-       f.append( 'SUPPORTS_NEW_LUNINFO2' )
-    if ( n & 0x80000000 ):
-       f.append( 'SUPPORTS_SINGLE_LUN_FORMAT' )
-    if ( n & 0x40000000 ):
-       f.append( 'SUPPORTS_VOLUME_RENAME' )
+    for feature in feature_map:
+        #print "checking for %s %04x in %04x: " % ( feature[1], feature[0], n )
+        if n & feature[0] :
+          n = n & ~ feature[0]
+          f.append( feature[1] )
+    if n != 0:
+        f.append( "leftovers (%04x)" % n )
+
     return f
 
 class Drobo:
