@@ -10,7 +10,10 @@ setup (name = 'Drobo-utils',
        py_modules=['Drobo','DroboGUI', 'DroboIOctl' ],
        scripts=['drobom', 'droboview'],
        data_files = [
-                    ('share/pixmaps',             ['Drobo-Front-0000.gif'])
+                    ('share/pixmaps',             ['Drobo-Front-0000.gif']),
+                    ('share/drobo-utils-doc',             ['README.html']),
+                    ('share/drobo-utils-doc',             ['DEVELOPERS.html']),
+                    ('share/drobo-utils-doc',             ['CHANGES.html'])
                     ]
 
       )

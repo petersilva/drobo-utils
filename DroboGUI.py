@@ -84,23 +84,21 @@ class DroboAbout(QtGui.QWidget):
  
 class DroboManual(QtGui.QWidget):
    def __init__(self, manual, parent=None):
+
         QtGui.QWidget.__init__(self, parent)
-        
         self.setMinimumSize(500, 440)
         al = QtGui.QVBoxLayout(self)
 
-        dirs=[ '/usr/local/share/drobo-utils-doc', '/usr/share/drobo-utils/share/drobo-utils-doc', '.' ]
+        dirs=[ "/usr/local/share/drobo-utils-doc", "/usr/share/drobo-utils/share/drobo-utils-doc", "." ]
         readme=""
-        try:
-#         i=0
-#         while (i < 3 ) and (readme == "") :
-#          try:
-          readmefile = open(dirs[2] + "/" + manual)
+        i=0
+        while (i < 3 ) and (readme == "") :
+          readmefile = open( dirs[2] + "/" + manual )
           readme = readmefile.read()
           readmefile.close()
-#          i++
-#
-        except:
+          i=i+1
+
+        if i >= 3:
           readme = "Documentation %s not found" % manual
 
         self.main = QtGui.QTextEdit(readme, self )
@@ -538,10 +536,10 @@ class DroboGUI(QtGui.QMainWindow):
         help.addAction(devmanual)
         self.connect(devmanual, QtCore.SIGNAL('triggered()'), self.devmanualdialog.show)
 
-        devmanual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Change log', self)
-        self.devmanualdialog = DroboManual("CHANGES.html")
-        help.addAction(devmanual)
-        self.connect(devmanual, QtCore.SIGNAL('triggered()'), self.devmanualdialog.show)
+        chgmanual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Change log', self)
+        self.chgmanualdialog = DroboManual("CHANGES.html")
+        help.addAction(chgmanual)
+        self.connect(chgmanual, QtCore.SIGNAL('triggered()'), self.chgmanualdialog.show)
 
         about = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'About DroboView', self)
         self.aboutdialog = DroboAbout()
