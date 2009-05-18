@@ -4,6 +4,8 @@
 
 
 0.5.1
+  * replaced fixed dimensions in GUI with layouts, should look better.
+  * added ability to detect un-documented feature bit settings.
   * drobopro support added (thanks to lemonizer on the google group!)
   * ddiag.c becomes drobom diagprint
   * catlee fixes the packagin again. 
