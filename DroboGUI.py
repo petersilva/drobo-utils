@@ -147,7 +147,7 @@ class DroboGUI(QtGui.QMainWindow):
            return
 
         settings=self.drobo.GetSubPageSettings()
-        self.Device.id.setText(  self.drobo.GetCharDev() + ' firmware: ' + fwv[7] )
+        self.Device.id.setText(  self.drobo.GetCharDev() + ' ' + settings[2] + ' firmware: ' + fwv[7] )
 
         self.Device.id.setToolTip(
            "Firmware build: " + str(fwv[0]) + '.' + str(fwv[1]) + '.' + str(fwv[2]) + "\n Features: " + string.join(fwv[8],"\n") )
@@ -180,8 +180,8 @@ class DroboGUI(QtGui.QMainWindow):
         c=self.drobo.GetSubPageCapacity()
         if c[2] > 0:
            self.Device.fullbar.setValue( c[1]*100/c[2] )
-           self.Device.fullbar.setToolTip( 
-	    "used: " + _toGB(c[1]) + ' free: ' + _toGB(c[0]) + ' Total: ' + _toGB(c[2]) + ' GB, update# ' + str(self.updates) )
+           self.Device.fullbar.setToolTip(  string.join(self.drobo.DiscoverMounts(),',') +
+	    "\nused: " + _toGB(c[1]) + ' free: ' + _toGB(c[0]) + ' Total: ' + _toGB(c[2]) + ' GB, update# ' + str(self.updates) )
 	#print self.statusmsg
         #self.__StatusBar_space()
         self.statusBar().showMessage( self.statusmsg )
@@ -217,7 +217,7 @@ class DroboGUI(QtGui.QMainWindow):
 
         # Create Device tab...
         devtablayout=QtGui.QGridLayout(self.Device)
-        devtablayout.setColumnStretch(0,9)
+        devtablayout.setColumnStretch(0,19)
         devtablayout.setColumnStretch(1,1)
         devtablayout.setVerticalSpacing(4)
 
@@ -236,20 +236,16 @@ class DroboGUI(QtGui.QMainWindow):
           slotlayout=QtGui.QHBoxLayout()
           self.Device.slot[i][0] = QtGui.QPushButton('uninitialized - 0000GB', self.Device)
           self.Device.slot[i][0].setCheckable(False)
-          #self.Device.slot[i][0].setMinimumWidth(200)
           self.Device.slot[i][0].setStyleSheet( "QWidget { background-color: white }" )
           self.Device.slot[i][0].setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
           devtablayout.addWidget(self.Device.slot[i][0],i+1,0,1,1)
           self.Device.slot[i][1] = QtGui.QWidget(self.Device)
           self.Device.slot[i][1].setMinimumWidth(10)
-          self.Device.slot[i][1].setMinimumHeight(30)
 
           devtablayout.addWidget(self.Device.slot[i][1],i+1,1,1,1)
-          devtablayout.setRowMinimumHeight(i+1,10)
           i=i+1
 
         self.Device.fullbar = QtGui.QProgressBar(self.Device)
-        self.Device.fullbar.setMinimumWidth(230)
         devtablayout.addWidget(self.Device.fullbar,i+1,0,1,-1)
         self.connect(self.Device.fullbar, QtCore.SIGNAL('focusInEvent()'), 
 		self.__StatusBar_space)
@@ -330,14 +326,11 @@ class DroboGUI(QtGui.QMainWindow):
 
 	self.Format = QtGui.QWidget()
         self.Format.setObjectName("Format")
-        w=160
 
         flay = QtGui.QGridLayout(self.Format)
-        flay.setColumnMinimumWidth(0,240)
 
         self.Format.header = QtGui.QLabel("WARNING: Format erases whole Drobo", self.Format)
         self.Format.header.setStyleSheet( "QWidget { color: red }" )
-        #self.Format.header.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
         flay.addWidget(self.Format.header,0,0,1,2)
 
         self.Format.lunsztitle = QtGui.QLabel("Maximum LUN size:", self.Format)
@@ -348,7 +341,6 @@ class DroboGUI(QtGui.QMainWindow):
         flay.addWidget(self.Format.lunszlcd,1,1,1,1)
 
         self.Format.horizontalSlider = QtGui.QSlider(self.Format)
-        self.Format.horizontalSlider.setMinimumWidth(w)
         flay.addWidget(self.Format.horizontalSlider,2,0,1,2)
         self.Format.horizontalSlider.setMaximum(4)
         self.Format.horizontalSlider.setMinimum(0)
@@ -378,7 +370,6 @@ class DroboGUI(QtGui.QMainWindow):
         flay.addWidget(self.Format.ext3,3,0,1,-1)
 
         self.Format.msdos = QtGui.QRadioButton("FAT32 MS - Disk Operating System", self.Format)
-        #self.Format.msdos.setStyleSheet( "QWidget { color: gray }" )
         mkfs = commands.getoutput("which mkdosfs")
         if ( mkfs == "" ): 
             self.Format.msdos.setCheckable(0)
@@ -480,13 +471,12 @@ class DroboGUI(QtGui.QMainWindow):
         Diagbutton.setCheckable(False)
         tlay.addWidget(Diagbutton,2,1,1,1)
 
-        self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), 
-                self.__diags)
+        self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), self.__diags)
 
         self.Tools.progress = QtGui.QProgressBar(self.Tools)
-        self.Tools.progress.setMinimumWidth(2*w)
+        #self.Tools.progress.setMinimumWidth(2*w)
         tlay.addWidget(self.Tools.progress,3,0,1,2)
-        self.Tools.progress.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed )
+        #self.Tools.progress.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed )
         self.Tools.progress.setValue( 0 )
 
         self.Tools.comment = QtGui.QLabel("Press 'Update' to look for updates", self.Tools)

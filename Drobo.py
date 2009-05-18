@@ -52,8 +52,9 @@ DBG_Detection = 0x10
 DBG_General = 0x20 
 
 # This isn't entirely simulation mode.  It is to aid development
-# when no drobo is available.  you can format random disks, including 
+# when no drobo is available.  You can format random disks, including 
 # non-drobos.  So do not activate unless you read what the code does first.
+# in simulation mode, can run non-root, best for GUI work.
 DBG_Simulation = 0x80
 
 #for generic SCSI IO details...
@@ -1243,6 +1244,10 @@ class Drobo:
        umount all file systems using the given Drobo.
        return true on success, false on failure.
     """
+
+    if DEBUG & DBG_Simulation:
+       return True
+
     toumount = self.DiscoverMounts()
     if len(toumount) > 0:
        for i in toumount:
@@ -1257,6 +1262,10 @@ class Drobo:
     """
         return the list of mounted file systems using the unit.
     """
+
+    if DEBUG & DBG_Simulation:
+       return [ "/drmnt0", "/drmnt2" ]
+    
     mounts=open("/etc/mtab")
     dlen=len(self.char_dev_file)
     filesystems=[]
