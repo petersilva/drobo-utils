@@ -506,6 +506,9 @@ class Drobo:
         I feed it UTC, and when I read the time, normal routines convert to local time.
         so it looks perfect.  but diagnostics might not agree.
     """
+    if DEBUG & DBG_Simulation:
+       return
+ 
     now=int(time.time())
     payload="LH32s"
     payloadlen=struct.calcsize(payload)
@@ -708,6 +711,9 @@ class Drobo:
 
 
     """
+    if DEBUG & DBG_Simulation:
+       return ('fwarch', 'fwv', 'hwlevel', 'value')
+
     inqw=self.inquire()
     hwlevel=inqw[10] 
     fwi=self.GetSubPageFirmware()
