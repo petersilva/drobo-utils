@@ -6,7 +6,7 @@ build: doc
 clean:
 	-python setup.py clean
 	-find . -name "*\.pyc" -delete
-	-rm CHANGES.html DEVELOPERS.html README.html
+	-rm CHANGES.html DEVELOPERS.html README.html drobom.html droboview.html
 	-rm -rf build*
 
 doc:
