@@ -4,6 +4,7 @@ in no particular order:
 Name command support in GUI
 
 Alerting...
+	-- save config...
 	.. SMTP forwarder:
         .. address 
         .. authentication.? u+p
@@ -13,9 +14,6 @@ BUGS:
   when running two fw uploads, the second one will not run easily.
   need to wait for transaction to timeout...  perhaps randomize id?
   did randomization, did not change anything...
-
-Alerting
-	-- save config...
 
 STANDARD menu entries for droboview...
   partition types do not appear to be correctly displayed...
@@ -29,8 +27,6 @@ gnats:
   man page does not document output.  
   -- what is the meaning of the output? provide a sample...
 
-  help pages?
-
 review print statements:
   should they write to stderr?
 
@@ -43,9 +39,6 @@ Better STATUS progress reporting:
    -- when it is busy, it should say so... like when I emptied an
       ntfs it took hours for the led indicators to drop from 70% to 0.
       It should say something about what is going on.
-
-Documentation Dialogs:
-   -- maybe a help window.
 
 LIVELIER GUI:
    -- have status queries proceed asynchronously from the GUI.
