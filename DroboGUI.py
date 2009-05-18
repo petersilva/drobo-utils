@@ -93,9 +93,13 @@ class DroboManual(QtGui.QWidget):
         readme=""
         i=0
         while (i < 3 ) and (readme == "") :
-          readmefile = open( dirs[2] + "/" + manual )
-          readme = readmefile.read()
-          readmefile.close()
+          try: 
+            readmefile = open( dirs[2] + "/" + manual )
+            readme = readmefile.read()
+            readmefile.close()
+          except:
+            pass
+
           i=i+1
 
         if i >= 3:
