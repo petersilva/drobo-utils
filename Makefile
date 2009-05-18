@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-build:
+build: doc
 	python setup.py build
 
 clean:
