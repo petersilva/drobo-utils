@@ -202,7 +202,7 @@ for o, a in opts:
             assert False, "unhandled option"
 
 if cmd==None :
-  if len(args) == 0:
+  if (len(args) == 0) or (cmd == 'help'):
      usage()
      sys.exit()
   cmd=args[0]
