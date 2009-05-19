@@ -624,6 +624,19 @@ class Drobo:
     df.close()
     return dfname
 
+  def decodeDiagnostics(self,diagfilename):
+    try:
+      f=open( diagfilename )
+      data = f.read()
+      f.close()
+    except:
+      return ''
+
+    key = ord(data[0]) ^ 0x2d
+    datam = ''.join(map( lambda x: chr(ord(x)^key), data ))
+    return datam
+
+
 
   #
   # constants for use with firmware operations

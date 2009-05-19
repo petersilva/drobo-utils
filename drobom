@@ -252,12 +252,7 @@ for u in l:
      print "diagnostics in ", f
 
   elif cmd == "diagprint":
-     f=open( args[1] ) 
-     data = f.read()
-     key = ord(data[0]) ^ 0x2d
-     datam = ''.join(map( lambda x: chr(ord(x)^key), data ))
-     print datam
-     f.close()
+     print d.decodeDiagnostics( args[1] )
 
   elif cmd == "format":
      if len(args) < 3 :
