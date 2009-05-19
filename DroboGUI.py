@@ -449,10 +449,15 @@ class DroboGUI(QtGui.QMainWindow):
             self.diagdialog = ShowText(datam,False)
             self.diagdialog.show()
 
-
-
-
-
+    def __loadFirmware(self):
+        fileName = QtGui.QFileDialog.getOpenFileName(self,
+                                         self.tr("QFileDialog.getOpenFileName()"),
+                                         '/root/.drobo-utils',
+                                         self.tr("All Files (*);;Text Files (*.txt)"))
+        if not fileName.isEmpty():
+          if self.drobo.PickFirmware(str(fileName)):
+             self.drobo.writeFirmware( self.Tools.progress.setValue )
+	  
 
     def __renameDialog(self):
 
@@ -514,6 +519,11 @@ class DroboGUI(QtGui.QMainWindow):
         Diagbutton.setCheckable(False)
         tlay.addWidget(Diagbutton,3,0,1,1)
         self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), self.__printDiagFile)
+
+        DiagLdbutton = QtGui.QPushButton('Load Firmware', self.Tools)
+        DiagLdbutton.setCheckable(False)
+        tlay.addWidget(DiagLdbutton,3,1,1,1)
+        self.connect(DiagLdbutton, QtCore.SIGNAL('clicked()'), self.__loadFirmware)
 
         self.Tools.progress = QtGui.QProgressBar(self.Tools)
         #self.Tools.progress.setMinimumWidth(2*w)
