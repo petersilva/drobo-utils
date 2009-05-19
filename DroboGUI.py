@@ -431,6 +431,17 @@ class DroboGUI(QtGui.QMainWindow):
         fname = self.drobo.dumpDiagnostics()
         self.Tools.comment.setText( fname )
 
+    def __renameDialog(self):
+
+        
+        settings=self.drobo.GetSubPageSettings()
+        text, ok = QtGui.QInputDialog.getText(self, self.tr("QInputDialog.getText()"),
+                                              self.tr("New name:"), QtGui.QLineEdit.Normal,
+                                              settings[2])
+        if ok and not text.isEmpty():
+            self.drobo.Sync(str(text)) # convenient side effect:  make the host and drobo clocks agree...
+
+
     def __initToolTab(self):
 
 	self.Tools = QtGui.QWidget()
@@ -457,9 +468,9 @@ class DroboGUI(QtGui.QMainWindow):
                 self.drobo.Blink)
 
         self.Tools.Renamebutton = QtGui.QPushButton('Rename', self.Tools)
-        self.Tools.Renamebutton.setStyleSheet( "QWidget { color: gray }" )
         self.Tools.Renamebutton.setCheckable(False)
         tlay.addWidget(self.Tools.Renamebutton,1,0,1,1)
+        self.connect(self.Tools.Renamebutton, QtCore.SIGNAL('clicked()'), self.__renameDialog)
         
         self.Tools.Updatebutton = QtGui.QPushButton('Update', self.Tools)
         tlay.addWidget(self.Tools.Updatebutton,1,1,1,1)
