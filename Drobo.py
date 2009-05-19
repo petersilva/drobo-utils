@@ -324,9 +324,6 @@ class Drobo:
               print "%s fw[6] is not armmarvell." % self.char_dev_file
             raise DroboException
         
-
-
-
  
   def __del__(self):
 
