@@ -2,16 +2,16 @@
  $LastChangedDate$
  $Rev$
 
-
 0.5.1
+  * Major: DroboPRO support added (thanks to lemonizer on the google group!)
+  * Major: GUI improvement: replaced fixed dimensions in GUI with layouts.
+  * GUI gets online documentation.
   * added Rename support to GUI.
   * added Name display to main display. Easier to tell which Drobo is which.
   * added mount point display to space used tool tip.
-  * replaced fixed dimensions in GUI with layouts, should look better.
   * added ability to detect un-documented feature bit settings.
-  * drobopro support added (thanks to lemonizer on the google group!)
   * ddiag.c becomes drobom diagprint
-  * catlee fixes the packagin again. 
+  * catlee fixes the packaging again. 
 
 0.5.0 2009/01/30
   * replaced DroboDMP C extension by DroboIOctl python class.  no need

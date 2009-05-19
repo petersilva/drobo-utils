@@ -82,13 +82,14 @@ class DroboAbout(QtGui.QWidget):
         self.connect(self.quit, QtCore.SIGNAL('clicked()'), 
                 self.hide)
  
-class DroboManual(QtGui.QWidget):
-   def __init__(self, manual, parent=None):
+class ShowText(QtGui.QWidget):
+   def __init__(self, manual, isfile=True, parent=None):
 
-        QtGui.QWidget.__init__(self, parent)
-        self.setMinimumSize(500, 440)
-        al = QtGui.QVBoxLayout(self)
+      QtGui.QWidget.__init__(self, parent)
+      self.setMinimumSize(500, 440)
+      al = QtGui.QVBoxLayout(self)
 
+      if isfile:
         dirs=[ "/usr/local/share/drobo-utils-doc", "/usr/share/drobo-utils/share/drobo-utils-doc", "." ]
         readme=""
         i=0
@@ -106,10 +107,15 @@ class DroboManual(QtGui.QWidget):
           readme = "Documentation %s not found" % manual
 
         self.main = QtGui.QTextEdit(readme, self )
-        al.addWidget(self.main)
-        self.quit = QtGui.QPushButton('Dismiss',self)
-        al.addWidget(self.quit)
-        self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
+      else:
+        self.main = QtGui.QTextEdit('', self )
+        self.main.setPlainText(manual)
+
+        
+      al.addWidget(self.main)
+      self.quit = QtGui.QPushButton('Dismiss',self)
+      al.addWidget(self.quit)
+      self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
 
 class DroboGUI(QtGui.QMainWindow):
     """ GUI for a single Drobo, start one for each drobo.
@@ -429,7 +435,24 @@ class DroboGUI(QtGui.QMainWindow):
     def __diags(self):
         self.drobo.Sync() # convenient side effect  make the host and drobo clocks agree...
         fname = self.drobo.dumpDiagnostics()
+        self.last_diagfile = fname
         self.Tools.comment.setText( fname )
+
+ 
+    def __printDiagFile(self):
+        fileName = QtGui.QFileDialog.getOpenFileName(self,
+                                         self.tr("QFileDialog.getOpenFileName()"),
+                                         self.last_diagfile,
+                                         self.tr("All Files (*);;Text Files (*.txt)"))
+        if not fileName.isEmpty():
+            datam =self.drobo.decodeDiagnostics(str(fileName))
+            self.diagdialog = ShowText(datam,False)
+            self.diagdialog.show()
+
+
+
+
+
 
     def __renameDialog(self):
 
@@ -485,17 +508,21 @@ class DroboGUI(QtGui.QMainWindow):
         Diagbutton = QtGui.QPushButton('Diagnostics', self.Tools)
         Diagbutton.setCheckable(False)
         tlay.addWidget(Diagbutton,2,1,1,1)
-
         self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), self.__diags)
+
+        Diagbutton = QtGui.QPushButton('Show Diag', self.Tools)
+        Diagbutton.setCheckable(False)
+        tlay.addWidget(Diagbutton,3,0,1,1)
+        self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), self.__printDiagFile)
 
         self.Tools.progress = QtGui.QProgressBar(self.Tools)
         #self.Tools.progress.setMinimumWidth(2*w)
-        tlay.addWidget(self.Tools.progress,3,0,1,2)
+        tlay.addWidget(self.Tools.progress,4,0,1,2)
         #self.Tools.progress.setSizePolicy( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed )
         self.Tools.progress.setValue( 0 )
 
         self.Tools.comment = QtGui.QLabel("Press 'Update' to look for updates", self.Tools)
-        tlay.addWidget(self.Tools.comment,4,0,1,2)
+        tlay.addWidget(self.Tools.comment,5,0,1,2)
 
         normal = self.Tools.Updatebutton.palette().color( QtGui.QPalette.Button )
 
@@ -510,6 +537,7 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.drobo = d
         self.updates = 0
+        self.last_diagfile='/tmp'
 
         self.statusmsg='Ready'
         self.color = QtGui.QColor(0, 0, 0) 
@@ -532,27 +560,27 @@ class DroboGUI(QtGui.QMainWindow):
         help = menubar.addMenu('&Help')
 
         manual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Read Me', self)
-        self.manualdialog = DroboManual("README.html")
+        self.manualdialog = ShowText("README.html")
         help.addAction(manual)
         self.connect(manual, QtCore.SIGNAL('triggered()'), self.manualdialog.show)
 
         devmanual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'For Developers', self)
-        self.devmanualdialog = DroboManual("DEVELOPERS.html")
+        self.devmanualdialog = ShowText("DEVELOPERS.html")
         help.addAction(devmanual)
         self.connect(devmanual, QtCore.SIGNAL('triggered()'), self.devmanualdialog.show)
 
         dmmanpage = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Drobom man-page', self)
-        self.dmmanpagedialog = DroboManual("drobom.html")
+        self.dmmanpagedialog = ShowText("drobom.html")
         help.addAction(dmmanpage)
         self.connect(dmmanpage, QtCore.SIGNAL('triggered()'), self.dmmanpagedialog.show)
 
         dvmanpage = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Droboview man-page', self)
-        self.dvmanpagedialog = DroboManual("droboview.html")
+        self.dvmanpagedialog = ShowText("droboview.html")
         help.addAction(dvmanpage)
         self.connect(dvmanpage, QtCore.SIGNAL('triggered()'), self.dvmanpagedialog.show)
 
         chgmanual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Change log', self)
-        self.chgmanualdialog = DroboManual("CHANGES.html")
+        self.chgmanualdialog = ShowText("CHANGES.html")
         help.addAction(chgmanual)
         self.connect(chgmanual, QtCore.SIGNAL('triggered()'), self.chgmanualdialog.show)
 
