@@ -399,6 +399,7 @@ class DroboGUI(QtGui.QMainWindow):
 
 
         self.Format.Formatbutton = QtGui.QPushButton('Format (Erases All Data!)       ', self.Format)
+        self.Format.Formatbutton.setToolTip("Configure a Drobo for use")
         flay.addWidget(self.Format.Formatbutton,6,0,1,-1)
 
         self.tab.addTab(self.Format, "Format")
@@ -480,6 +481,7 @@ class DroboGUI(QtGui.QMainWindow):
         # Set the tool colors to grey, to indicate non-functional...
         #
         self.Tools.Standbybutton = QtGui.QPushButton('Shutdown', self.Tools)
+        self.Tools.Standbybutton.setToolTip( 'Unmount file systems, and turn Drobo off (DRI calls this standby)' )
         self.Tools.Standbybutton.setCheckable(False)
         tlay.addWidget(self.Tools.Standbybutton,0,0,1,1)
 
@@ -489,6 +491,7 @@ class DroboGUI(QtGui.QMainWindow):
 	w=self.Tools.Standbybutton.width()
 
         self.Tools.Blinkybutton = QtGui.QPushButton('Blink Lights', self.Tools)
+        self.Tools.Blinkybutton.setToolTip( 'Make a light show (totally harmless)' )
         self.Tools.Blinkybutton.setCheckable(False)
         tlay.addWidget(self.Tools.Blinkybutton,0,1,1,1)
 
@@ -496,34 +499,40 @@ class DroboGUI(QtGui.QMainWindow):
                 self.drobo.Blink)
 
         self.Tools.Renamebutton = QtGui.QPushButton('Rename', self.Tools)
+        self.Tools.Renamebutton.setToolTip( "Change the Drobo's name (does not affect mount points.)" )
         self.Tools.Renamebutton.setCheckable(False)
         tlay.addWidget(self.Tools.Renamebutton,1,0,1,1)
         self.connect(self.Tools.Renamebutton, QtCore.SIGNAL('clicked()'), self.__renameDialog)
         
         self.Tools.Updatebutton = QtGui.QPushButton('Update', self.Tools)
+        self.Tools.Updatebutton.setToolTip( "See if new firmware is available." )
         tlay.addWidget(self.Tools.Updatebutton,1,1,1,1)
 
         self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
 
         Registerbutton = QtGui.QPushButton('Register', self.Tools)
+        Registerbutton.setToolTip( "Report for warranty service." )
         Registerbutton.setStyleSheet( "QWidget { color: gray }" )
         Registerbutton.setCheckable(False)
         tlay.addWidget(Registerbutton,2,0,1,1)
 
         Diagbutton = QtGui.QPushButton('Diagnostics', self.Tools)
+        Diagbutton.setToolTip( "Have Drobo write a diagnostics file to /tmp" )
         Diagbutton.setCheckable(False)
         tlay.addWidget(Diagbutton,2,1,1,1)
         self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), self.__diags)
 
-        Diagbutton = QtGui.QPushButton('Show Diag', self.Tools)
-        Diagbutton.setCheckable(False)
-        tlay.addWidget(Diagbutton,3,0,1,1)
-        self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), self.__printDiagFile)
+        DiagShowbutton = QtGui.QPushButton('Show Diag', self.Tools)
+        DiagShowbutton.setToolTip( "Show a decoded diagnostics file" )
+        DiagShowbutton.setCheckable(False)
+        tlay.addWidget(DiagShowbutton,3,0,1,1)
+        self.connect(DiagShowbutton, QtCore.SIGNAL('clicked()'), self.__printDiagFile)
 
-        DiagLdbutton = QtGui.QPushButton('Load Firmware', self.Tools)
-        DiagLdbutton.setCheckable(False)
-        tlay.addWidget(DiagLdbutton,3,1,1,1)
-        self.connect(DiagLdbutton, QtCore.SIGNAL('clicked()'), self.__loadFirmware)
+        FwLdbutton = QtGui.QPushButton('Load Firmware', self.Tools)
+        FwLdbutton.setToolTip( "Pick your own firmware (use Update normally)" )
+        FwLdbutton.setCheckable(False)
+        tlay.addWidget(FwLdbutton,3,1,1,1)
+        self.connect(FwLdbutton, QtCore.SIGNAL('clicked()'), self.__loadFirmware)
 
         self.Tools.progress = QtGui.QProgressBar(self.Tools)
         #self.Tools.progress.setMinimumWidth(2*w)
