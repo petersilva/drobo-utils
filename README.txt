@@ -302,6 +302,32 @@ ON LUNSIZES >= 2TB:
      It would be fun to set the LunSIZE to 8 TiB and test it out...
 
 
+Drobo Pro
+---------
+Drobo-utils depends on the linux generic scsi layer.  I suspect that 
+there is just a basic ethernet connection now, and you a few additional driver layers
+set up before it will work.   You need to configure the iscsi driver to recognize 
+the device.  Lemonizer on the Google Group 2009/05/16 reported good luck with:
+
+I had to manually configure the ip of the dbpro from the Drobo
+Dashboard on my macbook to do this as I'm not sure how to get the
+portal ip for iscsiadm. In my case it was 192.168.2.80 port 3260 and
+I'll use that ip in the example below
+
+1. Configure iscsi ip address via drobo dashboard on win/osx
+2. Install open-iscsi (http://www.open-iscsi.org/): sudo apt-get install open-iscsi
+3. Connect the dbpro to host machine via iscsi
+4. Query dbpro's id: sudo iscsiadm --mode discovery --type sendtargets --portal 192.168.2.80
+5. Copy the id string returned by iscsiadm, something like "iqn.2005-06.com.datarobotics:drobopro.tdb091840080.node0"
+6. Connect to the dbpro: sudo iscsiadm --mode node --targetname iqn.2005-06.com.datarobotics:drobopro.tdb091840080.node0 --portal 192.168.2.80:3260 --login
+
+If everything went well, your dbpro should show up under /dev. Also
+check /var/log/messages to confirm that the iscsi device connected
+successfully.
+
+After that, drobo-utils should be able to detect the Drobo and manage
+it over ethernet.
+
 
 Firmware Upgrades
 -----------------
@@ -381,6 +407,8 @@ on for days.
 After you resize luns, droboview gets confused, you need to exit and
 restart.
 
+We have a report that dumping diagnostics does not work over firewire.
+Work-around:  connect via USB.
 
 Building debian & ubuntu packages
 ---------------------------------
