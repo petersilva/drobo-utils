@@ -5,13 +5,40 @@ QA Test checklist prior to release:
 	-- Set version to pre-release one.
         -- build packages with pre-release version id.
    1.1 drobom status... check for accuracy.
+
+root@pepino:~# drobom status
+/dev/sdf:/dev/sdg - Drobo01 00% full - ([], 0)
+root@pepino:~#
+
    1.2 drobom settime
+
+root@pepino:~# drobom settime
+root@pepino:~#
+
    1.3 drobom status... check for accuracy.
+
+root@pepino:~# drobom status
+/dev/sdf:/dev/sdg - Drobo01 00% full - ([], 0)
+root@pepino:~#
+
    1.4 drobom fwload (something really old) 1.03
+
+done with GUI.
+
      1.4.1 drobom shutdown -- to run the firmware.
+
+done with GUI.
+
      1.4.2 restart (unplug and replug usb)
+
+done
      1.4.3 run drobom status etc.. (make sure it is running 1.0.3)
        should say disk pack is un-readable or some such.
+
+root@pepino:~# drobom status
+firmware too old to report capacity properly... or the drobo is empty...
+/dev/sdf - TRUSTED DATA -1% full - (['Unknown version'], 0)
+root@pepino:~#
 
      1.4.4 hard reset to factory default 
         after downgrade, disk pack will no longer be recognized. need to reset to make Drobo
@@ -20,14 +47,229 @@ QA Test checklist prior to release:
         http://www.drobospace.com/article/10207/Resetting-the-Drobo/?highlight=reset+drobo
 
      1.4.3 place a file on the Drobo. make sure it works.
+
+root@pepino:~# drobom format ext3                                           
+This is guaranteed to erase your disk, so you must say: PleaseEraseMyData   
+root@pepino:~# drobom format ext3 PleaseEraseMyData                         
+You asked nicely, so I will format ext3 as you requested                    
+OK, I built the script but nothing is erased yet...                         
+If you are really sure, go ahead and do: sh /tmp/fmtscript                  
+root@pepino:~# more /tmp/fmtscript
+#!/bin/sh                         
+parted /dev/sdf mklabel gpt       
+parted /dev/sdf mkpart ext2 0 100%
+parted /dev/sdf print; sleep 5    
+mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdf1
+root@pepino:~# sh -x /tmp/fmtscript                                        
++ parted /dev/sdf mklabel gpt                                              
+Information: You may need to update /etc/fstab.                            
+
++ parted /dev/sdf mkpart ext2 0 100%
+Information: You may need to update /etc/fstab.                           
+
++ parted /dev/sdf print
+Model: TRUSTED USB Mass Storage (scsi)
+Disk /dev/sdf: 2199GB                 
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt                     
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      17.4kB  2199GB  2199GB               ext2       
+
++ sleep 5
++ mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdf1
+mke2fs 1.41.4 (27-Jan-2009)                                                  
+Filesystem label=Drobo01
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+8388608 inodes, 536870886 blocks
+0 blocks (0.00%) reserved for the super user
+First data block=0
+16384 block groups
+32768 blocks per group, 32768 fragments per group
+512 inodes per group
+Superblock backups stored on blocks:
+        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+        4096000, 7962624, 11239424, 20480000, 23887872, 71663616, 78675968,
+        102400000, 214990848, 512000000
+
+Writing inode tables: done
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+This filesystem will be automatically checked every 37 mounts or
+180 days, whichever comes first.  Use tune2fs -c or -i to override.
+root@pepino:~# mount /dev/sdf1 /drobo01
+root@pepino:~# 
+root@pepino:~# echo hoho >/drobo01/kk
+root@pepino:~# ls -al /drobo01/
+total 28
+drwxr-xr-x  3 root root  4096 2009-05-19 22:25 .
+drwxr-xr-x 25 root root  4096 2009-05-04 23:21 ..
+-rw-r--r--  1 root root     5 2009-05-19 22:25 kk
+drwx------  2 root root 16384 2009-05-19 22:20 lost+found
+root@pepino:~# drobom status
+/dev/sdf /drobo01 TRUSTED DATA 00% full - ([], 0)
+root@pepino:~#
+
+
      1.4.4 drobom status -- have a look.
+oot@pepino:~# drobom info
+---------------------------------------------------------
+Info about Drobo     Name: TRUSTED DATA       Devices: /dev/sdf
+---------------------------------------------------------      
+query config result:                                           
+(4, 1, 2199023250944)                                          
+max lun size is:  2199023250944                                
+
+query capacity result:
+(995528540160, 0, 995528540160, 0)
+Physical space... used:  0  free:  995528540160  Total:  995528540160
+
+query protocol version result: 
+(0, 10)                        
+
+query settings result:
+(293, 8, 'TRUSTED DATA')
+Drobo time is Wed Dec 31 19:04:53 1969
+
+query slotinfo result:  number of slots: 4
+[(0, 500107862016, 0, 'green', 'ST3500830AS', 'ST3500830AS'), (1, 500107862016, 0, 'green', 'WDC WD5000AAKS-00C8A0', 'WDC WD5000AAKS-0'), (2, 0, 0, 'gray', '', ''), (3, 500107862016, 0, 'green', 'WDC WD5000AAKS-00C8A0', 'WDC WD5000AAKS-0')]
+query firmware result:
+(1, 172, 9222, 8, 0, 'Sep 13 2007,16:07:38', 'ArmMarvell', '1.0.3', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE'])
+drobo says firmware revision:  1 . 172 ( 9222 ) was built:  Sep 13 2007,16:07:38
+
+query status result:
+([], 0)
+
+query options result:
+(0, 0, 0)
+
+query luninfo result:
+(0, 995528540160, 0)
+
+---------------------------------------------------------
+root@pepino:~#
+
    
    1.5 drobom fwupgrade
+
+with GUI
+root@pepino:~# drobom view
+looking for firmware for: armmarvell 1.172.9222 hw version: 1.00
+This Drobo should be running:  raptor/firmware/armmarvell/v1.12.tdf
+checkup: this Drobo is a armmarvell hw rev: 1.00, and needs: 1.172.9222
+looking for firmware for: armmarvell 1.172.9222 hw version: 1.00
+This Drobo should be running:  raptor/firmware/armmarvell/v1.12.tdf
+looking for: /root/.drobo-utils/armmarvell_1.00_v1.12.tdf
+local copy already present: /root/.drobo-utils/armmarvell_1.00_v1.12.tdf
+Reading Firmware from = /root/.drobo-utils/armmarvell_1.00_v1.12.tdf
+validateFirmware start...
+header+body lengths validated.  Good.
+Magic number validated. Good.
+484 + 2942433 = 2942917 length validated. Good.
+CRC from header: 1401631832, calculated using python zlib crc32: 1401631832
+CRC for body from header: 2717012571, calculated: 2717012571
+32 bit Cyclic Redundancy Check correct. Good.
+validateFirmware successful...
+correct fw available
+
      1.5.1 drobom shutdown - to run the firmware.
      1.5.2 drobom status -- have a look.
+
+root@pepino:~# drobom info firmware
+---------------------------------------------------------
+Info about Drobo     Name: TRUSTED DATA       Devices: /dev/sdf
+---------------------------------------------------------
+query firmware result:
+(1, 201, 12942, 12, 6, 'May 13 2008,15:29:32', 'ArmMarvell', '1.1.2', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', 'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', 'FAT32_FORMAT_VOLNAME', 'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2'])
+drobo says firmware revision:  1 . 201 ( 12942 ) was built:  May 13 2008,15:29:32
+
+---------------------------------------------------------
+root@pepino:~#
+
      1.5.3 repeat 1.5 perhaps a second time (as needed to get to current)
 
+root@pepino:~# drobom view
+looking for firmware for: armmarvell 1.201.12942 hw version: 1.00
+This Drobo should be running:  raptor/firmware/armmarvell/v1.3.0.tdz
+checkup: this Drobo is a armmarvell hw rev: 1.00, and needs: 1.201.12942
+looking for firmware for: armmarvell 1.201.12942 hw version: 1.00       
+This Drobo should be running:  raptor/firmware/armmarvell/v1.3.0.tdz    
+looking for: /root/.drobo-utils/armmarvell_1.00_v1.3.0.tdz              
+local copy already present: /root/.drobo-utils/armmarvell_1.00_v1.3.0.tdz
+Reading Firmware from = /root/.drobo-utils/armmarvell_1.00_v1.3.0.tdz    
+validateFirmware start...                                                
+header+body lengths validated.  Good.                                    
+Magic number validated. Good.                                            
+484 + 3130135 = 3130619 length validated. Good.                          
+CRC from header: 4183081909, calculated using python zlib crc32: 4183081909 
+CRC for body from header: 2216664787, calculated: 2216664787                
+32 bit Cyclic Redundancy Check correct. Good.                               
+validateFirmware successful...                                              
+correct fw available                                                        
+root@pepino:~# drobom info firmware
+---------------------------------------------------------
+Info about Drobo     Name: Drobo disk pack       Devices: /dev/sdf
+---------------------------------------------------------
+query firmware result:
+(1, 248, 15408, 13, 6, 'Dec  2 2008,10:24:08', 'ArmMarvell', '1.3.0', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', 'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', 'FAT32_FORMAT_VOLNAME', 'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2', 'feature x0800', 'feature x2000 '])
+drobo says firmware revision:  1 . 248 ( 15408 ) was built:  Dec  2 2008,10:24:08
+
+---------------------------------------------------------
+root@pepino:~#
+
+
    1.7 drobom setlunsize 3 (should fail),1,2  
+
+root@pepino:~# drobom setlunsize 2
+This is guaranteed to erase your disk, so you must say: PleaseEraseMyData
+root@pepino:~# drobom setlunsize 3 PleaseEraseMyData
+lun size needs to be 1, 2, 4, 8, or 16 TiB; 3 is invalid
+root@pepino:~#
+root@pepino:~# drobom setlunsize 4 PleaseEraseMyData                     
+You asked nicely, so I will set the lunsize to 4 as you requested        
+set lunsize to 4 TiB                                                     
+Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.
+root@pepino:~# 
+root@pepino:~# drobom info luns                          
+---------------------------------------------------------
+Info about Drobo     Name: Drobo disk pack       Devices: /dev/sdf
+---------------------------------------------------------         
+query luninfo result:                                             
+(0, 4398046511104, 0, 'No Partitions', ['FAT32'])                 
+
+---------------------------------------------------------
+root@pepino:~# drobom setlunsize 1 PleaseEraseMyData
+You asked nicely, so I will set the lunsize to 1 as you requested
+set lunsize to 1 TiB                                             
+Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.
+root@pepino:~# drobom info luns
+---------------------------------------------------------
+Info about Drobo     Name: Drobo disk pack       Devices: /dev/sdf
+---------------------------------------------------------         
+query luninfo result:                                             
+(0, 1099511558144, 0, 'No Partitions', ['FAT32'])                 
+
+---------------------------------------------------------
+root@pepino:~#
+
+root@pepino:~# drobom setlunsize 2 PleaseEraseMyData
+You asked nicely, so I will set the lunsize to 2 as you requested
+set lunsize to 2 TiB
+Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.
+root@pepino:~#
+root@pepino:~# drobom info luns
+---------------------------------------------------------
+Info about Drobo     Name: Drobo disk pack       Devices: /dev/sdf
+---------------------------------------------------------
+query luninfo result:
+(0, 2199023185920, 0, 'No Partitions', ['FAT32'])
+
+---------------------------------------------------------
+root@pepino:~#
+
 
    1.8 drobom create file systems, each type.
     msdos
@@ -35,10 +277,110 @@ QA Test checklist prior to release:
     ext3
    ....
 
+MSDOS one didn't work!
+
+root@pepino:~# drobom format FAT32 PleaseEraseMyData
+You asked nicely, so I will format FAT32 as you requested
+OK, I built the script but nothing is erased yet...      
+If you are really sure, go ahead and do: sh /tmp/fmtscript
+root@pepino:~# more /tmp/fmtscript
+#!/bin/sh                         
+parted /dev/sdf mklabel msdos     
+parted /dev/sdf mkpart primary fat32 0 100%
+parted /dev/sdf print; sleep 5             
+mkdosfs -v -v -F 32 -S 4096 -n Drobo01 /dev/sdf1
+root@pepino:~# sh -x /tmp/fmtscript         
++ parted /dev/sdf mklabel msdos             
+Warning: The existing disk label on /dev/sdf will be destroyed and all data on this disk will be lost. Do
+you want to continue?                                                                                    
+parted: invalid token: msdos                                                                             
+Yes/No? Yes                                                                                              
+New disk label type?  [gpt]?                                                                             
+Information: You may need to update /etc/fstab.                                                          
+
++ parted /dev/sdf mkpart primary fat32 0 100%
+Information: You may need to update /etc/fstab.                           
+
++ parted /dev/sdf print
+Model: TRUSTED Mass Storage (scsi)
+Disk /dev/sdf: 2199GB             
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt                     
+
+Number  Start   End     Size    File system  Name     Flags  
+ 1      17.4kB  2199GB  2199GB               primary  msftres
+
++ sleep 5
++ mkdosfs -v -v -F 32 -S 4096 -n Drobo01 /dev/sdf1
+mkdosfs 3.0.1 (23 Nov 2008)
+Boot jump code is eb 58
+Using 32 reserved sectors
+536870854 sectors for FAT+data, starting with 32 sectors/cluster
+Trying with 32 sectors/cluster:
+FAT12: #clu=16776830, fatlen=6144, maxclu=4080, limit=4080
+FAT12: too much clusters
+FAT16: #clu=16776702, fatlen=8192, maxclu=65520, limit=65520
+FAT16: too much clusters
+FAT16: would be misdetected as FAT12
+FAT32: #clu=16776190, fatlen=16383, maxclu=16776192, limit=268435440
+Using sector 6 as backup boot sector (0 = none)
+/dev/sdf1 has 255 heads and 63 sectors per track,
+logical sector size is 4096,
+using 0xf8 media descriptor, with 536870886 sectors;
+file system has 2 32-bit FATs and 32 sectors per cluster.
+FAT size is 16383 sectors, and provides 16776190 clusters.
+Volume ID is 180dbb15, volume label Drobo01    .
+root@pepino:~#
+
+
+NTFS OK...
+    root@pepino:~# drobom format ntfs PleaseEraseMyData
+You asked nicely, so I will format ntfs as you requested
+OK, I built the script but nothing is erased yet...     
+If you are really sure, go ahead and do: sh /tmp/fmtscript
+root@pepino:~# more /tmp/fmtscript                        
+#!/bin/sh                                                 
+parted /dev/sdf mklabel gpt                               
+parted /dev/sdf mkpart ntfs 0 100%                        
+parted /dev/sdf print; sleep 5                            
+mkntfs -f -L Drobo01  /dev/sdf1                           
+root@pepino:~# sh -x /tmp/fmtscript
++ parted /dev/sdf mklabel gpt      
+Warning: The existing disk label on /dev/sdf will be destroyed and all data on this disk will be lost. Do
+you want to continue?                                                                                    
+parted: invalid token: gpt                                                                               
+Yes/No? Yes
+New disk label type?  [gpt]?
+Information: You may need to update /etc/fstab.
+
++ parted /dev/sdf mkpart ntfs 0 100%
+Information: You may need to update /etc/fstab.
+
++ parted /dev/sdf print
+Model: TRUSTED Mass Storage (scsi)
+Disk /dev/sdf: 2199GB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      17.4kB  2199GB  2199GB               ntfs
+
++ sleep 5
++ mkntfs -f -L Drobo01 /dev/sdf1
+Cluster size has been automatically set to 4096 bytes.
+Creating NTFS volume structures.
+mkntfs completed successfully. Have a nice day.
+root@pepino:~#
+
+
    1.9 drobom diags # verify that dumping diagnostics still works...
+
+Done with GUI, and show as well...
 
    2.0 with fw >= 1.30
      drobom name 
+ done with GUI.
      drobom info...
+ done with GUI.
 
    3.0 Re-build packages with final release id.

@@ -38,7 +38,7 @@ import random
 MAX_TRANSACTION = 250
 
 # obviously need to update this with every release.
-VERSION = 'running trunk at: ' + time.ctime(time.time())
+VERSION = 'r0_6_0'
 
 
 # set to non-zero to increase verbosity of library functions.
