@@ -66,15 +66,14 @@ class DroboAbout(QtGui.QWidget):
         al = QtGui.QVBoxLayout(self)
         self.main = QtGui.QLabel("""
   drobo-utils: software to manage a Drobo storage unit from Data Robotics International Corp.
-  Winner of the Data Robotics Bounty 2008 for a linux dashboard!  
-  Version: """ + Drobo.VERSION + """ 
+  Winner of the Data Robotics Incorporated (DRI) Bounty 2008 for a linux dashboard!  
+  Thanks tor RI for putting up the Bounty!
+
   Copyright 2008 Peter Silva ( Peter.A.Silva@gmail.com )
   license: General Public License (GPL) v3
+  Version: """ + Drobo.VERSION + """ 
 
-  with contributions from: Chris Atlee (chris@atlee.ca), Brad Guillory, <withheld@spammenot.norge> 
-  and inspiration from: Joe Krahn
-
-  and thanks for DRI for putting up the Bounty!
+  See README for other contributors.
         """ , self)
         al.addWidget(self.main)
         self.quit = QtGui.QPushButton('Dismiss',self)
@@ -83,11 +82,18 @@ class DroboAbout(QtGui.QWidget):
                 self.hide)
  
 class ShowText(QtGui.QWidget):
+
+
    def __init__(self, manual, isfile=True, parent=None):
 
       QtGui.QWidget.__init__(self, parent)
       self.setMinimumSize(500, 440)
       al = QtGui.QVBoxLayout(self)
+
+      # search support... buggy.
+      #self.lastsearch=''
+      #self.lscursor=QtGui.QTextCursor(self)
+      #self.lscursor.setPosition(0)
 
       if isfile:
         dirs=[ "/usr/local/share/drobo-utils-doc", "/usr/share/drobo-utils/share/drobo-utils-doc", "." ]
@@ -116,6 +122,24 @@ class ShowText(QtGui.QWidget):
       self.quit = QtGui.QPushButton('Dismiss',self)
       al.addWidget(self.quit)
       self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
+
+      #self.findbt = QtGui.QPushButton('Find',self)
+      #al.addWidget(self.findbt)
+      #self.connect(self.findbt, QtCore.SIGNAL('clicked()'), self.__search)
+
+
+   def __search(self):
+        """
+         search is for finding a string in a text document being displayed.
+         STATUS: totally borked.
+        """
+        text, ok = QtGui.QInputDialog.getText(self, self.tr("Search Text"),
+                                              self.tr("Look for:"), QtGui.QLineEdit.Normal,
+                                              self.lastsearch)
+        if ok and not text.isEmpty():
+            self.lastsearch = QtCore.QString(text)
+	    self.lscursor = self.find(self.lastsearch,0)
+            self.lscursor.setPosition(0)
 
 class DroboGUI(QtGui.QMainWindow):
     """ GUI for a single Drobo, start one for each drobo.
@@ -462,7 +486,6 @@ class DroboGUI(QtGui.QMainWindow):
 
     def __renameDialog(self):
 
-        
         settings=self.drobo.GetSubPageSettings()
         text, ok = QtGui.QInputDialog.getText(self, self.tr("QInputDialog.getText()"),
                                               self.tr("New name:"), QtGui.QLineEdit.Normal,

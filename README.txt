@@ -457,6 +457,7 @@ who did what::
  Chris Atlee:    the proper debian packaging. 
  Brad Guillory:  some help with diagnostics and patches.
  Joe Krahn:      lots of inspiration.
+ Andy Grover:    some elegance cleanups. 
 
 
 Administrivia
