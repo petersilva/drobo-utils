@@ -1,7 +1,11 @@
 
+
 in no particular order:
 
-Name command support in GUI
+Find Dialog -- in ShowFile 
+
+Review feature bits, mis-marked? 28
+test with old firmware...
 
 Alerting...
 	-- save config...
@@ -55,7 +59,7 @@ Re-design the whole darn thing.
    -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
 
 
-Revision date: 2008/12/27
+Revision date: 2009/05/19
 
 copyright:
 

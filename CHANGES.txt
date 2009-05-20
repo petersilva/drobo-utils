@@ -2,14 +2,17 @@
  $LastChangedDate$
  $Rev$
 
-0.5.1
+0.6.0
+  * Major: GUI heavily re-vamped.  Behaves better. 
   * Major: DroboPRO support added (thanks to lemonizer on the google group!)
-  * Major: GUI improvement: replaced fixed dimensions in GUI with layouts.
-  * GUI gets online documentation.
-  * added Rename support to GUI.
-  * added Name display to main display. Easier to tell which Drobo is which.
-  * added mount point display to space used tool tip.
-  * added ability to detect un-documented feature bit settings.
+  * Major: GUI gets online documentation.
+  * GUI: layouts replaced fixed dimensions. 
+  * GUI: added Rename support 
+  * GUI: added Load firmware button 
+  * GUI: Show Diagnostics (equiv. to diagprint.)
+  * GUI: Name display to main display. Easier to tell which Drobo is which.
+  * GUI: added mount point display to space used tool tip.
+  * api: added ability to detect un-documented feature bit settings.
   * ddiag.c becomes drobom diagprint
   * catlee fixes the packaging again. 
 
