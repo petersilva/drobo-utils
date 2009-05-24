@@ -44,7 +44,7 @@ SAFETY
 ------
 
 Those worried about safety of using this software should know:  it was 
-developed with assistance from the vendor (Digital Robotics Inc.), and 
+developed with assistance from the vendor (Data Robotics Inc.), and 
 in every case, based on vendor documentation, and with at least encouragement,
 if not outright support.  For each release, a QA.txt file is built, demonstrating
 the functionality tests run.  There are multiple checksum verifications built 
@@ -328,6 +328,7 @@ successfully.
 After that, drobo-utils should be able to detect the Drobo and manage
 it over ethernet.
 
+(source: http://groups.google.com/group/drobo-talk/browse_frm/thread/453e02e105e9b41?hl=en )
 
 Firmware Upgrades
 -----------------
