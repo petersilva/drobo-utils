@@ -371,7 +371,7 @@ class Drobo:
      fd=open(format_script, 'w')
      fd.write( "#!/bin/sh\n" )
 
-     if fstype == 'FAT32':
+     if fstype == 'FAT32' or fstype == 'msdos':
          ptype='msdos'
      else:
          ptype='gpt' 
@@ -399,7 +399,7 @@ class Drobo:
             fd.write( "parted %s mkpart ntfs 0 100%%\n" % cd )
             fd.write( "parted %s print; sleep 5\n" % cd )
             fd.write( 'mkntfs -f -L Drobo01  %s1\n' % cd )
-        elif fstype == 'FAT32':
+        elif fstype == 'FAT32' or fstype == 'msdos':
             fd.write( "parted %s mkpart primary fat32 0 100%%\n" % cd )
             fd.write( "parted %s print; sleep 5\n" % cd )
             fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % cd )
