@@ -132,7 +132,7 @@ class DroboIOctl:
      mcb=struct.pack("6B", 0x12, 0, 0, 0, hoholen, 0 )
      
      # len ought to be 96
-     hoho=self.get_sub_page(hoholen,mcb,0,4,self.debug)
+     hoho=self.get_sub_page(hoholen,mcb,0,self.debug)
      (dunno1,vendor,dunno2) = struct.unpack(fmt,hoho)
 
      return ( host, channel, id, lun, vendor )
