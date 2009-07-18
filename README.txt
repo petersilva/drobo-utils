@@ -28,6 +28,9 @@ essential::
   python      -- interpreter for python language
   parted      -- partitioner, usually included with the distro.
 
+  if using RHEL, which has python 2.4...
+     python-ctypes -- module for C-interface
+
 for the GUI:
   python-qt4  -- the python bindings for version 4 of the QT toolkit
 
