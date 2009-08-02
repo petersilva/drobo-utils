@@ -2,7 +2,7 @@
 DEVELOPERS NOTES
 ----------------
 
-.. contents:
+.. contents::
 
 
 This software is copyright under GPL.  See near end file for details...
@@ -71,7 +71,7 @@ Making a Release
    Record results of release tests in the branch (QA.txt) As new tests are created, modify QA.txt on trunk for to keep references for the next release.
 
 Quality Assurance (QA.txt)
---------------------------
+==========================
 
 QA.txt is a quality assurance log.  The version on the trunk of the releases indicates 
 the QA procedure to be applied to the next version during the release process.  Since 
@@ -81,7 +81,7 @@ log for any release (QA.txt introduce in version 0.4.0)
 
 
 Building Debian & Ubuntu Packages
----------------------------------
+=================================
 
 assumes you have installed the Build dependencies::
 
@@ -122,6 +122,112 @@ update the web site:
 
  % scp README.html <user>,drobo-utils@web.sourceforge.net:htdocs
 
+Droboshare
+----------
+
+Droboshare is not directly supported by drobo utils running on a linux host.  
+However, the droboshare itself is a linux host, and it is possible to run
+drobo-utils un-modified on the droboshare itself.  There is download called 
+the Droboshare Augmented Root File system (DARFS), which includes a python 
+interpreter and drobo-utils.
+
+Open Task: Reverse Engineer Dashboard <-> Droboshare Protocol
+=============================================================
+
+Why isn't there full support in host based drobo-utils itself?  Digital 
+Robotics hasn't released details of the protocol used by the proprietary 
+dashboard to communicate with a droboshare, so it would be a lot of work to 
+reverse engineer that.  So support of a droboshare from a linux GUI on a 
+host system is not likely in the near future.  
+
+If someone wants to figure that out, it might be a good thing (tm)
+After that is figured out, the next step would be to understand
+how to flash the firmware remotely.  That would eliminate the last function
+that cannot be done with open source.
+
+Building DARFS
+==============
+
+DARFS - Droboshare Augmented Root File System. A pile of stuff that can
+be run on a droboshare.
+
+Have a look here:
+
+http://groups.google.com/group/drobo-talk/web/building-droboshare-apps-on-debianish-os?hl=en
+
+TODO
+----
+
+Tasks which would be cool to get done, in no particular order:
+
+CentOS support.  Fedora is likely fine, but should build a VM with CentOS on it, and build an rpm.  RHEL has an ancient python (2.4?) with no ctypes by default, so could be interesting.
+
+GUI - handle when Drobo disappears...
+
+Refuse known non-working feature bits... firmware (review 2009 SDK release)
+   Review feature bits, mis-marked? 28
+
+Add Alerting to GUI & CLI
+	-- save config...
+	.. SMTP forwarder:
+        .. address 
+        .. authentication.? u+p
+	.. 
+
+Droboshare bugs
+        -- don't dump diags to /tmp, they don't fit.
+        -- don't 
+
+BUGS: 
+  when running two fw uploads, the second one will not run easily.
+  need to wait for transaction to timeout...  perhaps randomize id?
+  did randomization, did not change anything...
+
+STANDARD menu entries for droboview...
+  partition types do not appear to be correctly displayed...
+   some confusion between NTFS vs. EXT3  no obvious ill effect.
+
+  partition type should pre-select in Format dialog...
+
+  memory consumption on the GUI. still chews up 4 MB per hour...
+
+gnats:
+  man page does not document output.  
+  -- what is the meaning of the output? provide a sample...
+
+review print statements:
+  should they write to stderr?
+
+
+STANDARD menu entries for droboview...
+
+Better STATUS progress reporting:
+   -- the block count is there, but heuristics for determining timing suck.
+   -- some sort of indicator of how long 'relay out' will be in progress.
+   -- when it is busy, it should say so... like when I emptied an ntfs it took hours for the led indicators to drop from 70% to 0.  It should say something about what is going on.
+
+LIVELIER GUI:
+   -- have status queries proceed asynchronously from the GUI.
+      right now, if the drobo is slow, the GUI makes it slower, and gets very slow too.
+      should run as a daemon, async. from the GUI.
+
+Re-design the whole darn thing.
+   -- there should be some sort of service integrated with dbus-hal
+   -- not sure that a GUI is needed at all. but if it is, it should be a DBUS client.
+   -- how does authentication work in DBUS?
+
+
+   of interest:
+   -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
+
+
+Revision date: 2009/05/19
+
+copyright:
+
+Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
+named COPYING in the root of the source directory tree.
 
 Administrivia
 -------------
