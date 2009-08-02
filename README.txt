@@ -11,12 +11,20 @@ on the system and used by other applications as well.
 For experienced Linux hands, there is a command line interface, drobom,
 which offers the same functionality as droboview.   For real hackers, fire
 up a python interpreter, 'import Drobo', help(Drobo), and you are off to 
-the races...
+the races...  Command-line access is also bundled into a set of improvements
+to a standards droboshare called 'Droboshare Augmented Root File System' (DARFS)
+
+
 
 .. contents::
 
-REQUIREMENTS
+INSTALLATION
 ------------
+
+Drobo utils installation.
+
+REQUIREMENTS
+============
 
 Drobo-utils was developed on pre-release version of Kubuntu (Hardy, Intrepid, 
 and now Jaunty) Any similarly recent distro ought to do.
@@ -43,33 +51,8 @@ build system)::
  Depends: ${shlibs:Depends}, ${misc:Depends}, parted
  peter@pepino%      
 
-SAFETY
-------
-
-Those worried about safety of using this software should know:  it was 
-developed with assistance from the vendor (Data Robotics Inc.), and 
-in every case, based on vendor documentation, and with at least encouragement,
-if not outright support.  For each release, a QA.txt file is built, demonstrating
-the functionality tests run.  There are multiple checksum verifications built 
-into the firmware upgrade process, so it is next to impossible to brick a drobo 
-using the tools.  Drobo-utils verifies firmware checksums before attempting 
-to upload the image to the device, and the device checks the firmware against 
-the checksums as well.  New firmware is loaded into an alternate location 
-from the currently active one, and if activation of the new firmware fails, 
-the drobo will simply boot the old one.  
- 
-On the other hand, common sense rules do apply.  Setting the LUN size, or 
-re-formatting a Drobo will erase all your data whether you do it on Linux or 
-any other operating system.  These are power tools, and they can do some 
-damage to your data if used without proper care.  For example, the reliability 
-of any storage unit does not reduce the need for backups it only makes doing them 
-easier. A Drobo is an excellent place to put backups, but not a substitute for 
-them.  Backups are the only way to address error 18 (the number of inches in 
-front of the keyboard the source of the issue lies.) and no storage unit can 
-protect against fire or flood.
-
 INSTALLING pre-requisites  
--------------------------
+=========================
 
 On ubuntu, it would typically look like so: Open a shell window. Enter the following package installation commands::
 
@@ -96,7 +79,7 @@ NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will work 
 
 
 Install From Package
---------------------
+====================
 Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
 where current packages are available.  after downloading a .deb, it is simply a matter of:
 
@@ -105,39 +88,37 @@ where current packages are available.  after downloading a .deb, it is simply a 
 done!
 
 Install from Source
--------------------
+===================
 
 See DEVELOPER.txt
 
 
-Try it Out
-----------
+Try Out the CLI
+===============
 
 Assuming you have all of the above parts, in the directory where you
-downloaded the source, you should be able to just do::
+downloaded the source, you should be able to invoke the command line 
+interface as follows::
 
          drobom status 
 
 see if something sensible happens... on my system with a drobo
 the following happens::
 
- % drobom status
+ % sudo drobom status
  /dev/sdz /drobo01 100% full ( ['Red alert', 'Bad disk', 'No redundancy'], 0 )
  %
 
 Note: drive changed to sdz to avoid copy/paste errors.
 
 very scary, but my drobo is in bad shape right now... you should just get []
-as a status, which means there is nothing wrong.   If you get an error
-like it isn't detecting any drobos:
+as a status, which means there is nothing wrong.   To get all kinds of 
+information on your drobo, try 'drobom info.'  You can then invoke it 
+with no arguments at all which will cause it to print out a list of the 
+commands available through the command line interface.
 
-No Drobo discovered, is one connected?
-
-Try to start up drobom from the root account. (sudo drobom..., or 
-sudo bash, or su - ) To get all kinds of information on your drobo, 
-try 'drobom info.'  You can then invoke it with no arguments at all 
-which will cause it to print out a list of the commands available 
-through the command line interface.
+Try Out the GUI
+===============
 
 Once the command line stuff that is working, and assuming you have python-qt4 
 installed, try::
@@ -149,6 +130,16 @@ you have permission to access (depends on the setup, usually USB devices
 on desktops are accessible to users, so you can see them.  
 
          
+Try Out the Python API
+======================
+
+   See DEVELOPERS.txt
+
+Building debian & ubuntu packages
+=================================
+
+   See DEVELOPERS.txt
+
 
 Setup Drobo with Linux
 ----------------------
@@ -259,13 +250,13 @@ On my system the process looked like this::
 
 
 Getting an svn Snapshot
------------------------
+=======================
 
 See DEVELOPERS.txt
  
 
 Multiple LUNS
--------------
+=============
 
 LUN is an abbreviation of 'Logical UNit'. The origin of the term is SCSI terminology.
 When RAID units became too large for support in the past, and were sub-divided 
@@ -306,7 +297,8 @@ ON LUNSIZES >= 2TB:
 
 
 Drobo Pro
----------
+=========
+
 Drobo-utils depends on the linux generic scsi layer.  I suspect that 
 there is just a basic ethernet connection now, and you a few additional driver layers
 set up before it will work.   You need to configure the iscsi driver to recognize 
@@ -333,15 +325,20 @@ it over ethernet.
 
 (source: http://groups.google.com/group/drobo-talk/browse_frm/thread/453e02e105e9b41?hl=en )
 
-Firmware Upgrades
------------------
+Some people reported data corruption.  This link claims to fix one such
+issue:
+http://www.drobospace.com/forum/thread/13951/Dropped-iSCSI-connections/?page=2#24792
 
-It's pretty self-explanatory in the GUI.  the first time you press the
-Update button, it checks to see if a new firmware is available.  If it
-there is newer firmware, it offer to upgrade, with suitable prompts. 
+
+Drobo Firmware
+--------------
+
+Upgrading firmware is pretty self-explanatory in the GUI.  the first time you 
+press the Update button, it checks to see if a new firmware is available.  If 
+it there is newer firmware, it offer to upgrade, with suitable prompts. 
 Similarly, the line mode interface has two commands to deal with firmware,
-fwcheck will tell you if an upgrade is required.  Fwupgrade 
-will do the work.  It takes a few minutes, and prints a status 
+fwcheck will tell you if an upgrade is required.  the fwupgrade 
+will do the job.  It takes a few minutes, and prints a status 
 you you can see how it is progressing.  Have patience::
 
  root@pepino:/home/peter/drobo/drobo-utils/trunk# drobom fwupgrade
@@ -393,38 +390,35 @@ the need, you can load arbitrary firmware from the CLI with
 fwload command.
 
 
-   
-KNOWN BUGS
-----------
+SAFETY
+======
 
-droboview isn't suited to run continuously for long periods, 
-as it has a memory leak...  total foot print starts out at 32M
-with a 15 MB resident set size, of which 10 MB are shared, so only 
-about 4M of real memory consumed.   but the RSS grows at about 
-2MB/hour.
+Those worried about safety of using this software should know:  it was 
+developed with assistance from the vendor (Data Robotics Inc.), and 
+in every case, based on vendor documentation, and with at least encouragement,
+if not outright support.  For each release, a QA.txt file is built, demonstrating the functionality tests run.  There are multiple checksum verifications built 
+into the firmware upgrade process, so it is next to impossible to brick a drobo 
+using the tools.  Drobo-utils verifies firmware checksums before attempting 
+to upload the image to the device, and the device checks the firmware against 
+the checksums as well.  New firmware is loaded into an alternate location 
+from the currently active one, and if activation of the new firmware fails, 
+the drobo will simply boot the old one.  
+ 
+On the other hand, common sense rules do apply.  Setting the LUN size, or 
+re-formatting a Drobo will erase all your data whether you do it on Linux or 
+any other operating system.  These are power tools, and they can do some 
+damage to your data if used without proper care.  For example, the reliability 
+of any storage unit does not reduce the need for backups it only makes doing them 
+easier. A Drobo is an excellent place to put backups, but not a substitute for 
+them.  Backups are the only way to address error 18 (the number of inches in 
+front of the keyboard the source of the issue lies.) and no storage unit can 
+protect against fire or flood.
 
-  29m  11m S    1  2.9   9:44.50 droboview
+Compatibility
+=============
 
-best to restart it daily, or use it when necessary, but not leave it
-on for days.
-
-After you resize luns, droboview gets confused, you need to exit and
-restart.
-
-We have a report that dumping diagnostics does not work over firewire.
-Work-around:  connect via USB.
-
-Building debian & ubuntu packages
----------------------------------
-
-   See DEVELOPERS.txt
-
-
-Firmware Compatibility
-----------------------
-
-  Drobo has been tested with every old firmware version. Any Drobo should
-  be upgradable to modern firmware using the dashboard.
+Drobo has been tested with every old firmware version. Any Drobo should
+be upgradable to modern firmware using the dashboard.
 
    NOTE: really need at least 1.1.1 to use Linux & ext3.
          just use the tools to upgrade your firmware ASAP.
@@ -450,6 +444,100 @@ Firmware Compatibility
            ('name' not supported by firmware)
 
    1.3.0 - works without issues.
+
+
+   
+KNOWN BUGS
+----------
+
+droboview isn't suited to run continuously for long periods, 
+as it has a memory leak...  total foot print starts out at 32M
+with a 15 MB resident set size, of which 10 MB are shared, so only 
+about 4M of real memory consumed.   but the RSS grows at about 
+2MB/hour.
+
+  29m  11m S    1  2.9   9:44.50 droboview
+
+best to restart it daily, or use it when necessary, but not leave it
+on for days.
+
+After you resize luns, droboview gets confused, you need to exit and
+restart.
+
+We have a report that dumping diagnostics does not work over firewire.
+Work-around:  connect via USB.
+
+
+Droboshare Support
+------------------
+
+Droboshare is not directly supported by drobo utils running on a linux host.
+However, the droboshare itself is a linux host, and it is possible to run
+drobo-utils un-modified on the droboshare itself.  In order to do run drobo-utils, you need to build a python interpreter.  A python interpreter has, itself,
+a bunch of dependencies.  So you need to install a whack of packages on the droboshare in order to get a working drobo-utils.  This is where DARFS comes in.
+
+DARFS
+=====
+The Droboshare Augmented Root File System (darfs) is a 60 MB or so download 
+you can get from drobo-utils.sf.net.  There isn't any source code, because,
+well, nothing from any of the packages has been modified.  there are
+instructions on how to build DARFS in DEVELOPERS.html
+
+DARFS is a standard droboshare root file system, with some packages added: 
+openssl, openssh, berkeleydb, bzip2, a fairly complete Python 2.6.2.  drobo-
+utils is a python app. and it works in line and API mode, natively, on
+the droboshare.  for example, I've used it to replace the firmware. no
+problem at all. 
+
+People un-afraid of the command line can upgrade drobo firmware, query 
+status, and take diagnositc dumps, from the command line on the droboshare 
+itself, just as they would on any linux host computer.  But a full GUI 
+would be too much for the little processor and more importantly the limited 
+memory in the droboshare, so that is not provided.
+
+DARFS Installation
+==================
+Download it from drobo-utils.sf.net:
+steps:
+
+   1. copy the tar file onto somewhere on your share.
+   2. log in via DropBear ssh as a root user on the droboshare.
+   3. cd /mnt/DroboShares/YourDrobo (root of drobo file system, for example)
+   4. tar -xzf darfs.tgz (root of drobo file system, for example)
+   5. the root directory of the tar is 'slash'.. it will be under YourDrobo
+   6. export PATH="/mnt/DroboShares/YourDrobo/slash/usr/bin:${PATH}"  (which is where python and drobom are.)
+   7. drobom status
+
+you're done!
+
+Enable SFTP Support
+===================
+
+all you need to do is:
+
+ln -s /usr/libexec /mnt/Droboshares/YourDrobo/slash/usr/libexec
+
+Try an sftp from another machine (as root...) and it ought to work.
+
+(explanation: when one tries to sftp to a droboshare, it gives an error 
+about trying to exec '/usr/libexec/sftp-server'.  Openssh builds the 
+right binary, but Dropbear doesn't know where to look for it.  the
+libexec directory isn't there on the droboshare, so there is no harm
+in creating it and linking into DARFS.)
+
+
+Building Droboshare applications
+================================
+    See DEVELOPERS.txt
+
+Droboshare Firmware
+===================
+
+With DARFS, and the third party software you can get from drobospace and 
+drobo.com, the droboshare is very open and hackable.   However, there
+remains one remaining limitation: There is no open source way to upgrade 
+or modify droboshare firmware.  If you want to re-flash to a factory 
+original state, you need the vendor dashboard.
 
 
 Credits
