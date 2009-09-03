@@ -127,13 +127,13 @@ class DroboIOctl:
      #      channel, id, lun )
 
      #bog standard inquiry mcb
-     fmt="8s32s48s"
+     fmt="8s8s16s"
      hoholen=struct.calcsize(fmt)
      mcb=struct.pack("6B", 0x12, 0, 0, 0, hoholen, 0 )
-     
+
      # len ought to be 96
      hoho=self.get_sub_page(hoholen,mcb,0,self.debug)
-     (dunno1,vendor,dunno2) = struct.unpack(fmt,hoho)
+     (dunno1,vendor,product) = struct.unpack(fmt,hoho)
 
      return ( host, channel, id, lun, vendor )
 
@@ -169,7 +169,6 @@ class DroboIOctl:
     #io_hdr.sbp=addressof(sense_buffer)
     io_hdr.sbp=cast(sense_buffer,c_char_p)
     io_hdr.sb_len_wr = 0 # initialize just in case...
-
     
     page_buffer=create_string_buffer(sz)
     io_hdr.dxfer_len = sz
