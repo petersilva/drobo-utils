@@ -315,6 +315,7 @@ class DroboGUI(QtGui.QMainWindow):
             fstype='ext3'
        else:
             fstype='none'
+            if ( self.Format.lunszlcd.value() != self.Format.lunsize ):
             self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, QtCore.Qt.yellow )
             self.Format.Formatbutton.setText( \
                   "Last Chance, Resize to %d TiB" % self.Format.lunszlcd.value() )
@@ -331,7 +332,20 @@ class DroboGUI(QtGui.QMainWindow):
 
     def __adjustlunsize(self,sz):
 
+        # This crap is here only because of firmware broken for large LUNS
+        #   please remove the whole if mess once the firmware gets fixed.
+        if ( sz > 1 ):
+           # force down to 2 TiB
+           newsize=2
+           self.Format.lunsize = newsize 
+           self.Format.lunszlcd.display( newsize )
+           self.Format.horizontalSlider.setValue( 1 )
+           self.__adjustlunsize(1)
+           self.Format.Formatbutton.setText( "Sorry, only upto %d TiB on Linux" % newsize )
+           return
+
         newsize=2**sz
+
         self.Format.lunszlcd.display(newsize)
         if ( self.Format.lunsize != newsize ):
             self.Format.fstype= 'none'
