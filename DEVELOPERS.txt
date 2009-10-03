@@ -13,6 +13,8 @@ Random useful bits for developers.  (aka notes to myself ;-)
 Getting an SVN Source Snapshot
 ------------------------------
 
+The source code management is moving to git.  Please consult GIT documentation.
+
 Sometimes, when there are issues, the correction gets checked in, but there hasn't
 been time to do a full release process.  If you really need the fix, then your
 only option is to get it from svn.  If you are told 'it is svn', that refers to 
@@ -34,6 +36,22 @@ a copy that is contains no svn cruft, then use 'export' instead of 'co'.
 
 If moving between downloaded packages and source installs, check out the next 
 section for gotchas.
+
+GIT
+---
+git clone ssh://peter_silva@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils master
+
+GIT Configure Patch Author
+--------------------------
+
+To ensure the correct author on patches created, make sure to set your author settings.
+Something like the following is appropriate if you use a single identity for all your code contributions.  
+
+  boule% git config --global user.name "firstname lastname"
+  boule% git config --global user.email "developer@sourceforge.net"
+  boule% 
+
+Others may wish for the identity to be associated with each project.
 
 
 Dpkg vs. Python Install
