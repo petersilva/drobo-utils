@@ -297,6 +297,9 @@ for u in l:
         print 'lun size needs to be 1, 2, 4, 8, or 16 TiB; %d is invalid' % lunsize
         sys.exit()
 
+     if lunsize > 2:
+        print 'WARNING: lun size > 2 TiB known not work in many cases under Linux' 
+
      if len(args) < 3 :
         print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
         sys.exit()
