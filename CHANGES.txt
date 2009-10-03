@@ -2,6 +2,8 @@
  $LastChangedDate$
  $Rev$
 
+  * Minor: migrated source code managers from subversion to git
+
 0.6.0
   * Major: GUI heavily re-vamped.  Behaves better. 
   * Major: DroboPRO support added (thanks to lemonizer on the google group!)
