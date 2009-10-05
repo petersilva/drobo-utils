@@ -9,15 +9,24 @@ This software is copyright under GPL.  See near end file for details...
 
 Random useful bits for developers.  (aka notes to myself ;-)
 
- 
 
-GIT
----
+Working With Source
+-------------------
+
+Project Source code is managed using a git repository provided by sourceforge.net. 
+Git ( http://git-scm.com/ ) provides a fully distributed development model,
+so one can exchange patches arbitrarily among developers.  On the sf.net repository, the 'master' branch is the final integration target for future releases. 
+
+
+Getting a Source Tree 
+---------------------
 
 the following checks out the master branch of the source code tree and
 puts it in the drobo-utils subdirectory of the current tree.
 
 git clone ssh://peter_silva@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils drobo-utils
+
+Before doing Any commits, ensure that the author fields are appropriately set.
 
 One can obtain patches applied to the branch with git pull, and commit patches for distribution with git push.
 
@@ -34,8 +43,8 @@ Something like the following is appropriate if you use a single identity for all
 
 Others may wish for the identity to be associated with each project.
 
-Getting an Source Snapshot
---------------------------
+Using a Source Snapshot
+-----------------------
 
 Sometimes, when there are issues, the correction gets checked in, but there 
 hasn't been time to do a full release process.  If you really need the fix, 
@@ -43,7 +52,7 @@ then your only option is to get it from the developers' git repository.
 If you are told 'it is in git', that refers to the git source code management 
 system, and the server for that is at sourceforge.net.  How to get it::
 
- # git clone ssh://peter_silva@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils mine
+ # git clone ssh://developer@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils mine
  # cd mine                 # go into the source directory you downloaded
  # ./drobom status         # try it out...
  # python setup.py install # install it in system places...
@@ -51,7 +60,7 @@ system, and the server for that is at sourceforge.net.  How to get it::
  # git pull # get any changes made since the git clone was done.
  # python setup.py install # install the changes in system places.
 
-Sample checkout of a stable version, just do::
+Sample checkout of a stable version.  To view available branches::
 
  % git branch -r
  origin/HEAD -> origin/master
@@ -63,15 +72,18 @@ Sample checkout of a stable version, just do::
  origin/r0_4_0
  origin/r0_5_0
  origin/r0_6_0
+
+Where a version is something like r0_4_0.  then you can pick anyone to work with::
+
  % git branch r0_4_0 -r origin/r0_4_0
  Branch r0_4_0 set up to track remote branch r0_4_0 from origin.
  % git checkout r0_4_0
  Switched to branch 'r0_4_0'
  %
 
-Where a version is something like r0_4_0.  When you use git to get a tree,
-it keeps copies of metadata to be able to track changes.  If you want 
-a copy that is contains no git cruft, rm -rf .git in the root of the source tree.
+When you use git to get a tree, it keeps copies of metadata to be able to 
+track changes.  If you want a copy that is contains no git cruft, 
+rm -rf .git in the root of the source tree.
 
 If you are mixing downloaded packages and source installs, check out the next 
 section for gotchas.
