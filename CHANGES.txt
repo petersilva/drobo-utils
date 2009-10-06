@@ -1,6 +1,11 @@
 
- $LastChangedDate$
- $Rev$
+master
+  * misc. bug-fixes. DroboPro identification fix by spobole
+  * Looked at newly released DMIP. Found option2 command. 
+  * Options2 query implemented (but cannot test.)
+  * TODO: looking at firmware based LUN creation/deletion & format.
+  * TODO: review unitstatus vs. diskpack status.
+  * TODO: review format queries (NTFS/GPT/MBR, etc...)
 
 0.6.0
   * Major: GUI heavily re-vamped.  Behaves better. 

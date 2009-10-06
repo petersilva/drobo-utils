@@ -1,3 +1,25 @@
+drobo-utils (9999) stable; urgency=low
+
+  * misc. bug-fixes. DroboPro identification fix by spobole.
+ -- Peter Silva <Peter.A.Silva@gmail.com>  Sat, 03 Oct 2009 10:36:17 -0500
+
+drobo-utils (0.6.0) stable; urgency=high
+
+  * Major: GUI heavily re-vamped.  Behaves better.
+  * Major: DroboPRO support added (thanks to lemonizer on the google group!)
+  * Major: GUI gets online documentation.
+  * GUI: layouts replaced fixed dimensions.
+  * GUI: added Rename support
+  * GUI: added Load firmware button
+  * GUI: Show Diagnostics (equiv. to diagprint.)
+  * GUI: Name display to main display. Easier to tell which Drobo is which.
+  * GUI: added mount point display to space used tool tip.
+  * api: added ability to detect un-documented feature bit settings.
+  * ddiag.c becomes drobom diagprint
+  * catlee fixes the packaging again.
+
+ -- Peter Silva <Peter.A.Silva@gmail.com>  Sat, 31 Jan 2009 15:36:17 -0500
+
 drobo-utils (0.5.0-2) unstable; urgency=low
 
   * replaced DroboDMP C extension by DroboIOctl python class.  no need

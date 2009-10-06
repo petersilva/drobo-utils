@@ -38,7 +38,7 @@ import random
 MAX_TRANSACTION = 250
 
 # obviously need to update this with every release.
-VERSION = 'running trunk at: ' + time.ctime(time.time())
+VERSION = 'running unknown at: ' + time.ctime(time.time())
 
 
 # set to non-zero to increase verbosity of library functions.
@@ -221,7 +221,8 @@ def _unitfeatures(norig):
        ( 0x0040, 'VARIABLE_LUN_SIZE_1_16' ), ( 0x0080, 'PARTITION_LUN_GPT_MBR' ),
        ( 0x0100, 'FAT32_FORMAT_VOLNAME' ), ( 0x0200, 'SUPPORTS_DROBOSHARE' ),
        ( 0x0400, 'SUPPORTS_NEW_LUNINFO2' ), ( 0x0800, 'feature x0800' ),
-       ( 0x2000, 'feature x2000 ' ), 
+       ( 0x1000, 'LUN_MANAGEMENT' ), ( 0x2000, 'feature x2000 ' ), 
+       ( 0x4000, 'SUPPORTS_OPTIONS2' ), ( 0x8000, 'SUPPORTS_SHUTDOWN' ), 
        ( 0x80000000, 'SUPPORTS_SINGLE_LUN_FORMAT' ), ( 0x40000000, 'SUPPORTS_VOLUME_RENAME' ) ]
     f = []
     for feature in feature_map:
@@ -1233,27 +1234,41 @@ class Drobo:
 
   def GetSubPageOptions(self): 
      """
-        return( YellowAlertThresh, RedAlertThresh, AutoDelSnapshot )
-  
-        STATUS: untested, ERRATA too hard to reconcile...
+        different fw/hw combinations will return different results.
+        return one of:
+           None 
+               - this drobo does not support Options ( fw < 1.11 )
+           ( YellowThresh, RedThresh, AutoDelSnapshot, LowYel, LowRed )
+               - drobo supports first version of options ( fw >= 1.11)
+  	   ( above + FeatureOnOffStates, SpinDownDelay, IPAddress, Subnetmask ) 
+               - DroboPro only ? my v1's don't support it.
+	
+        STATUS: untested, seems to agree with dmp.h for Options
+            Options2 (only on Drobo Pro) completely un-tested.
 
-        spec says:
+
+        DMIP spec says:
            B-YelThresh, B-RedThresh, 5B-Rsvd, 1bit-AutoDel, B-Rsvd
-        dmp.h says:
-           B-YelThresh, B-RedThresh, B-Flags, H-DataCheckParam, B-YelLow, B-RedLow
 
-        AutodelSnapshot is right shifted 7 bits, 
-        other cases where there bit shfts are claimed have ended unhappily... 
+        dmp.h (published 2007 and summer 2009) says:
+           B-YelThresh, B-RedThresh, B-Flags, L-DataCheckParam, B-LowYelThresh, B-LowRedThresh.
+        
+        later firmware version and dmp published in 2009 adds OPTIONS2 with
         hmm...
      """
      if DEBUG & DBG_Simulation:
         return (1, 0, 0)
 
      try: # insert try/except for compatibility with firmware <= 1.1.0  
-         o = self.__getsubpage(0x07, 'BB5BBB' )
-         return ( o[0], o[1], o[4] >>7 )
+         #o = self.__getsubpage(0x07, 'BB5BBB' )
+         #return ( o[0], o[1], o[4] >>7 )
+         o = self.__getsubpage(0x30, 'BBBLBB' )
+         #return ( o[0], o[1], o[2], )
+         if ( 'SUPPORTS_OPTIONS2' in self.features ):
+             o += self.__getsubpage(0x31, 'QHLL490B' )
+         return o
      except:
-         return ( 0,0,0 )
+         return None
 
   def umount(self):
     """

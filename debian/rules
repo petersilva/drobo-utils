@@ -26,7 +26,7 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-        make doc
+	make doc
 	python setup.py install_lib -d $(CURDIR)/debian/$(PKGNAME)/usr/share/python-support/$(PKGNAME)
 	find $(CURDIR)/debian/$(PKGNAME) -name "*\.pyc" -delete
 	python setup.py install_data -d $(CURDIR)/debian/$(PKGNAME)/usr/share/$(PKGNAME)

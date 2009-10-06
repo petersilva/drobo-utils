@@ -61,7 +61,8 @@ Making a Release
    svn copy https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<branch>
 
   2 - Stamp the branch with version 
-   vi debian/changelog     # review version tags for accuracy and consistency.
+   vi CHANGES.txt          # complete change manifest for release
+   vi debian/changelog     # copy manifest from txt, add signature.
    vi setup.py 		   # edit version
    vi Drobo.py             # edit VERSION
 
@@ -93,7 +94,7 @@ assumes you have installed the Build dependencies::
 
 
  # this debian/ config is just for non-distro packages.
-   # builds for debian and Ubuntu.
+ # builds for debian and Ubuntu.
 
  % dpkg-buildpackage -rfakeroot
  % cd ..
@@ -159,6 +160,8 @@ TODO
 ----
 
 Tasks which would be cool to get done, in no particular order:
+
+Option setting... especially for DroboPro IP Address & netmask.
 
 CentOS support.  Fedora is likely fine, but should build a VM with CentOS on it, and build an rpm.  RHEL has an ancient python (2.4?) with no ctypes by default, so could be interesting.
 

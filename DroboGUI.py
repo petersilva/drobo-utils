@@ -315,7 +315,9 @@ class DroboGUI(QtGui.QMainWindow):
             fstype='ext3'
        else:
             fstype='none'
-            if ( self.Format.lunszlcd.value() != self.Format.lunsize ):
+            if ( self.Format.lunszlcd.value() == self.Format.lunsize ):
+                 return
+
             self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, QtCore.Qt.yellow )
             self.Format.Formatbutton.setText( \
                   "Last Chance, Resize to %d TiB" % self.Format.lunszlcd.value() )
@@ -403,7 +405,10 @@ class DroboGUI(QtGui.QMainWindow):
         c=self.drobo.GetSubPageConfig()
         self.Format.lunsize =  _toTiB(c[2])
         self.Format.lunszlcd.display( self.Format.lunsize )
-        self.Format.horizontalSlider.setValue( int(math.log(self.Format.lunsize,2)) )
+        if self.Format.lunsize > 1:
+           self.Format.horizontalSlider.setValue( int(math.log(self.Format.lunsize,2)) )
+        else:
+           self.Format.horizontalSlider.setValue(0) 
 
         self.Format.connect(self.Format.horizontalSlider, QtCore.SIGNAL('valueChanged(int)'),
                 self.__adjustlunsize)
