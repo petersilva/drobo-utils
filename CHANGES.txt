@@ -7,6 +7,8 @@ master
   * TODO: review unitstatus vs. diskpack status.
   * TODO: review format queries (NTFS/GPT/MBR, etc...)
 
+  * Minor: migrated source code managers from subversion to git
+
 0.6.0
   * Major: GUI heavily re-vamped.  Behaves better. 
   * Major: DroboPRO support added (thanks to lemonizer on the google group!)

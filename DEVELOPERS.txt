@@ -9,39 +9,91 @@ This software is copyright under GPL.  See near end file for details...
 
 Random useful bits for developers.  (aka notes to myself ;-)
 
- 
-Getting an SVN Source Snapshot
-------------------------------
 
-Sometimes, when there are issues, the correction gets checked in, but there hasn't
-been time to do a full release process.  If you really need the fix, then your
-only option is to get it from svn.  If you are told 'it is svn', that refers to 
-the subversion source code management system, and the server for that is at 
-sourceforge.net.  If you want it now::
+Working With Source
+-------------------
 
- # svn co https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk mine
+Project Source code is managed using a git repository provided by sourceforge.net. 
+Git ( http://git-scm.com/ ) provides a fully distributed development model,
+so one can exchange patches arbitrarily among developers.  On the sf.net repository, the 'master' branch is the final integration target for future releases. 
+
+
+Getting a Source Tree 
+---------------------
+
+the following checks out the master branch of the source code tree and
+puts it in the drobo-utils subdirectory of the current tree.
+
+git clone ssh://peter_silva@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils drobo-utils
+
+Before doing Any commits, ensure that the author fields are appropriately set.
+
+One can obtain patches applied to the branch with git pull, and commit patches for distribution with git push.
+
+
+GIT Configure Patch Author
+--------------------------
+
+To ensure the correct author on patches created, make sure to set your author settings.
+Something like the following is appropriate if you use a single identity for all your code contributions.  
+
+  boule% git config --global user.name "firstname lastname"
+  boule% git config --global user.email "developer@sourceforge.net"
+  boule% 
+
+Others may wish for the identity to be associated with each project.
+
+Using a Source Snapshot
+-----------------------
+
+Sometimes, when there are issues, the correction gets checked in, but there 
+hasn't been time to do a full release process.  If you really need the fix, 
+then your only option is to get it from the developers' git repository.  
+If you are told 'it is in git', that refers to the git source code management 
+system, and the server for that is at sourceforge.net.  How to get it::
+
+ # git clone ssh://developer@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils mine
  # cd mine                 # go into the source directory you downloaded
  # ./drobom status         # try it out...
  # python setup.py install # install it in system places...
  # drobom status           # try it out...
- # svn update              # get any changes made since the svn co was done.
+ # git pull # get any changes made since the git clone was done.
  # python setup.py install # install the changes in system places.
 
-To get a any stable version, just replace trunk in the svn  'branches/<version>'
-where a version is something like r0_4_0.  When you use svn to get a tree,
-subversion keeps copies of metadata to be able to track changes.  If you want 
-a copy that is contains no svn cruft, then use 'export' instead of 'co'.
+Sample checkout of a stable version.  To view available branches::
 
-If moving between downloaded packages and source installs, check out the next 
+ % git branch -r
+ origin/HEAD -> origin/master
+ origin/master
+ origin/noC
+ origin/peter
+ origin/r0.2.1
+ origin/r0_3_3
+ origin/r0_4_0
+ origin/r0_5_0
+ origin/r0_6_0
+
+Where a version is something like r0_4_0.  then you can pick anyone to work with::
+
+ % git branch r0_4_0 -r origin/r0_4_0
+ Branch r0_4_0 set up to track remote branch r0_4_0 from origin.
+ % git checkout r0_4_0
+ Switched to branch 'r0_4_0'
+ %
+
+When you use git to get a tree, it keeps copies of metadata to be able to 
+track changes.  If you want a copy that is contains no git cruft, 
+rm -rf .git in the root of the source tree.
+
+If you are mixing downloaded packages and source installs, check out the next 
 section for gotchas.
-
 
 Dpkg vs. Python Install
 -----------------------
 
 The 'setup.py' script, mentioned in the previous section, is a convention  
 from the distutils python packaging system.  distutils installation is slightly 
-different from installation from packages.  There doesn't seem to be a 
+different from installation from debian packages.  There doesn't seem to be a 
 distutils way to remove a package. touch all the files, do an installation, then 
 manually remove the files it installed.
 
@@ -58,7 +110,9 @@ Making a Release
 ----------------
 
   1 - make a branch
-   svn copy https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/trunk https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<branch>
+   # assuming you have a local repository...
+   git branch <branch>  # creates the branch, from the cwd (ought to be master)
+   git checkout <branch> # switches current dir to the branch.
 
   2 - Stamp the branch with version 
    vi CHANGES.txt          # complete change manifest for release
@@ -74,24 +128,24 @@ Making a Release
 Quality Assurance (QA.txt)
 ==========================
 
-QA.txt is a quality assurance log.  The version on the trunk of the releases indicates 
-the QA procedure to be applied to the next version during the release process.  Since 
-a branch is created for each release, the version of QA.txt acts as a quality log 
-for that release.  so one can do an svn checkout, or svn export to get the quality 
-log for any release (QA.txt introduce in version 0.4.0)
+QA.txt is a quality assurance log.  The version on the trunk of the releases 
+indicates the QA procedure to be applied to the next version during the 
+release process.  Since a branch is created for each release, the version 
+of QA.txt acts as a quality log for that release.  so one can do an git 
+checkout, or git export to get the quality log for any release (QA.txt 
+introduce in version 0.4.0)
 
 
 Building Debian & Ubuntu Packages
 =================================
 
-assumes you have installed the Build dependencies::
+Assumes you have installed the Build dependencies::
 
- # obtain a fresh tree with no svn cruft to just build a package:
- % svn export https://drobo-utils.svn.sourceforge.net/svnroot/drobo-utils/branches/<version>
- % mv trunk drobo-utils-<version>
+ # obtain a fresh tree 
+ % git clone ssh://peter_silva@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/<version> drobo-utils-<version>
  % cd drobo-utils-<version>
+ % rm -rf .git  # get rid of Git cruft, yielding a raw source tree.
  % chmod 755 debian/rules  # I dunno why the permissions are wrong...
-
 
  # this debian/ config is just for non-distro packages.
  # builds for debian and Ubuntu.

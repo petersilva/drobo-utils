@@ -249,8 +249,8 @@ On my system the process looked like this::
  root@alu:~# mount /dev/sdz1 /mnt
 
 
-Getting an svn Snapshot
-=======================
+Getting Source 
+==============
 
 See DEVELOPERS.txt
  
