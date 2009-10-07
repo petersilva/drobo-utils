@@ -496,7 +496,7 @@ class DroboGUI(QtGui.QMainWindow):
     def __loadFirmware(self):
         fileName = QtGui.QFileDialog.getOpenFileName(self,
                                          self.tr("QFileDialog.getOpenFileName()"),
-                                         '/root/.drobo-utils',
+                                         self.drobo.localFirmwareRepository(),
                                          self.tr("All Files (*);;Text Files (*.txt)"))
         if not fileName.isEmpty():
           if self.drobo.PickFirmware(str(fileName)):

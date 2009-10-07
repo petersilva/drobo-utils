@@ -643,6 +643,9 @@ class Drobo:
   fwsite="ftp://updates.drobo.com/"
   localfwrepository= os.path.expanduser("~") + "/.drobo-utils"
 
+  def localFirmwareRepository(self):
+     return Drobo.localfwrepository
+
   def PickFirmware(self,name):
     """
        read in a given firmware from disk.

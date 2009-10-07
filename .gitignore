@@ -1,1 +1,14 @@
 *.pyc
+CHANGES.html
+DEVELOPERS.html
+README.html
+build-stamp
+build/
+debian/drobo-utils.debhelper.log
+debian/drobo-utils.postinst.debhelper
+debian/drobo-utils.prerm.debhelper
+debian/drobo-utils.substvars
+debian/drobo-utils/
+debian/files
+drobom.html
+droboview.html
