@@ -353,8 +353,6 @@ class Drobo:
      partitions are never marked bootable.
 
      need to detect each lun...
-     ok, but if a single drobo has multiple luns, how do we know which
-     LUNS refer to a given drobo?
 
      algorithm:
 	do discoverLUNs()

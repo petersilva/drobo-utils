@@ -555,8 +555,6 @@ who did what::
 Administrivia
 -------------
 
- $LastChangedDate$
- $Rev$
 
 
 
