@@ -133,7 +133,6 @@ def printoptions(d):
   if Drobo.DEBUG & Drobo.DBG_Chatty:
     print 'query options result:'
     print options
-    print
   else:
     print options
   
@@ -311,6 +310,25 @@ for u in l:
      print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
      d.SetLunSize(lunsize)
      print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
+
+  elif cmd == "set": 
+     what = args[1]
+     if what == "time" :
+        d.Sync()
+     else:
+        options=d.GetSubPageOptions()
+        if args[1] in options.keys():
+           # TODO: are all options integers? no..
+           if args[1] == 'IPAddress' or args[1] == 'NetMask':
+               value=args[2]
+           else:
+               value=int(args[2])
+
+           options[args[1]]=value
+        else:
+           print 'option not present: ', args[1]
+
+        d.SetOptions( options ) 
 
   elif cmd == "settime": 
      d.Sync()          
