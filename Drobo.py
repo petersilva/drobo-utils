@@ -38,7 +38,7 @@ import random
 MAX_TRANSACTION = 250
 
 # obviously need to update this with every release.
-VERSION = 'running unknown at: ' + time.ctime(time.time())
+VERSION = '0.6.1'
 
 
 # set to non-zero to increase verbosity of library functions.
