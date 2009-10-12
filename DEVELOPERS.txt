@@ -289,8 +289,9 @@ named COPYING in the root of the source directory tree.
 Administrivia
 -------------
 
- $LastChangedDate$
- $Rev$
+ version 0.6.1, October 6th 2009.
+
+
 
 
 copyright:

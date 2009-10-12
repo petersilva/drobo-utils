@@ -555,6 +555,7 @@ who did what::
 Administrivia
 -------------
 
+version 0.6.1, October 6th 2009.
 
 
 
