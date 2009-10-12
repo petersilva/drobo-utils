@@ -36,6 +36,7 @@ peter@pepino:~/drobo/drobo-utils/drobo-utils-0.6.1$
    
    1.5 drobom fwupgrade
      1.5.1 drobom shutdown - to run the firmware.
+yup.
      1.5.2 drobom status -- have a look.
      1.5.3 repeat 1.5 perhaps a second time (as needed to get to current)
 
