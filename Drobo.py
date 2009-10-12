@@ -541,8 +541,18 @@ class Drobo:
       payloadlen=struct.calcsize(fmt)
       rawip = struct.unpack('I', socket.inet_aton(options['IPAddress']))
       rawnm = struct.unpack('I',socket.inet_aton(options['NetMask']))
+      flags=0
+      if (d["DualDiskRedundancy"]):
+        flags |= 0x0001
+      if (d["SpinDownDelay"]):
+        flags |= 0x0002
+      if (d["UseManualVolumeManagement"]):
+        flags |= 0x0004
+      if (d["UseStaticIPAddress"]):
+        flags |= 0x0008
+
       buffer = struct.pack(">BBH" + fmt, 0x7a, 0x31, payloadlen, \
-        options["FlagsOnOff"], options["SpinDownMinutes"], \
+        flags, options["SpinDownDelayMinutes"], \
         rawip, rawnm, "" )
       sblen=len(buffer)
       modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, \
@@ -1301,9 +1311,14 @@ class Drobo:
          o = self.__getsubpage(0x30, 'BBBLBB' )
          d = { "YellowThreshold": o[0], "RedThreshold": o[1] }
          if ( 'SUPPORTS_OPTIONS2' in self.features ):
-             ( pagelen, d['FlagsOnOff'], \
-               d['SpinDownMinutes'], rawip, rawnm, \
-               reserved ) = self.__getsubpage(0x31, 'QHLL490B' )
+             ( pagelen, flags, d['SpinDownDelayMinutes'], \
+               rawip, rawnm, reserved ) = \
+               self.__getsubpage(0x31, 'QHLL490B' )
+             d["DualDiskRedundancy"] = ( flags & 0x0001 ) > 0 
+             d["SpinDownDelay"] = ( flags & 0x0002 ) > 0 
+             d["UseManualVolumeManagement"] = ( flags & 0x0004 ) > 0 
+             d["UseStaticIPAddress"] = ( flags & 0x0008 ) > 0 
+
              d["IPAddress"]=socket.inet_ntoa(struct.pack('I',rawip))
              d["NetMask"]=socket.inet_ntoa(struct.pack('I',rawnm))
          return d
