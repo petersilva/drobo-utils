@@ -518,6 +518,39 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, 0x05, 0, 0, 0, sblen, 0)
     self.fd.put_sub_page( modepageblock, buffer, DEBUG )
 
+  def SetOptions(self,options):
+    """ Set Options.
+        accepts a set of options as returned by GetSubPageOptions
+
+    STATUS:  UNTESTED!
+         basic thresholds work on Drobo v1.
+         OPTIONS2 is just a guess, have no Pro, cannot test.
+
+    """
+    # v1 Options first...
+    fmt = 'BBBLBB'
+    payloadlen=struct.calcsize(fmt)
+    buffer = struct.pack(">BBH" + fmt, 0x7a, 0x30, payloadlen, options["YellowThreshold"], options["RedThreshold"], 0, 0, 0, 0 )
+    sblen=len(buffer)
+    modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, 0x30, 0, 0, 0, sblen, 0)
+    self.fd.put_sub_page( modepageblock, buffer, DEBUG )
+
+    # These are for the DroboPro.  UNTESTED.
+    if ( 'SUPPORTS_OPTIONS2' in self.features ):
+      fmt = 'QHLL490B' 
+      payloadlen=struct.calcsize(fmt)
+      rawip = struct.unpack('I', socket.inet_aton(options['IPAddress']))
+      rawnm = struct.unpack('I',socket.inet_aton(options['NetMask']))
+      buffer = struct.pack(">BBH" + fmt, 0x7a, 0x31, payloadlen, \
+        options["FlagsOnOff"], options["SpinDownMinutes"], \
+        rawip, rawnm, "" )
+      sblen=len(buffer)
+      modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, \
+        0x31, 0, 0, 0, sblen, 0)
+      self.fd.put_sub_page( modepageblock, buffer, DEBUG )
+
+    return
+
 
   def SetLunSize(self,tb):
     """
@@ -1258,16 +1291,22 @@ class Drobo:
         hmm...
      """
      if DEBUG & DBG_Simulation:
-        return (1, 0, 0)
+        return {"YellowThreshold":85, "RedThreshold":95 }
 
      try: # insert try/except for compatibility with firmware <= 1.1.0  
          #o = self.__getsubpage(0x07, 'BB5BBB' )
          #return ( o[0], o[1], o[4] >>7 )
-         o = self.__getsubpage(0x30, 'BBBLBB' )
          #return ( o[0], o[1], o[2], )
+
+         o = self.__getsubpage(0x30, 'BBBLBB' )
+         d = { "YellowThreshold": o[0], "RedThreshold": o[1] }
          if ( 'SUPPORTS_OPTIONS2' in self.features ):
-             o += self.__getsubpage(0x31, 'QHLL490B' )
-         return o
+             ( pagelen, d['FlagsOnOff'], \
+               d['SpinDownMinutes'], rawip, rawnm, \
+               reserved ) = self.__getsubpage(0x31, 'QHLL490B' )
+             d["IPAddress"]=socket.inet_ntoa(struct.pack('I',rawip))
+             d["NetMask"]=socket.inet_ntoa(struct.pack('I',rawnm))
+         return d
      except:
          return None
 
