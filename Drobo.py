@@ -376,7 +376,7 @@ class Drobo:
          ptype='gpt' 
 
      for cd in self.char_devs:
-        fd.write( "parted %s mklabel %s\n" % (cd, ptype) )
+        fd.write( "parted -s %s mklabel %s\n" % (cd, ptype) )
 
         # there is a bit of a race condition creating the partition special file.
         # the parted print gives a little time before starting the mkfs, to ensure
@@ -391,16 +391,16 @@ class Drobo:
             #       option is 'off' (the '^' at the beginning.)
             # sparse_super -- there are lots too many superblock copies made by default.
             #       safe enough with fewer.
-            fd.write( "parted %s mkpart ext2 0 100%%\n" % cd )
-            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( "parted -s %s mkpart ext2 0 100%%\n" % cd )
+            fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1\n' % cd )
         elif fstype == 'ntfs':
-            fd.write( "parted %s mkpart ntfs 0 100%%\n" % cd )
-            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( "parted -s %s mkpart ntfs 0 100%%\n" % cd )
+            fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mkntfs -f -L Drobo01  %s1\n' % cd )
         elif fstype == 'FAT32' or fstype == 'msdos':
-            fd.write( "parted %s mkpart primary fat32 0 100%%\n" % cd )
-            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( "parted -s %s mkpart primary fat32 0 100%%\n" % cd )
+            fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % cd )
         else:
             print 'unsupported  partition type %s, sorry...' % fstype
