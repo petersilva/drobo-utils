@@ -1,6 +1,5 @@
 
 master
-  * TODO: Fix the weird prompt in parted... you got a letter about that.
   * TODO: looking at firmware based LUN creation/deletion & format.
   * TODO: alerts.
   * TODO: review unitstatus vs. diskpack status.

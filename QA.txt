@@ -6,23 +6,14 @@ QA Test checklist prior to release:
         -- build packages with pre-release version id.
    1.1 drobom status... check for accuracy.
 
-sudo drobom status
-/dev/sdf - Drobo disk pack 00% full - ([], 0)
-peter@pepino:~/drobo/drobo-utils/drobo-utils-0.6.1$
 
    1.2 drobom settime
- yup.
    1.3 drobom status... check for accuracy.
- yup.
    1.4 drobom fwload (something really old) 1.03
- yup.
      1.4.1 drobom shutdown -- to run the firmware.
- yup.
      1.4.2 restart (unplug and replug usb)
- yup.
      1.4.3 run drobom status etc.. (make sure it is running 1.0.3)
        should say disk pack is un-readable or some such.
- yup.
 
      1.4.4 hard reset to factory default 
         after downgrade, disk pack will no longer be recognized. need to reset to make Drobo
@@ -30,7 +21,6 @@ peter@pepino:~/drobo/drobo-utils/drobo-utils-0.6.1$
         (with the pin in the back and all that.)
         http://www.drobospace.com/article/10207/Resetting-the-Drobo/?highlight=reset+drobo
 
- yup.
      1.4.3 place a file on the Drobo. make sure it works.
      1.4.4 drobom status -- have a look.
    

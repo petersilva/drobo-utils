@@ -38,7 +38,7 @@ import random
 MAX_TRANSACTION = 250
 
 # obviously need to update this with every release.
-VERSION = '0.6.1'
+VERSION = '9999'
 
 
 # set to non-zero to increase verbosity of library functions.
