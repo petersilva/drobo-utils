@@ -1,13 +1,16 @@
 drobo-utils (0.6.1) stable; urgency=low
 
-  * misc. bug-fixes. DroboPro identification fix by spobole
-  * Looked at newly released DMIP. Found option2 command.
-  * Options2 query implemented (but cannot test.)
+  * DroboPro identification fix by spobole,
+  * parted fix from Patrick Bills
+  * Looked at newly released DMIP. Found option2 commands for settings.
+  * Options2 query/set implemented (but cannot test for DroboPRO)
   * migrated source code managers from subversion to git
   * minor: consistency of default location to look for fw between lib and gui.
-  * fixed that inability to read lun size on old firmwares crashed GUI. now works all the way back to the beginning.
+  * fixed that inability to read lun size on old firmwares crashed GUI.
+    GUI now works all the way back to the beginning.
 
- -- Peter Silva <Peter.A.Silva@gmail.com>  Sat, 03 Oct 2009 10:36:17 -0500
+
+ -- Peter Silva <Peter.A.Silva@gmail.com>  Mon, 12 Oct 2009 21:22:31 -0500
 
 drobo-utils (0.6.0) stable; urgency=high
 

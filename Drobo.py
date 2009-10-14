@@ -38,7 +38,7 @@ import random
 MAX_TRANSACTION = 250
 
 # obviously need to update this with every release.
-VERSION = 'running unknown at: ' + time.ctime(time.time())
+VERSION = '0.6.1'
 
 
 # set to non-zero to increase verbosity of library functions.
@@ -376,7 +376,7 @@ class Drobo:
          ptype='gpt' 
 
      for cd in self.char_devs:
-        fd.write( "parted %s mklabel %s\n" % (cd, ptype) )
+        fd.write( "parted -s %s mklabel %s\n" % (cd, ptype) )
 
         # there is a bit of a race condition creating the partition special file.
         # the parted print gives a little time before starting the mkfs, to ensure
@@ -391,16 +391,16 @@ class Drobo:
             #       option is 'off' (the '^' at the beginning.)
             # sparse_super -- there are lots too many superblock copies made by default.
             #       safe enough with fewer.
-            fd.write( "parted %s mkpart ext2 0 100%%\n" % cd )
-            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( "parted -s %s mkpart ext2 0 100%%\n" % cd )
+            fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1\n' % cd )
         elif fstype == 'ntfs':
-            fd.write( "parted %s mkpart ntfs 0 100%%\n" % cd )
-            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( "parted -s %s mkpart ntfs 0 100%%\n" % cd )
+            fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mkntfs -f -L Drobo01  %s1\n' % cd )
         elif fstype == 'FAT32' or fstype == 'msdos':
-            fd.write( "parted %s mkpart primary fat32 0 100%%\n" % cd )
-            fd.write( "parted %s print; sleep 5\n" % cd )
+            fd.write( "parted -s %s mkpart primary fat32 0 100%%\n" % cd )
+            fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % cd )
         else:
             print 'unsupported  partition type %s, sorry...' % fstype
@@ -541,8 +541,18 @@ class Drobo:
       payloadlen=struct.calcsize(fmt)
       rawip = struct.unpack('I', socket.inet_aton(options['IPAddress']))
       rawnm = struct.unpack('I',socket.inet_aton(options['NetMask']))
+      flags=0
+      if (d["DualDiskRedundancy"]):
+        flags |= 0x0001
+      if (d["SpinDownDelay"]):
+        flags |= 0x0002
+      if (d["UseManualVolumeManagement"]):
+        flags |= 0x0004
+      if (d["UseStaticIPAddress"]):
+        flags |= 0x0008
+
       buffer = struct.pack(">BBH" + fmt, 0x7a, 0x31, payloadlen, \
-        options["FlagsOnOff"], options["SpinDownMinutes"], \
+        flags, options["SpinDownDelayMinutes"], \
         rawip, rawnm, "" )
       sblen=len(buffer)
       modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, \
@@ -1301,9 +1311,14 @@ class Drobo:
          o = self.__getsubpage(0x30, 'BBBLBB' )
          d = { "YellowThreshold": o[0], "RedThreshold": o[1] }
          if ( 'SUPPORTS_OPTIONS2' in self.features ):
-             ( pagelen, d['FlagsOnOff'], \
-               d['SpinDownMinutes'], rawip, rawnm, \
-               reserved ) = self.__getsubpage(0x31, 'QHLL490B' )
+             ( pagelen, flags, d['SpinDownDelayMinutes'], \
+               rawip, rawnm, reserved ) = \
+               self.__getsubpage(0x31, 'QHLL490B' )
+             d["DualDiskRedundancy"] = ( flags & 0x0001 ) > 0 
+             d["SpinDownDelay"] = ( flags & 0x0002 ) > 0 
+             d["UseManualVolumeManagement"] = ( flags & 0x0004 ) > 0 
+             d["UseStaticIPAddress"] = ( flags & 0x0008 ) > 0 
+
              d["IPAddress"]=socket.inet_ntoa(struct.pack('I',rawip))
              d["NetMask"]=socket.inet_ntoa(struct.pack('I',rawnm))
          return d

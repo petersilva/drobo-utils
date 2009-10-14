@@ -1,13 +1,16 @@
 
 master
+  * TODO: Fix the weird prompt in parted... you got a letter about that.
   * TODO: looking at firmware based LUN creation/deletion & format.
+  * TODO: alerts.
   * TODO: review unitstatus vs. diskpack status.
   * TODO: review format queries (NTFS/GPT/MBR, etc...)
 
-0.6.1
-  * misc. bug-fixes. DroboPro identification fix by spobole
-  * Looked at newly released DMIP. Found option2 command. 
-  * Options2 query implemented (but cannot test.)
+0.6.1: October 7th, 2009
+  * DroboPro identification fix by spobole, 
+  * parted fix from Patrick Bills
+  * Looked at newly released DMIP. Found option2 commands for settings.
+  * Option query/set implemented (but cannot test for DroboPRO)
   * migrated source code managers from subversion to git
   * minor: consistency of default location to look for fw between lib and gui.
   * fixed that inability to read lun size on old firmwares crashed GUI.

@@ -319,7 +319,11 @@ for u in l:
         options=d.GetSubPageOptions()
         if args[1] in options.keys():
            # TODO: are all options integers? no..
-           if args[1] == 'IPAddress' or args[1] == 'NetMask':
+           if args[2] == 'True':
+               value=True
+           elif args[2] == 'False':
+               value=False
+           elif args[1] == 'IPAddress' or args[1] == 'NetMask':
                value=args[2]
            else:
                value=int(args[2])
