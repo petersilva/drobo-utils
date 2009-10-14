@@ -1301,7 +1301,11 @@ class Drobo:
         hmm...
      """
      if DEBUG & DBG_Simulation:
-        return {"YellowThreshold":85, "RedThreshold":95 }
+        return {"YellowThreshold":85, "RedThreshold":95, \
+                "SpinDownDelayMinutes":5, "SpinDownDelay": True, \
+                "UseStaticIPAddress":True, "IPAddress":'192.168.10.4', \
+                "NetMask":'255.255.255.0', "DualDiskRedundancy":True, \
+                "UseManualVolumeManagement":False }
 
      try: # insert try/except for compatibility with firmware <= 1.1.0  
          #o = self.__getsubpage(0x07, 'BB5BBB' )
