@@ -6,6 +6,10 @@ master
   * TODO: review format queries (NTFS/GPT/MBR, etc...)
   * TODO: fix make_tarball to exclude .git and debian, like it is supposed to.
 
+0.6.2: 
+  * changed command line syntax to more consistently set <item>
+  * documented option setting in CLI
+
 0.6.1: October 7th, 2009
   * DroboPro identification fix by spobole, 
   * parted fix from Patrick Bills
