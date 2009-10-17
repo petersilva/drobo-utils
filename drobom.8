@@ -1,6 +1,6 @@
-.TH DROBOM 8 October 2008 droboa  System Administration Utilities
+.TH DROBOM 16 October 2009 "drobo manager" System Administration Utilities
 .SH NAME
-drobom \- CLI for managing drobo units
+drobom \- CLI for managing data robotics (drobo) storage units
 .SH SYNOPSIS
 .B drobom
 [ \fIoptions\fR ] \fI<command> \fR[ \fIarguments\fR... ]
@@ -59,12 +59,10 @@ print information on a Drobo. The <toprint> argument is a comma separated list o
 list
 show device files for all Drobos found.
 .TP
-name  <newname>
+set name  <newname>
 Set the name of the Drobo to the given value ( only firmware > 1.3.0 supports this command )
 .TP
-settime sync Drobo's clock to UTC
-.TP
-setlunsize  Set the size of LUNS on device. Arguments:
+set lunsize  Set the size of LUNS on device. Arguments:
 .sp
 <sz>
 integer number of TiB to set the lunsize to
@@ -73,6 +71,11 @@ integer number of TiB to set the lunsize to
 Specify 'PleaseEraseMyData' if you really mean it
 .sp
 Note: After execution, Drobo reboots, wait a few minutes before accessing again
+.TP
+set time - sets various Drobo's clock to UTC
+.TP
+set <options> - Change the value of Drobo Options, 
+See 'info options' output. 
 .TP
 shutdown
 shutdown drobo (DRI calls this 'standby')

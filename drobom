@@ -49,17 +49,25 @@ def usage():
    for line in textwrap.wrap(opt_str, 40):
       print "\t\t\t\t" + line
    print "\tlist \tshow device files for all Drobos found."
-   print "\tname <name> \tSet Drobo name"
-   print "\tsettime\tsync Drobo's clock to UTC"
-   print "\tsetlunsize\tSet the size of LUNS on device. Arguments:"
-   print "\t\t<sz>\tinteger number of TiB to set the lunsize to"
-   print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you"
+   print "\tset\t Set some Drobo thingum."
+   print "\t\tDualDiskRedundancy <True|False> \tSet option feature flag"
+   print "\t\tIPAddress <Address> \tSet iSCSI IP address"
+   print "\t\tlunsize\tSet the size of LUNS on device. Arguments:"
+   print "\t\t\t<sz>\tinteger number of TiB to set the lunsize to"
+   print "\t\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you"
    print "\t\t\t\treally mean it"
-   print "\t\tNote: After execution, Drobo reboots, wait a few minutes"
+   print "\t\t\tNote: After execution, Drobo reboots, wait a few minutes"
    print "\t\t\tbefore accessing again"
+   print "\t\tname <name> \tSet Drobo name"
+   print "\t\tNetMask <NetMask> \tSet iSCSI IP netmask"
+   print "\t\tSpinDownDelay <True|False> \tSet option feature flag"
+   print "\t\tSpinDownDelayMinutes <minutes> \tSet how long before spin down"
+   print "\t\ttime\tsync Drobo's clock to UTC"
+   print "\t\tUseManualVolumeManagement <True|False> \tSet option feature flag"
+   print "\t\tUseStaticIPAddress <True|False> \tSet option feature flag"
    print "\tshutdown\tShutdown drobo"
    print "\t\t\t(DRI calls this 'standby'. Shutdown also umounts.)"
-   print "\tstatus\treport how is the Drobo doing"
+   print "\tstatus\treport how the Drobo is doing"
    print "\tview\tstart up a management dashboard GUI"
 
 
@@ -164,6 +172,23 @@ def info(d,choices):
 def update(pct):
   print "write is %2d%% done." % ( pct )
 
+def setlunsize(d,newlunsize,confirmation):
+  lunsize=int(newlunsize)
+
+  if lunsize not in (1, 2, 4, 8, 16):
+     print 'lun size needs to be 1, 2, 4, 8, or 16 TiB; %d is invalid' % lunsize
+     sys.exit()
+
+  if lunsize > 2:
+     print 'WARNING: lun size > 2 TiB known not work in many cases under Linux' 
+
+  if confirmation != 'PleaseEraseMyData':
+     print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+     sys.exit()
+
+  print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
+  d.SetLunSize(lunsize)
+  print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
 
 # Mainline...
 
@@ -286,34 +311,17 @@ for u in l:
        toprint=args[1].split(',')
      info(d,toprint)
 
-  elif cmd == "name": 
-    d.Sync(args[1])          
-
-  elif cmd == "setlunsize": 
-     lunsize=int(args[1])
-
-     if lunsize not in (1, 2, 4, 8, 16):
-        print 'lun size needs to be 1, 2, 4, 8, or 16 TiB; %d is invalid' % lunsize
-        sys.exit()
-
-     if lunsize > 2:
-        print 'WARNING: lun size > 2 TiB known not work in many cases under Linux' 
-
-     if len(args) < 3 :
-        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
-        sys.exit()
-
-     if args[2] != 'PleaseEraseMyData':
-        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
-        sys.exit()
-
-     print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
-     d.SetLunSize(lunsize)
-     print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
-
   elif cmd == "set": 
      what = args[1]
-     if what == "time" :
+     if what == "name": 
+        d.Sync(args[2])          
+     elif what == "lunsize" :
+        if len(args) < 3 :
+            print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+            sys.exit()
+
+        setlunsize(d,args[2],args[3])
+     elif what == "time" :
         d.Sync()
      else:
         options=d.GetSubPageOptions()
@@ -333,9 +341,6 @@ for u in l:
            print 'option not present: ', args[1]
 
         d.SetOptions( options ) 
-
-  elif cmd == "settime": 
-     d.Sync()          
 
   elif cmd == "shutdown":
      d.Standby() 
