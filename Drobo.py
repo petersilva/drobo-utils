@@ -520,7 +520,7 @@ class Drobo:
 
   def SetOptions(self,options):
     """ Set Options.
-        accepts a set of options as returned by GetSubPageOptions
+        accepts a set of options as returned by GetOptions
 
     STATUS:  UNTESTED!
          basic thresholds work on Drobo v1.
@@ -1276,7 +1276,7 @@ class Drobo:
 
      return ( s, ss[1] )
 
-  def GetSubPageOptions(self): 
+  def GetOptions(self): 
      """
         different fw/hw combinations will return different results.
         return one of:

@@ -26,8 +26,8 @@ Drobo utils installation.
 REQUIREMENTS
 ============
 
-Drobo-utils was developed on pre-release version of Kubuntu (Hardy, Intrepid, 
-and now Jaunty) Any similarly recent distro ought to do.
+Drobo-utils was developed on pre-release version of Kubuntu (Hardy, 
+Intrepid, and now Jaunty) Any similarly recent distro ought to do.
 
 To get drobo-utils running, you need packages something like (these are
 ubuntu packages, names may vary on other distros):
@@ -120,8 +120,8 @@ commands available through the command line interface.
 Try Out the GUI
 ===============
 
-Once the command line stuff that is working, and assuming you have python-qt4 
-installed, try::
+Once the command line stuff that is working, and assuming you 
+have python-qt4 installed, try::
 
  % droboview
 

@@ -13,9 +13,11 @@ Random useful bits for developers.  (aka notes to myself ;-)
 Working With Source
 -------------------
 
-Project Source code is managed using a git repository provided by sourceforge.net. 
-Git ( http://git-scm.com/ ) provides a fully distributed development model,
-so one can exchange patches arbitrarily among developers.  On the sf.net repository, the 'master' branch is the final integration target for future releases. 
+Project Source code is managed using a git repository provided by 
+sourceforge.net.  Git ( http://git-scm.com/ ) provides a fully 
+distributed development model, so one can exchange patches arbitrarily 
+among developers.  On the sf.net repository, the 'master' branch is 
+the final integration target for future releases. 
 
 
 Getting a Source Tree 
@@ -24,18 +26,19 @@ Getting a Source Tree
 the following checks out the master branch of the source code tree and
 puts it in the drobo-utils subdirectory of the current tree.
 
-git clone ssh://peter_silva@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils drobo-utils
+git clone ssh://username@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils drobo-utils
 
-Before doing Any commits, ensure that the author fields are appropriately set.
-
-One can obtain patches applied to the branch with git pull, and commit patches for distribution with git push.
+Before doing Any commits, ensure that the author fields are 
+appropriately set.  One can obtain patches applied to the branch 
+with git pull, and commit patches for distribution with git push.
 
 
 GIT Configure Patch Author
 --------------------------
 
-To ensure the correct author on patches created, make sure to set your author settings.
-Something like the following is appropriate if you use a single identity for all your code contributions.  
+To ensure the correct author on patches created, make sure to set your 
+author settings.  Something like the following is appropriate if you 
+use a single identity for all your code contributions::
 
   boule% git config --global user.name "firstname lastname"
   boule% git config --global user.email "developer@sourceforge.net"

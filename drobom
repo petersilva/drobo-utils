@@ -129,7 +129,7 @@ def printstatus(d):
     print status
   
 def printoptions(d):
-  options=d.GetSubPageOptions()
+  options=d.GetOptions()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
     print 'query options result:'
     print options

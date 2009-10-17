@@ -4,6 +4,7 @@ master
   * TODO: alerts.
   * TODO: review unitstatus vs. diskpack status.
   * TODO: review format queries (NTFS/GPT/MBR, etc...)
+  * TODO: fix make_tarball to exclude .git and debian, like it is supposed to.
 
 0.6.1: October 7th, 2009
   * DroboPro identification fix by spobole, 
