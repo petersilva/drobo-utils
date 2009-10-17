@@ -316,15 +316,15 @@ for u in l:
      if what == "name": 
         d.Sync(args[2])          
      elif what == "lunsize" :
-        if len(args) < 3 :
+        if len(args) < 4 :
             print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
             sys.exit()
-
         setlunsize(d,args[2],args[3])
+
      elif what == "time" :
         d.Sync()
      else:
-        options=d.GetSubPageOptions()
+        options=d.GetOptions()
         if args[1] in options.keys():
            # TODO: are all options integers? no..
            if args[2] == 'True':
