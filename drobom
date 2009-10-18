@@ -10,8 +10,16 @@ import os
 import types
 import textwrap
 
-toprint = ("config", "capacity", "protocol", "settings", "slots",
+toprint = ("config", "capacity", "protocol", "slots",
            "firmware", "status", "options", "luns")
+
+opt_str = ', '.join(toprint)
+
+def togig(b):
+   return b/(1000*1000*1000)
+
+def totb(b):
+   return b/(1000*1000*1000*1024)
 
 def usage():
    print "\nUsage: drobom [options] <command> [ arguments... ] \n"
@@ -45,7 +53,6 @@ def usage():
    print "\t\t\trecommended by DRI"
    print "\tinfo <options>\tprint information on a Drobo"
    print "\t\t<options>\tcomma separated list of:"
-   opt_str = ', '.join(toprint)
    for line in textwrap.wrap(opt_str, 40):
       print "\t\t\t\t" + line
    print "\tlist \tshow device files for all Drobos found."
@@ -74,20 +81,16 @@ def usage():
 def printconfig(d):
   config=d.GetSubPageConfig()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query config result: '
-    print config
-    print 'max lun size is: ', config[2]
-    print
+    print 'Configuration maxima: slots: %d, luns: %d, lunsize: %d TB' % \
+        ( config[0], config[1], totb(config[2]))
   else:
     print config
 
 def printcapacity(d):
   c=d.GetSubPageCapacity()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query capacity result:'
-    print c
-    print 'Physical space... used: ',  c[1] , ' free: ' , c[0],  ' Total: ', c[2]
-    print
+    print 'Capacity (in GB):  used: %d, free: %d, total: %d'  % \
+          ( togig(c[1]), togig(c[0]), togig(c[2]))
   else:
     print c
 
@@ -95,76 +98,66 @@ def printcapacity(d):
 def printprotocol(d):
   protocol=d.GetSubPageProtocol()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query protocol version result: '
-    print protocol 
-    print
+    print 'protocol version: %2d.%d' % ( protocol[0], protocol[1] )
   else:
     print protocol
 
-def printsettings(d):
-  settings=d.GetSubPageSettings()
-  if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query settings result:' 
-    print settings
-    print 'Drobo time is', time.ctime(settings[0])
-    print
-  else:
-    print settings
-  
 def printslots(d):
   slotinfo=d.GetSubPageSlotInfo()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
     print 'query slotinfo result:  number of slots:', d.slot_count
-  print slotinfo
+    print "%4s %4s %20s %20s" % ( "slot", "GB", "Model", "Status" )
+  for i in slotinfo:
+    print "  %2d %4d %20s %20s" % ( i[0], togig(i[1]), i[4], i[3] )
   
 def printfirmware(d):
   firmware=d.GetSubPageFirmware()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query firmware result:' 
-    print firmware
-    print 'drobo says firmware revision: ', str(firmware[0]), '.', str(firmware[1]), '(', str(firmware[2]), ') was built: ', firmware[5]
-    print
+    print 'Firmware:', firmware[7]
+    print 'Revision: %d.%d ( %d ) built: %s' % \
+       ( firmware[0], firmware[1], firmware[2], firmware[5] )
+    print 'Features: %s' % ','.join(firmware[8])
   else:
     print firmware
   
 def printstatus(d):
   status=d.GetSubPageStatus()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query status result:' 
-    print status
-    print
+    print 'status: %s,  relayoutcount: %d' % ( status[0], status[1] )
   else:
     print status
   
 def printoptions(d):
   options=d.GetOptions()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query options result:'
-    print options
+    print 'query options result: %s' % options
   else:
     print options
   
 def printluns(d):
   luninfo=d.GetSubPageLUNs()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query luninfo result:'
+    print    'lun     size (GB) used    PTFmt  FStype:'
     for i in luninfo:
-       print i
-    print
+       print ' %2d %8d  %8d  %7s %s ' % ( i[0], togig(i[1]), togig(i[2]), i[3], i[4] )
   else:
     for i in luninfo:
        print i
  
 def info(d,choices):
   if debug & Drobo.DBG_Chatty:
+    s = d.GetSubPageSettings()
     print '---------------------------------------------------------'
-    print 'Info about Drobo ' ,
-    print '   Name:', d.GetSubPageSettings()[2],
-    print '      Devices:', ':'.join(d.char_devs)
+    print 'Drobo Info: Name: %-10s Devices: %s' %( s[2], ':'.join(d.char_devs))
+    print '      Time:', time.ctime(s[0])
     print '---------------------------------------------------------'
 
   for c in choices:
-     eval( "print" + c + "(d)"  )
+     try: 
+        eval( "print" + c + "(d)"  )
+     except:
+        print 'invalid info option: %s' % c
+        print 'valid options: ', opt_str
 
   if debug & Drobo.DBG_Chatty:
     print '---------------------------------------------------------'
