@@ -539,8 +539,8 @@ class Drobo:
     if ( 'SUPPORTS_OPTIONS2' in self.features ):
       fmt = 'QHLL490B' 
       payloadlen=struct.calcsize(fmt)
-      rawip = struct.unpack('I', socket.inet_aton(options['IPAddress']))
-      rawnm = struct.unpack('I',socket.inet_aton(options['NetMask']))
+      rawip = struct.unpack('I', socket.inet_aton(options['IPAddress']))[0]
+      rawnm = struct.unpack('I',socket.inet_aton(options['NetMask']))[0]
       flags=0
       if (d["DualDiskRedundancy"]):
         flags |= 0x0001
