@@ -589,6 +589,37 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.tab.addTab(self.Tools, "Tools")
 
+    def __initOptionsTab(self):
+
+	self.Options = QtGui.QWidget()
+        self.Options.setObjectName("Options")
+
+        olay = QtGui.QGridLayout(self.Options)
+
+        self.Options.header = QtGui.QLabel("Firmware Options", self.Format)
+        options = self.drobo.GetOptions()
+        print options
+        olay.addWidget(self.Options.header,0,0,1,2)
+
+        self.Options.AlertTitle = QtGui.QLabel( "Alerting Thresholds:", \
+           self.Options)
+        olay.addWidget(self.Options.AlertTitle,1,0,1,1)
+        self.Options.AlertTitle.setSizePolicy( QtGui.QSizePolicy.Expanding, \
+           QtGui.QSizePolicy.Fixed )
+
+        self.Options.yelthresh = QtGui.QLCDNumber(2, self.Options)
+        olay.addWidget(self.Options.yelthresh,1,1,1,1)
+        self.Options.yelthresh.setStyleSheet( \
+		"QWidget { background-color: yellow }" )
+        self.Options.yelthresh.display( options['YellowThreshold'] )
+        self.Options.redthresh = QtGui.QLCDNumber(2, self.Options)
+        olay.addWidget(self.Options.redthresh,1,2,1,1)
+        self.Options.redthresh.setStyleSheet( \
+		"QWidget { background-color: red }" )
+        self.Options.redthresh.display( options['RedThreshold'] )
+
+        self.tab.addTab(self.Options, "Options")
+
 
     def __init__(self, d, parent=None):
         QtGui.QMainWindow.__init__(self)
@@ -658,6 +689,7 @@ class DroboGUI(QtGui.QMainWindow):
 	self.__initDeviceTab()
 	self.__initToolTab()
 	self.__initFormatTab()
+	self.__initOptionsTab()
 
 	self.__updatewithQueryStatus()
         self.updateTimer = QtCore.QTimer(self)
