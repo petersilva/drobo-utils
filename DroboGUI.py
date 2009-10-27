@@ -593,30 +593,84 @@ class DroboGUI(QtGui.QMainWindow):
 
 	self.Options = QtGui.QWidget()
         self.Options.setObjectName("Options")
-
         olay = QtGui.QGridLayout(self.Options)
-
-        self.Options.header = QtGui.QLabel("Firmware Options", self.Format)
         options = self.drobo.GetOptions()
-        print options
-        olay.addWidget(self.Options.header,0,0,1,2)
+
+        i=0 
+        j=0
+        self.Options.DDRCheckBox = QtGui.QCheckBox('Dual Disk Redundancy')
+        olay.addWidget(self.Options.DDRCheckBox,i,j,1,2)
+
+        i+=1
+        j=0
+        self.Options.SDDCheckBox = QtGui.QCheckBox('Spin Down Delay Minutes:')
+        olay.addWidget(self.Options.SDDCheckBox,i,j,1,2)
+
+        j+=2
+        self.Options.SDDMinutes = QtGui.QSpinBox()
+        self.Options.SDDMinutes.setRange(0, 100)
+        self.Options.SDDMinutes.setSingleStep(1)
+        olay.addWidget(self.Options.SDDMinutes,i,j,1,1)
+
+        i+=1
+        j=0
+        self.Options.MVMCheckBox = QtGui.QCheckBox('Manual Volume Management')
+        olay.addWidget(self.Options.MVMCheckBox,i,j,1,2)
+
+        i+=1
+        j=0
+        self.Options.SIPCheckBox = QtGui.QCheckBox('Use Static IP Address')
+        olay.addWidget(self.Options.SIPCheckBox,i,j,1,2)
+
+        i+=1
+        self.Options.AddrLabel = QtGui.QLabel("Address:")
+        olay.addWidget(self.Options.AddrLabel,i,j,1,2)
+
+        j+=1
+        self.Options.AddrEdit = QtGui.QLineEdit()
+        olay.addWidget(self.Options.AddrEdit,i,j,1,2)
+
+        j=0
+        i+=1
+        self.Options.NetMaskLabel = QtGui.QLabel("NetMask:")
+        olay.addWidget(self.Options.NetMaskLabel,i,j,1,2)
+
+        j+=1
+        self.Options.netmaskEdit = QtGui.QLineEdit()
+        olay.addWidget(self.Options.netmaskEdit,i,j,1,2)
+
 
         self.Options.AlertTitle = QtGui.QLabel( "Alerting Thresholds:", \
            self.Options)
-        olay.addWidget(self.Options.AlertTitle,1,0,1,1)
+        i+=1
+        j=0
+        olay.addWidget(self.Options.AlertTitle,i,j,1,1)
         self.Options.AlertTitle.setSizePolicy( QtGui.QSizePolicy.Expanding, \
            QtGui.QSizePolicy.Fixed )
 
-        self.Options.yelthresh = QtGui.QLCDNumber(2, self.Options)
-        olay.addWidget(self.Options.yelthresh,1,1,1,1)
+        j+=1
+        self.Options.yelthresh = QtGui.QSpinBox()
+        self.Options.yelthresh.setRange(0, 100)
+        self.Options.yelthresh.setSingleStep(1)
+        olay.addWidget(self.Options.yelthresh,i,j,1,1)
         self.Options.yelthresh.setStyleSheet( \
 		"QWidget { background-color: yellow }" )
-        self.Options.yelthresh.display( options['YellowThreshold'] )
-        self.Options.redthresh = QtGui.QLCDNumber(2, self.Options)
-        olay.addWidget(self.Options.redthresh,1,2,1,1)
+        self.Options.yelthresh.setValue( options['YellowThreshold'] )
+
+        j+=1
+        self.Options.redthresh = QtGui.QSpinBox()
+        self.Options.redthresh.setRange(0, 100)
+        self.Options.redthresh.setSingleStep(1)
+        olay.addWidget(self.Options.redthresh,i,j,1,1)
         self.Options.redthresh.setStyleSheet( \
 		"QWidget { background-color: red }" )
-        self.Options.redthresh.display( options['RedThreshold'] )
+        self.Options.redthresh.setValue( options['RedThreshold'] )
+
+        i+=1
+        j=0
+        self.Options.Setbutton = QtGui.QPushButton('Set', self.Options)
+        self.Options.Setbutton.setToolTip("Set the options on the Drobo")
+        olay.addWidget(self.Options.Setbutton,i,j,1,-1)
 
         self.tab.addTab(self.Options, "Options")
 
