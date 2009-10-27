@@ -639,6 +639,19 @@ class DroboGUI(QtGui.QMainWindow):
         self.Options.netmaskEdit = QtGui.QLineEdit()
         olay.addWidget(self.Options.netmaskEdit,i,j,1,2)
 
+        if ( 'SUPPORTS_OPTIONS2' in self.drobo.features ):
+          print 'hoho'
+        else:
+          #self.Options.DDRCheckBox.setCheckable(False)
+          #self.Options.DDRCheckBox.setStyleSheet( "QWidget { color: gray }" )
+          self.Options.SDDCheckBox.setCheckable(False)
+          self.Options.SDDCheckBox.setStyleSheet( "QWidget { color: gray }" )
+          self.Options.MVMCheckBox.setCheckable(False)
+          self.Options.MVMCheckBox.setStyleSheet( "QWidget { color: gray }" )
+          self.Options.SIPCheckBox.setCheckable(False)
+          self.Options.SIPCheckBox.setStyleSheet( "QWidget { color: gray }" )
+          self.Options.AddrLabel.setStyleSheet( "QWidget { color: gray }" )
+          self.Options.NetMaskLabel.setStyleSheet( "QWidget { color: gray }" )
 
         self.Options.AlertTitle = QtGui.QLabel( "Alerting Thresholds:", \
            self.Options)
