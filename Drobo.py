@@ -1306,12 +1306,12 @@ class Drobo:
                 "NetMask":'255.255.255.0', "DualDiskRedundancy":True, \
                 "UseManualVolumeManagement":False }
 
-     try: # insert try/except for compatibility with firmware <= 1.1.0  
+     if 1: # insert try/except for compatibility with firmware <= 1.1.0  
          #o = self.__getsubpage(0x07, 'BB5BBB' )
          #return ( o[0], o[1], o[4] >>7 )
          #return ( o[0], o[1], o[2], )
 
-         o = self.__getsubpage(0x30, 'BBBLBB' )
+         o = self.__getsubpage(0x30, 'BBBIBB' )
          d = { "YellowThreshold": o[0], "RedThreshold": o[1] }
          if ( 'SUPPORTS_OPTIONS2' in self.features ):
              ( pagelen, flags, d['SpinDownDelayMinutes'], \
@@ -1325,7 +1325,7 @@ class Drobo:
              d["IPAddress"]=socket.inet_ntoa(struct.pack('I',rawip))
              d["NetMask"]=socket.inet_ntoa(struct.pack('I',rawnm))
          return d
-     except:
+     else:
          return None
 
   def umount(self):
