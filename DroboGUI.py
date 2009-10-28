@@ -663,8 +663,8 @@ class DroboGUI(QtGui.QMainWindow):
           self.Options.AddrEdit.setText( self.options['IPAddress'] ) 
           self.Options.NetMaskEdit.setText( self.options['NetMask'] ) 
         else:
-          #self.Options.DDRCheckBox.setCheckable(False)
-          #self.Options.DDRCheckBox.setStyleSheet( "QWidget { color: gray }" )
+          self.Options.DDRCheckBox.setCheckable(False)
+          self.Options.DDRCheckBox.setStyleSheet( "QWidget { color: gray }" )
           self.Options.SDDCheckBox.setCheckable(False)
           self.Options.SDDCheckBox.setStyleSheet( "QWidget { color: gray }" )
           self.Options.MVMCheckBox.setCheckable(False)
