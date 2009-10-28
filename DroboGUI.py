@@ -78,8 +78,7 @@ class DroboAbout(QtGui.QWidget):
         al.addWidget(self.main)
         self.quit = QtGui.QPushButton('Dismiss',self)
         al.addWidget(self.quit)
-        self.connect(self.quit, QtCore.SIGNAL('clicked()'), 
-                self.hide)
+        self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
  
 class ShowText(QtGui.QWidget):
 
@@ -232,8 +231,8 @@ class DroboGUI(QtGui.QMainWindow):
                self.Format.ntfs.setChecked(0)
                self.Format.msdos.setChecked(0)
                self.Format.Formatbutton.setText('Format Done!')
-               self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
-                       self.FormatLUN)
+               self.Format.connect(self.Format.Formatbutton, \
+                     QtCore.SIGNAL('clicked()'), self.FormatLUN)
         #pdb.set_trace()
 
     def __updateStatus(self):
@@ -589,12 +588,27 @@ class DroboGUI(QtGui.QMainWindow):
 
         self.tab.addTab(self.Tools, "Tools")
 
+    def __SetOptions(self):
+
+       self.options['YellowThreshold'] = self.Options.yelthresh.value()
+       self.options['RedThreshold'] = self.Options.redthresh.value()
+
+       if ( 'SUPPORTS_OPTIONS2' in self.drobo.features ):
+          self.options['DualDiskRedundancy'] = self.Options.DDRCheckBox.value()
+          self.options['SpinDownDelay'] = self.Options.SDDCheckBox.value()
+          self.options['SpinDownDelayMinutes'] = self.Options.SDDMinutes.value()
+          self.options['UseManualVolumeManagement'] = self.Options.MVMCheckBox.value()
+          self.options['UseStaticIPAddress'] = self.Options.SIPCheckBox.value()
+
+       self.drobo.SetOptions(self.options)
+       return
+
     def __initOptionsTab(self):
 
 	self.Options = QtGui.QWidget()
         self.Options.setObjectName("Options")
         olay = QtGui.QGridLayout(self.Options)
-        options = self.drobo.GetOptions()
+        self.options = self.drobo.GetOptions()
 
         i=0 
         j=0
@@ -640,7 +654,14 @@ class DroboGUI(QtGui.QMainWindow):
         olay.addWidget(self.Options.netmaskEdit,i,j,1,2)
 
         if ( 'SUPPORTS_OPTIONS2' in self.drobo.features ):
-          print 'hoho'
+          self.Options.DDRCheckBox.setChecked( self.options['DualDiskRedundancy'] )
+          self.Options.SDDCheckBox.setChecked( self.options['SpinDownDelay'] )
+          self.Options.SDDMinutes.setValue( self.options['SpinDownDelayMinutes'] )
+          self.Options.MVMCheckBox.setChecked( \
+              self.options['UseManualVolumeManagement'] )
+          self.Options.SIPCheckBox.setChecked( self.options['UseStaticIPAddress'] )
+          self.Options.AddrEdit.setText( self.options['IPAddress'] ) 
+          self.Options.NetMaskEdit.setText( self.options['NetMask'] ) 
         else:
           #self.Options.DDRCheckBox.setCheckable(False)
           #self.Options.DDRCheckBox.setStyleSheet( "QWidget { color: gray }" )
@@ -668,7 +689,7 @@ class DroboGUI(QtGui.QMainWindow):
         olay.addWidget(self.Options.yelthresh,i,j,1,1)
         self.Options.yelthresh.setStyleSheet( \
 		"QWidget { background-color: yellow }" )
-        self.Options.yelthresh.setValue( options['YellowThreshold'] )
+        self.Options.yelthresh.setValue( self.options['YellowThreshold'] )
 
         j+=1
         self.Options.redthresh = QtGui.QSpinBox()
@@ -677,13 +698,15 @@ class DroboGUI(QtGui.QMainWindow):
         olay.addWidget(self.Options.redthresh,i,j,1,1)
         self.Options.redthresh.setStyleSheet( \
 		"QWidget { background-color: red }" )
-        self.Options.redthresh.setValue( options['RedThreshold'] )
+        self.Options.redthresh.setValue( self.options['RedThreshold'] )
 
         i+=1
         j=0
         self.Options.Setbutton = QtGui.QPushButton('Set', self.Options)
         self.Options.Setbutton.setToolTip("Set the options on the Drobo")
         olay.addWidget(self.Options.Setbutton,i,j,1,-1)
+        self.Options.connect(self.Options.Setbutton, \
+           QtCore.SIGNAL('clicked()'), self.__SetOptions)
 
         self.tab.addTab(self.Options, "Options")
 
