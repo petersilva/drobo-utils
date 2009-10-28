@@ -5,10 +5,10 @@ master
   * TODO: review unitstatus vs. diskpack status.
   * TODO: review format queries (NTFS/GPT/MBR, etc...)
   * TODO: fix make_tarball to exclude .git and debian, like it is supposed to.
-  * TODO: GUI Option setting, thresholds, etc...
   * TODO: review getSubPageStatus, DMIP seems better now.
 
 0.6.2: 
+  * GUI Option setting, thresholds, etc...
   * changed command line syntax to more consistently set <item>
   * documented option setting in CLI
 
