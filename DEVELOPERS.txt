@@ -26,7 +26,11 @@ Getting a Source Tree
 the following checks out the master branch of the source code tree and
 puts it in the drobo-utils subdirectory of the current tree.
 
+git clone git://drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils
+(read-only)
+
 git clone ssh://username@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils drobo-utils
+(to be able to patch)
 
 Before doing Any commits, ensure that the author fields are 
 appropriately set.  One can obtain patches applied to the branch 
