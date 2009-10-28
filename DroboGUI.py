@@ -650,8 +650,8 @@ class DroboGUI(QtGui.QMainWindow):
         olay.addWidget(self.Options.NetMaskLabel,i,j,1,2)
 
         j+=1
-        self.Options.netmaskEdit = QtGui.QLineEdit()
-        olay.addWidget(self.Options.netmaskEdit,i,j,1,2)
+        self.Options.NetMaskEdit = QtGui.QLineEdit()
+        olay.addWidget(self.Options.NetMaskEdit,i,j,1,2)
 
         if ( 'SUPPORTS_OPTIONS2' in self.drobo.features ):
           self.Options.DDRCheckBox.setChecked( self.options['DualDiskRedundancy'] )

@@ -445,7 +445,10 @@ class Drobo:
     cmdout = self.fd.get_sub_page(paklen, modepageblock,0, DEBUG)
 
     if len(cmdout) != paklen:
+      print 'expected %d, got %d bytes' %( len(cmdout), paklen )
       raise DroboException("cmdout is unexpected length")
+
+#    print 'Pack: ' + mypack
 
     result = struct.unpack(mypack, cmdout)
     if DEBUG & DBG_HWDialog :
@@ -537,10 +540,12 @@ class Drobo:
 
     # These are for the DroboPro.  UNTESTED.
     if ( 'SUPPORTS_OPTIONS2' in self.features ):
-      fmt = 'QHLL490B' 
+      fmt = 'QHLLB' 
       payloadlen=struct.calcsize(fmt)
-      rawip = struct.unpack('I', socket.inet_aton(options['IPAddress']))[0]
-      rawnm = struct.unpack('I',socket.inet_aton(options['NetMask']))[0]
+      ip = struct.unpack('I', socket.inet_aton(options['IPAddress']))[0]
+      nm = struct.unpack('I',socket.inet_aton(options['NetMask']))[0]
+      rawip = socket.htonl(ip)
+      rawnm = socket.htonl(nm)
       flags=0
       if (d["DualDiskRedundancy"]):
         flags |= 0x0001
@@ -1307,23 +1312,21 @@ class Drobo:
                 "UseManualVolumeManagement":False }
 
      if 1: # insert try/except for compatibility with firmware <= 1.1.0  
-         #o = self.__getsubpage(0x07, 'BB5BBB' )
-         #return ( o[0], o[1], o[4] >>7 )
-         #return ( o[0], o[1], o[2], )
 
          o = self.__getsubpage(0x30, 'BBBIBB' )
          d = { "YellowThreshold": o[0], "RedThreshold": o[1] }
          if ( 'SUPPORTS_OPTIONS2' in self.features ):
              ( pagelen, flags, d['SpinDownDelayMinutes'], \
                rawip, rawnm, reserved ) = \
-               self.__getsubpage(0x31, 'QHLL490B' )
+               self.__getsubpage(0x31, 'QHLLB' )
              d["DualDiskRedundancy"] = ( flags & 0x0001 ) > 0 
              d["SpinDownDelay"] = ( flags & 0x0002 ) > 0 
              d["UseManualVolumeManagement"] = ( flags & 0x0004 ) > 0 
              d["UseStaticIPAddress"] = ( flags & 0x0008 ) > 0 
-
-             d["IPAddress"]=socket.inet_ntoa(struct.pack('I',rawip))
-             d["NetMask"]=socket.inet_ntoa(struct.pack('I',rawnm))
+             ip   = socket.ntohl(rawip)
+             mask = socket.ntohl(rawnm)
+             d["IPAddress"]=socket.inet_ntoa(struct.pack('I',ip))
+             d["NetMask"]=socket.inet_ntoa(struct.pack('I',mask))
          return d
      else:
          return None
