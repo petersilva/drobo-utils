@@ -539,6 +539,7 @@ class Drobo:
     self.fd.put_sub_page( modepageblock, buffer, DEBUG )
 
     # These are for the DroboPro.  UNTESTED.
+    self.drobo.GetSubPageFirmware()
     if ( 'SUPPORTS_OPTIONS2' in self.features ):
       fmt = 'QHLLB' 
       payloadlen=struct.calcsize(fmt)
@@ -1316,8 +1317,7 @@ class Drobo:
          o = self.__getsubpage(0x30, 'BBBIBB' )
          d = { "YellowThreshold": o[0], "RedThreshold": o[1] }
          if ( 'SUPPORTS_OPTIONS2' in self.features ):
-             ( pagelen, flags, d['SpinDownDelayMinutes'], \
-               rawip, rawnm, reserved ) = \
+             ( flags, d['SpinDownDelayMinutes'], rawip, rawnm, reserved ) = \
                self.__getsubpage(0x31, 'QHLLB' )
              d["DualDiskRedundancy"] = ( flags & 0x0001 ) > 0 
              d["SpinDownDelay"] = ( flags & 0x0002 ) > 0 
