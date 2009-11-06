@@ -284,7 +284,10 @@ class Drobo:
 
      self.relaystart=0
  
-     if DEBUG & DBG_Simulation == 0:
+     if DEBUG & DBG_Simulation:
+        self.GetSubPageFirmware() \
+            #for the side effect, self.fw & self.features get set
+     else:
         self.fd=DroboIOctl.DroboIOctl(self.char_dev_file,0,debugflags)
         if self.fd == None :
             raise DroboException
@@ -313,14 +316,14 @@ class Drobo:
         if DEBUG & DBG_Detection:
             print "settings: ", set
 
-        fw=self.GetSubPageFirmware()
-        if ( len(fw) < 8 ) and (len(fw[7]) < 5):
+        self.GetSubPageFirmware()
+        if ( len(self.fw) < 8 ) and (len(self.fw[7]) < 5):
             if DEBUG & DBG_Detection:
-              print "%s length of fw query: is %d, should be < 8." % (self.char_dev_file, len(fw))
-              print "%s len(fw[7]) query: is %d, should be < 5." % (self.char_dev_file, len(fw[7]))
+              print "%s length of fw query: is %d, should be < 8." % (self.char_dev_file, len(self.fw))
+              print "%s len(fw[7]) query: is %d, should be < 5." % (self.char_dev_file, len(self.fw[7]))
             raise DroboException
 
-        if ( fw[6].lower() != 'armmarvell' ):
+        if ( self.fw[6].lower() != 'armmarvell' ):
             if DEBUG & DBG_Detection:
               print "%s fw[6] is not armmarvell." % self.char_dev_file
             raise DroboException
@@ -538,11 +541,7 @@ class Drobo:
     modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, 0x30, 0, 0, 0, sblen, 0)
     self.fd.put_sub_page( modepageblock, buffer, DEBUG )
 
-    # These are for the DroboPro.  UNTESTED.
-    self.drobo.GetSubPageFirmware()
     if ( 'SUPPORTS_OPTIONS2' in self.features ):
-      fmt = 'QHLLB' 
-      payloadlen=struct.calcsize(fmt)
       ip = struct.unpack('I', socket.inet_aton(options['IPAddress']))[0]
       nm = struct.unpack('I',socket.inet_aton(options['NetMask']))[0]
       rawip = socket.htonl(ip)
@@ -557,6 +556,8 @@ class Drobo:
       if (d["UseStaticIPAddress"]):
         flags |= 0x0008
 
+      fmt = 'QHLLB' 
+      payloadlen=struct.calcsize(fmt)
       buffer = struct.pack(">BBH" + fmt, 0x7a, 0x31, payloadlen, \
         flags, options["SpinDownDelayMinutes"], rawip, rawnm, "" )
       sblen=len(buffer)
@@ -776,8 +777,7 @@ class Drobo:
 
     inqw=self.inquire()
     hwlevel=inqw[10] 
-    fwi=self.GetSubPageFirmware()
-    fwv= str(fwi[0]) + '.' + str(fwi[1]) + '.' + str(fwi[2])
+    fwv= str(self.fw[0]) + '.' + str(self.fw[1]) + '.' + str(self.fw[2])
 
     #FIXME ugly hack to force v1 to get onto the v2 firmware stream
     #  current dri index.txt file says v1's should run 1.1.2, but win/Mac dashboards upgrade
@@ -1229,13 +1229,22 @@ class Drobo:
 	    byte 0x80 is supposed to be feature flags, found it a 0x73...
      """
      if DEBUG & DBG_Simulation:
-        return (1, 201, 12942, 12, 6, 'May 13 2008,15:29:32', 'ArmMarvell', '1.1.2', ['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', 'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', 'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', 'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', 'FAT32_FORMAT_VOLNAME', 'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2'])
+        self.features=['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', \
+               'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', \
+               'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', \
+	       'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', \
+               'FAT32_FORMAT_VOLNAME', 'SUPPORTS_OPTIONS2', \
+               'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2']
+        self.fw=(1, 201, 12942, 12, 6, 'May 13 2008,15:29:32', \
+                 'ArmMarvell', '1.1.2', self.features ) 
+        return self.fw
 
      raw=self.__getsubpage(0x08, 'BBHBB32s16s16s240s' )
      result = struct.unpack('>112sL32sH90s', raw[8])
      self.features = _unitfeatures(result[1])
-     return (raw[0], raw[1], raw[2], raw[3], raw[4], raw[5].strip(" \0"), 
+     self.fw = (raw[0], raw[1], raw[2], raw[3], raw[4], raw[5].strip(" \0"), 
          raw[6].strip(" \0"), raw[7].strip(" \0"), self.features )
+     return self.fw
 
   def GetSubPageStatus(self):
      """
@@ -1312,8 +1321,8 @@ class Drobo:
                 "NetMask":'255.255.255.0', "DualDiskRedundancy":True, \
                 "UseManualVolumeManagement":False }
 
-     if 1: # insert try/except for compatibility with firmware <= 1.1.0  
-
+     if self.fw[7] >= '1.1.0': 
+         # insert try/except for compatibility with firmware <= 1.1.0  
          o = self.__getsubpage(0x30, 'BBBIBB' )
          d = { "YellowThreshold": o[0], "RedThreshold": o[1] }
          if ( 'SUPPORTS_OPTIONS2' in self.features ):
