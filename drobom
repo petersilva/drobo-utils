@@ -130,7 +130,9 @@ def printstatus(d):
 def printoptions(d):
   options=d.GetOptions()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query options result: %s' % options
+    print 'query options result: ' 
+    for i in options.keys():
+       print '\t',i,options[i]
   else:
     print options
   
@@ -148,7 +150,7 @@ def info(d,choices):
   if debug & Drobo.DBG_Chatty:
     s = d.GetSubPageSettings()
     print '---------------------------------------------------------'
-    print 'Drobo Info: Name: %-10s Devices: %s' %( s[2], ':'.join(d.char_devs))
+    print 'Drobo Name: %-10s Devices: %s' %( s[2], ':'.join(d.char_devs))
     print '      Time:', time.ctime(s[0])
     print '---------------------------------------------------------'
 
