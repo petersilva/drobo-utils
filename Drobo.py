@@ -559,7 +559,7 @@ class Drobo:
       fmt = 'QHLLB' 
       payloadlen=struct.calcsize(fmt)
       buffer = struct.pack(">BBH" + fmt, 0x7a, 0x31, payloadlen, \
-        flags, options["SpinDownDelayMinutes"], rawip, rawnm, "" )
+        flags, options["SpinDownDelayMinutes"], rawip, rawnm, 0 )
       sblen=len(buffer)
       modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, \
         0x31, 0, 0, 0, sblen, 0)
