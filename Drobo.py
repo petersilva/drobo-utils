@@ -547,13 +547,13 @@ class Drobo:
       rawip = socket.htonl(ip)
       rawnm = socket.htonl(nm)
       flags=0
-      if (d["DualDiskRedundancy"]):
+      if (options["DualDiskRedundancy"]):
         flags |= 0x0001
-      if (d["SpinDownDelay"]):
+      if (options["SpinDownDelay"]):
         flags |= 0x0002
-      if (d["UseManualVolumeManagement"]):
+      if (options["UseManualVolumeManagement"]):
         flags |= 0x0004
-      if (d["UseStaticIPAddress"]):
+      if (options["UseStaticIPAddress"]):
         flags |= 0x0008
 
       fmt = 'QHLLB' 
