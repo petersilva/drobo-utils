@@ -549,7 +549,7 @@ class Drobo:
       flags=0
       if (options["DualDiskRedundancy"]):
         flags |= 0x0001
-      if (options["SpinDownDelay"]):
+      if (options["SpinDownDelayMinutes"] > 0):
         flags |= 0x0002
       if (options["UseManualVolumeManagement"]):
         flags |= 0x0004
