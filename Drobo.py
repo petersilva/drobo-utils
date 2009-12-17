@@ -1391,7 +1391,7 @@ def DiscoverLUNs(debugflags=0):
     DEBUG=debugflags
 
     if DEBUG & DBG_Simulation:
-       return [ [ "/dev/sdb", "/dev/sdc" ], [ "/dev/sdd" ] ]
+       return [ [ "/dev/sdx", "/dev/sdy" ], [ "/dev/sdz" ] ]
 
     devices=[]
 
