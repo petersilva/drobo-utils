@@ -9,6 +9,7 @@ import string
 import os
 import types
 import textwrap
+import subprocess
 
 toprint = ("config", "capacity", "protocol", "slots",
            "firmware", "status", "options", "luns")
@@ -21,6 +22,21 @@ def togig(b):
 def totb(b):
    return b/(1000*1000*1000*1024)
 
+def confirmed(prompt,setting):
+  ''' if setting does not indicate that an answer is pre-specified,
+      then ask the user.
+  '''
+  if setting == 'a':
+     print prompt,
+     answer=raw_input()
+  else:
+     answer=setting
+
+  if answer == 'y' or answer == 'Y' or answer == 'yes':
+     return True
+  else:
+     return False
+  
 def usage():
    print "\nUsage: drobom [options] <command> [ arguments... ] \n"
    print " drobo management interface, version: %s\n" % Drobo.VERSION
@@ -28,7 +44,9 @@ def usage():
    print " -c, --command <command>\tcommand to run."
    print " -d, --device <device>\tpick a specific disk, rather than scan"
    print " -h, --help \t\tprint this help text"
+   print " -n, --no \t answer all questions no (generally does not do any damage) "
    print " -v, --verbose <debug_code>\t bit-field, default is 0 (off) "
+   print " -y, --yes \t answer all questions yes (generally overwrites stuff) "
    print "\t1  - General"
    print "\t2  - Hardware Dialog"
    print "\t4  - Initiation"
@@ -43,8 +61,8 @@ def usage():
    print "\tdiagprint <file>  - print diagnostic file to stdout"
    print "\tformat\tPrepares a script to format LUNS from a device. Arguments:"
    print "\t\t<fstype>\tfile system type.  One of: ext3, ntfs, FAT32"
-   print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you"
-   print "\t\t\t\treally mean it"
+   #print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you"
+   #print "\t\t\t\treally mean it"
    print "\t\tNote: This places a script in /tmp, which you must run."
    print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
    print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
@@ -61,14 +79,13 @@ def usage():
    print "\t\tIPAddress <Address> \tSet iSCSI IP address"
    print "\t\tlunsize\tSet the size of LUNS on device. Arguments:"
    print "\t\t\t<sz>\tinteger number of TiB to set the lunsize to"
-   print "\t\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you"
-   print "\t\t\t\treally mean it"
+   #print "\t\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you"
+   #print "\t\t\t\treally mean it"
    print "\t\t\tNote: After execution, Drobo reboots, wait a few minutes"
    print "\t\t\tbefore accessing again"
    print "\t\tname <name> \tSet Drobo name"
    print "\t\tNetMask <NetMask> \tSet iSCSI IP netmask"
-   print "\t\tSpinDownDelay <True|False> \tSet option feature flag"
-   print "\t\tSpinDownDelayMinutes <minutes> \tSet how long before spin down"
+   print "\t\tSpinDownDelayMinutes <minutes> \tSet how long before spin down (0 to disable)"
    print "\t\ttime\tsync Drobo's clock to UTC"
    print "\t\tUseManualVolumeManagement <True|False> \tSet option feature flag"
    print "\t\tUseStaticIPAddress <True|False> \tSet option feature flag"
@@ -164,6 +181,7 @@ def info(d,choices):
   if debug & Drobo.DBG_Chatty:
     print '---------------------------------------------------------'
 
+
 def update(pct):
   print "write is %2d%% done." % ( pct )
 
@@ -177,13 +195,15 @@ def setlunsize(d,newlunsize,confirmation):
   if lunsize > 2:
      print 'WARNING: lun size > 2 TiB known not work in many cases under Linux' 
 
-  if confirmation != 'PleaseEraseMyData':
-     print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
-     sys.exit()
+  print 'You asked to set the lunsize to %d ' % lunsize
+  if confirmed("WARNING: This will erase all your data. Are you sure? (y/n)", \
+        confirmation ):
+  	d.SetLunSize(lunsize)
+        print '''Done... Drobo is likely now rebooting.  
+                 In a few minutes, it will come back with the new LUN size.'''
+  else:
+	print 'Phew... You stopped just in time!'
 
-  print 'You asked nicely, so I will set the lunsize to %d as you requested' % lunsize
-  d.SetLunSize(lunsize)
-  print 'Done... Drobo is likely now rebooting.  In a few minutes, it will come back with the new LUN size.'
 
 # Mainline...
 
@@ -203,6 +223,8 @@ except getopt.GetoptError, err:
    usage()
    sys.exit(2)
 
+#ask for confirmation...
+confirmation='a'
 
 for o, a in opts:
         if o in ("-c", "--command"):
@@ -212,11 +234,15 @@ for o, a in opts:
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
+        elif o in ("-n", "--no") :
+            confirmation='n'
         elif o in ("-v", "--verbosity", "--verbose") :
             debug = int(a)
         elif o in ("-V", "--version" ):
             print Drobo.VERSION
             sys.exit()
+        elif o in ("-y", "--yes") :
+            confirmation='y'
         else:
             assert False, "unhandled option"
 
@@ -274,18 +300,19 @@ for u in l:
      print d.decodeDiagnostics( args[1] )
 
   elif cmd == "format":
-     if len(args) < 3 :
-        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
-        sys.exit()
 
-     if args[2] != 'PleaseEraseMyData':
-        print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
-        sys.exit()
-
-     print 'You asked nicely, so I will format %s as you requested' % args[1]
+     print 'preparing a format script for a %s file system as you requested' % args[1]
      d.format_script(args[1])
      print 'OK, I built the script but nothing is erased yet...'
+     print 'You can have a look at it with: cat /tmp/fmtscript'
      print 'If you are really sure, go ahead and do: sh /tmp/fmtscript'
+     if confirmed("WARNING: Ready to run the script which will destroy all your data. Are you sure? (y/n)", \
+        confirmation ):
+        print 'ok... firing it off...'
+        fmtproc = subprocess.Popen("/tmp/fmtscript", bufsize=0, shell=True )
+     else:
+	print 'Phew... You stopped just in time!'
+
 
   elif cmd == 'fwcheck':
      tuple=d.PickLatestFirmware()
@@ -311,10 +338,10 @@ for u in l:
      if what == "name": 
         d.Sync(args[2])          
      elif what == "lunsize" :
-        if len(args) < 4 :
-            print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
-            sys.exit()
-        setlunsize(d,args[2],args[3])
+        #if len(args) < 4 :
+        #    print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
+        #    sys.exit()
+        setlunsize(d,args[2],confirmation)
 
      elif what == "time" :
         d.Sync()
@@ -362,7 +389,6 @@ for u in l:
      print "Drobo says it is:", time.ctime(settings[0])
 
   elif cmd == "view":
-     import sys,subprocess
      try: 
        from PyQt4 import QtGui
        from PyQt4 import QtCore
