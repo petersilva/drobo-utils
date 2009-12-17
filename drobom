@@ -310,6 +310,7 @@ for u in l:
         confirmation ):
         print 'ok... firing it off...'
         fmtproc = subprocess.Popen("/tmp/fmtscript", bufsize=0, shell=True )
+        fmtproc.wait()
      else:
 	print 'Phew... You stopped just in time!'
 
