@@ -558,8 +558,12 @@ class Drobo:
 
       fmt = 'QHLLB' 
       payloadlen=struct.calcsize(fmt)
+      # the ffff mask is there to suppress python 2.5 warning:
+      #  DeprecationWarning: struct integer overflow masking is deprecated
+      # which is quite strange because not a problem in 2.6.
       buffer = struct.pack(">BBH" + fmt, 0x7a, 0x31, payloadlen, \
-        flags, options["SpinDownDelayMinutes"], rawip, rawnm, 0 )
+        flags, options["SpinDownDelayMinutes"], \
+         0xffff&rawip, 0xffff&rawnm, 0 )
       sblen=len(buffer)
       modepageblock=struct.pack( ">BBBBBBBHB", 0x55, 0x01, 0x7a, \
         0x31, 0, 0, 0, sblen, 0)
