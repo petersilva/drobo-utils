@@ -138,11 +138,26 @@ def printfirmware(d):
     print firmware
   
 def printstatus(d):
-  status=d.GetSubPageStatus()
-  if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'status: %s,  relayoutcount: %d' % ( status[0], status[1] )
-  else:
-    print status
+     #  status=d.GetSubPageStatus()
+     #  if Drobo.DEBUG & Drobo.DBG_Chatty:
+     #    print 'status: %s,  relayoutcount: %d' % ( status[0], status[1] )
+     #  else:
+     #    print status
+     c=d.GetSubPageCapacity()
+     n=d.GetSubPageSettings()
+     if c[2] > 0 :
+         pfull = 100 * ((c[1]+1.0)/c[2])
+     else:
+         print "firmware too old to report capacity properly... or the drobo is empty..."
+         pfull = -1
+
+     m=':'.join(d.DiscoverMounts())
+     if m == "":
+       m="-"
+     if n[2] == "":
+       n[2] = "-"
+     print "%s %s %s %02d%% full - %s" % ( ':'.join(d.char_devs), m, n[2], \
+          pfull, d.GetSubPageStatus() )
   
 def printoptions(d):
   options=d.GetOptions()
@@ -301,6 +316,7 @@ for u in l:
 
   elif cmd == "format":
 
+     printstatus(d)
      print 'preparing a format script for a %s file system as you requested' % args[1]
      d.format_script(args[1])
      print 'OK, I built the script but nothing is erased yet...'
@@ -342,6 +358,7 @@ for u in l:
         #if len(args) < 4 :
         #    print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
         #    sys.exit()
+        printstatus(d)
         setlunsize(d,args[2],confirmation)
 
      elif what == "time" :
@@ -369,21 +386,8 @@ for u in l:
      d.Standby() 
    
   elif cmd == "status":
-     c=d.GetSubPageCapacity()
-     n=d.GetSubPageSettings()
-     if c[2] > 0 :
-         pfull = 100 * ((c[1]+1.0)/c[2])
-     else:
-         print "firmware too old to report capacity properly... or the drobo is empty..."
-         pfull = -1
+     printstatus(d)
 
-     m=':'.join(d.DiscoverMounts())
-     if m == "":
-       m="-"
-     if n[2] == "":
-       n[2] = "-"
-     print "%s %s %s %02d%% full - %s" % ( ':'.join(d.char_devs), m, n[2], \
-          pfull, d.GetSubPageStatus() )
 
   elif cmd == "time":
      settings=d.GetSubPageSettings()
