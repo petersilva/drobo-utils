@@ -44,12 +44,12 @@ VERSION = '9999'
 # set to non-zero to increase verbosity of library functions.
 DEBUG = 0
 # It's a bit field, 
-DBG_Chatty = 0x01 
-DBG_HWDialog = 0x02
-DBG_Instantiation = 0x04
-#DBG_DMP = 0x08 # C-layer...  not used here...
-DBG_Detection = 0x10
-DBG_General = 0x20 
+DBG_Chatty       = 0x01 
+DBG_HWDialog     = 0x02
+DBG_Instantiation= 0x04
+DBG_RawReturn    = 0x08 
+DBG_Detection    = 0x10
+DBG_General      = 0x20 
 
 # This isn't entirely simulation mode.  It is to aid development
 # when no drobo is available.  You can format random disks, including 
@@ -441,9 +441,12 @@ class Drobo:
 
     mypack = '>BBH' + pack
     paklen=struct.calcsize(mypack)
+    if DEBUG & DBG_RawReturn :
+        print 'DMIP sub_page query:0x%02x pattern: %s ' % (sub_page,mypack)
 
     modepageblock=struct.pack( ">BBBBBBBHB", 
          0x5a, 0, 0x3a, sub_page, 0, 0, 0, paklen, 0 )
+
 
     cmdout = self.fd.get_sub_page(paklen, modepageblock,0, DEBUG)
 
@@ -456,6 +459,8 @@ class Drobo:
     result = struct.unpack(mypack, cmdout)
     if DEBUG & DBG_HWDialog :
         print '4 byte returned sense buffer header: 0x%x, 0x%x, 0x%x' % result[:3]
+    if DEBUG & DBG_RawReturn :
+        print 'DMIP response sub_page:0x%02x returned: %s ' % (sub_page,str(result[3:]))
     return result[3:]
 
   def __transactionNext(self):
@@ -1156,11 +1161,11 @@ class Drobo:
        return [(0, 2199023251456, 5092651008, 'GPT', ['EXT3'])]
 
      lp="HBQQ"
-     l = self.__getsubpage( 0x04, 'B'+lp+lp+lp+lp+lp+lp+lp+lp )
+     l = self.__getsubpage( 0x04, 'B'+lp*8 )
 
      if ( 'SUPPORTS_NEW_LUNINFO2' in self.features ):
         li2="HBQBBB5B"
-        l2= self.__getsubpage( 0x07, "B"+ li2+li2+li2+li2+li2+li2+li2+li2 )
+        l2= self.__getsubpage( 0x07, "B"+li2*8 )
 
      i=0
      li=[]
@@ -1382,10 +1387,12 @@ class Drobo:
     mounts.close()
     return filesystems
 
-def DiscoverLUNs(debugflags=0):
+def DiscoverLUNs(debugflags=0,vendorstring="Drobo"):
     """ find all Drobo LUNs accessible to this user on this system. 
 	returns a list of list of character device files 
               samples: [ [ "/dev/sdf", "/dev/sdg" ], [ "/dev/sdh" ] ] 
+        vendorstring adds a string to be compared to for SCSI ID LUN call.
+        This value changes as new products are introduced.
     """
     global DEBUG
     DEBUG=debugflags
@@ -1395,7 +1402,7 @@ def DiscoverLUNs(debugflags=0):
 
     devices=[]
 
-    for potential in DroboIOctl.drobolunlist(DEBUG):
+    for potential in DroboIOctl.drobolunlist(DEBUG,vendorstring):
        if ( DEBUG & DBG_Detection ):
              print "trying: ", potential
 

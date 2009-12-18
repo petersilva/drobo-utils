@@ -45,16 +45,17 @@ def usage():
    print " -d, --device <device>\tpick a specific disk, rather than scan"
    print " -h, --help \t\tprint this help text"
    print " -n, --no \t answer all questions no (generally does not do any damage) "
+   print " -s, --string <string>\t sometimes, new models are not detected. See README "
    print " -v, --verbose <debug_code>\t bit-field, default is 0 (off) "
-   print " -y, --yes \t answer all questions yes (generally overwrites stuff) "
    print "\t1  - General"
    print "\t2  - Hardware Dialog"
    print "\t4  - Initiation"
-   print "\t8  - DMP layer"
+   print "\t8  - Raw returned records from DMIP queries"
    print "\t16 - Detection"
    print "\t63 - All of the above"
    print "\t128- Simulate presence of Drobo for testing\n"
    print " -V, --version\treport version of drobo-utils."
+   print " -y, --yes \t answer all questions yes (generally overwrites stuff) "
    print "\ncommand is one of: "
    print "\tblink\tidentify the drobo by making the lights blink"
    print "\tdiag \tdump diagnostics file into /tmp directory"
@@ -232,15 +233,15 @@ cmd=None
 debug=1
 
 try:
-   opts, args = getopt.getopt(sys.argv[1:], "c:d:hv:V", \
-       ["command=", "device=", "help", "verbosity=", "version"])
+   opts, args = getopt.getopt(sys.argv[1:], "c:d:hns:v:Vy", \
+       ["command=", "device=", "help", "no", "string=", "verbosity=", "version", "y" ])
 except getopt.GetoptError, err:
    usage()
    sys.exit(2)
 
 #ask for confirmation...
 confirmation='a'
-
+vendor_string=''
 for o, a in opts:
         if o in ("-c", "--command"):
 	    cmd = a
@@ -251,6 +252,8 @@ for o, a in opts:
             sys.exit()
         elif o in ("-n", "--no") :
             confirmation='n'
+        elif o in ("-s", "--string"):
+	    vendor_string=a
         elif o in ("-v", "--verbosity", "--verbose") :
             debug = int(a)
         elif o in ("-V", "--version" ):
@@ -271,7 +274,7 @@ if (os.geteuid() != 0) and (debug & Drobo.DBG_Simulation == 0):
    print "Please try again as root."
    sys.exit()
 
-l = Drobo.DiscoverLUNs(debug)
+l = Drobo.DiscoverLUNs(debug,vendor_string)
 if not l:
    print "No Drobos discovered"
    sys.exit()

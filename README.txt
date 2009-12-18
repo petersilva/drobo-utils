@@ -130,6 +130,8 @@ you have permission to access (depends on the setup, usually USB devices
 on desktops are accessible to users, so you can see them.  
 
          
+
+
 Try Out the Python API
 ======================
 
@@ -248,6 +250,34 @@ On my system the process looked like this::
  root@alu:~#
  root@alu:~# mount /dev/sdz1 /mnt
 
+Drobo Not Detected
+------------------
+
+To find Drobo's on a system, drobo-utils queries all the attached devices for indications
+it is made by Data Robotics.  These strings change from product to product.
+If your (new model) of Drobo is not detected, then run the command line interface
+with the hardware detection debugging output turned out.  like so:
+
+ # drobom -v 16 status 
+ examining:  /dev/sda 
+ id:  (0, 0, 0, 0, 'ATA     ') 
+ rejected: vendor is ATA      (not from DRI) 
+ examining:  /dev/sdb 
+ id:  (2, 0, 0, 0, 'ATA     ') 
+ rejected: vendor is ATA      (not from DRI) 
+ examining:  /dev/sdc 
+ id:  (8, 0, 0, 0, 'Drobo   ') 
+ rejected: vendor is Drobo    (not from DRI) 
+ returning list:  [] 
+ No Drobos discovered 
+
+Here you see that the vendor string is 'Drobo' which was not a known vendor string
+at the time this example was run.  so then try:
+
+ # drobom -s Drobo status
+
+as in, take the unknown vendor string and feed it as -s option to tweak detections
+of drobom.
 
 Getting Source 
 ==============

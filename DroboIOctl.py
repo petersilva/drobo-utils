@@ -270,7 +270,7 @@ class DroboIOctl:
 
 import os
 
-def drobolunlist(debugflags=0):
+def drobolunlist(debugflags=0,vendor="Drobo"):
     """
       return a list of attached Drobo devices, like so
 
@@ -315,7 +315,9 @@ def drobolunlist(debugflags=0):
              print "id: ", id
 
           thisdev="%02d%02d%02d" % (id[0], id[1], id[2])
-          if ( id[4].lower().startswith("trusted") or id[4].lower().startswith("drobo") ):  # you have a Drobo!
+          #if ( id[4].lower().startswith("trusted") or \
+          if ( id[4].lower().startswith("drobo") or \
+               id[4].lower().startswith(vendor.lower()) ):  # you have a Drobo!
              if debugflags & Drobo.DBG_Detection:
                 print "found a Drobo"
              if thisdev == previousdev :  # multi-lun drobo...
