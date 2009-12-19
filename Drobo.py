@@ -1097,9 +1097,6 @@ class Drobo:
 
      i = 0
      pattern='B'+slotrec*self.slot_count
-     #while ( i < self.slot_count ): 
-     #   pattern += slotrec
-     #   i +=1
  
      r = self.__getsubpage( 0x03, pattern )
 
@@ -1154,17 +1151,37 @@ class Drobo:
       See also ERRATA for _partscheme
 
       dmp.h says
-      8 x H-length, B-LunID, Q-TotalCapacity, B-PartScheme, B-PartCount, B-Format, 5B-rsvd 
+      struct _DroboLunInfo2DetailStruct
+      {
+        uint16 StructLength;
+        uint8 LunId;
+        uint64 TotalCapacity;
+        uint8 PartitionScheme;
+        uint8 PartitionCount;
+        uint8 FormatType;
+        uint8 Reserved[5];
+      } ATTRIBUTE_PACKED;
+
+      revised 2009 DMIP says:
+      8 x H-length, B-LunID, Q-TotalCapacity, B-PartScheme, B-PartCount, B-Format, H-unique LUNID 3B-rsvd 
+          2         1        8                1             1            1         2 = 16
+field indices in li2:
+          k         1        2                3             4            5         6              7,8,9,
+
+     would appear that Format is actually li2[4] rather than li2[5] as per documentation.
      
+     li[5] would appear to be always 8.  so maybe it indicates a maximum partition count?
      """
      if DEBUG & DBG_Simulation:
-       return [(0, 2199023251456, 5092651008, 'GPT', ['EXT3'])]
+       return [(0, 2199023251456, 5092651008, 'GPT', 1, ['EXT3'])]
 
      lp="HBQQ"
      l = self.__getsubpage( 0x04, 'B'+lp*8 )
 
      if ( 'SUPPORTS_NEW_LUNINFO2' in self.features ):
-        li2="HBQBBB5B"
+        # must ensure li2 fields have correct count.
+        li2fieldcount=10
+        li2="HBQBBBH3B"
         l2= self.__getsubpage( 0x07, "B"+li2*8 )
 
      i=0
@@ -1172,8 +1189,13 @@ class Drobo:
      while ( i < l[0] ):
         j=i*4
         if ( 'SUPPORTS_NEW_LUNINFO2' in self.features ):
-           k=i*7
-           li.append( (l[j+2], l2[k+3], l[j+4], _partscheme(l2[k+4]), _partformat(l2[k+5]) ) )
+           k=1+i*li2fieldcount
+
+           # sanity check, in case I ever get out of sync again...
+           if l2[k] != 17 :
+              print 'Warning: probably have not grokked the LUNINFO2 record correctly'
+
+           li.append( (l2[k+1], l2[k+2], l[j+4], _partscheme(l2[k+3]), _partformat(l2[k+4]) ) )
         else:
            li.append( (l[j+2], l[j+3], l[j+4]) )
         i=i+1
