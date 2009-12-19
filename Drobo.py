@@ -1096,10 +1096,10 @@ class Drobo:
      slotrec='HBQQB32s16sL'
 
      i = 0
-     pattern='B'
-     while ( i < self.slot_count ): 
-        pattern += slotrec
-        i +=1
+     pattern='B'+slotrec*self.slot_count
+     #while ( i < self.slot_count ): 
+     #   pattern += slotrec
+     #   i +=1
  
      r = self.__getsubpage( 0x03, pattern )
 
