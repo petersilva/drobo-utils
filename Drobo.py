@@ -795,7 +795,7 @@ class Drobo:
     #if fwv == "1.200.11177": 
     #   fwv="1.201.12942"     
 
-    fwarch = fwi[6].lower()
+    fwarch = self.fw[6].lower()
 
     if (DEBUG & DBG_Chatty):
       print 'looking for firmware for:', fwarch, fwv, 'hw version:', hwlevel

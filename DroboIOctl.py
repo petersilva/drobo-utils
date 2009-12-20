@@ -316,7 +316,7 @@ def drobolunlist(debugflags=0,vendor="Drobo"):
 
           thisdev="%02d%02d%02d" % (id[0], id[1], id[2])
           if ( id[4].lower().startswith("trusted") or \
-             ( id[4].lower().startswith("drobo") or \
+               id[4].lower().startswith("drobo") or \
                id[4].lower().startswith(vendor.lower()) ):  # you have a Drobo!
              if debugflags & Drobo.DBG_Detection:
                 print "found a Drobo"
