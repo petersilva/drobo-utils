@@ -350,8 +350,9 @@ for u in l:
 
   elif cmd == 'info':
      if len(args) > 1:
-       toprint=args[1].split(',')
-     info(d,toprint)
+       info(d,args[1].split(','))
+     else:
+       info(d,valid_print)
 
   elif cmd == "set": 
      what = args[1]
