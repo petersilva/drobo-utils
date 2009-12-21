@@ -761,6 +761,7 @@ class Drobo:
     if ( len(cmdout) == paklen ):
       return struct.unpack(mypack, cmdout)
     else:
+      print 'uh, oh... scsi inquire returned %d, bytes instead of %d expected.' % ( len(cmdout), paklen)
       raise DroboException
 
 
