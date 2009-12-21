@@ -752,8 +752,8 @@ class Drobo:
             28-31  dev. type params.
 
     """
-    dpropack = '>BBBBBBBB8s16s4' 
-    mypack= dpropack + 's20sBB8HH'
+    dpropack = '>BBBBBBBB8s16s4s' 
+    mypack= dpropack + '20sBB8HH'
     paklen=struct.calcsize(mypack)
 
     modepageblock=struct.pack( "BBBBBB", 0x12 , 0, 0, 0, paklen, 0 )
