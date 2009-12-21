@@ -752,7 +752,8 @@ class Drobo:
             28-31  dev. type params.
 
     """
-    mypack = '>BBBBBBBB8s16s4s20sBB8HH'
+    dpropack = '>BBBBBBBB8s16s4' 
+    mypack= dpropack + 's20sBB8HH'
     paklen=struct.calcsize(mypack)
 
     modepageblock=struct.pack( "BBBBBB", 0x12 , 0, 0, 0, paklen, 0 )
@@ -762,6 +763,9 @@ class Drobo:
       return struct.unpack(mypack, cmdout)
     else:
       print 'uh, oh... scsi inquire returned %d, bytes instead of %d expected.' % ( len(cmdout), paklen)
+      if ( len(cmdout) == 36 ): # we have a PRO...
+        return struct.unpack(dpropack, cmdout)
+
       raise DroboException
 
 
