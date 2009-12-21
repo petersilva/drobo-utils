@@ -11,10 +11,10 @@ import types
 import textwrap
 import subprocess
 
-toprint = ("config", "capacity", "protocol", "slots",
+valid_print = ("config", "capacity", "protocol", "slots",
            "firmware", "status", "options", "luns")
 
-opt_str = ', '.join(toprint)
+opt_str = ', '.join(valid_print)
 
 def togig(b):
    return b/(1000*1000*1000)
@@ -188,9 +188,9 @@ def info(d,choices):
     print '---------------------------------------------------------'
 
   for c in choices:
-     try: 
+     if c in valid_print:
         eval( "print" + c + "(d)"  )
-     except:
+     else:
         print 'invalid info option: %s' % c
         print 'valid options: ', opt_str
 
