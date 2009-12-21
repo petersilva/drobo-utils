@@ -324,9 +324,11 @@ class Drobo:
             raise DroboException
 
         if ( self.fw[6].lower() != 'armmarvell' ):
-            if DEBUG & DBG_Detection:
-              print "%s fw[6] is not armmarvell." % self.char_dev_file
-            raise DroboException
+	     print "interesting, %s fw[6] is: %s" % (self.char_dev_file,self.fw[6])
+        #if ( self.fw[6].lower() != 'armmarvell' ):
+        #    if DEBUG & DBG_Detection:
+        #      print "%s fw[6] is not armmarvell." % self.char_dev_file
+        #    raise DroboException
         
  
   def __del__(self):
