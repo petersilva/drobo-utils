@@ -168,9 +168,9 @@ def _partformat(n):
     f = []
     
     if ( n & 0x01 ):
-       f.append( 'NTFS' )
-    if ( n & 0x02 ):
        f.append( 'NO FORMAT' )
+    if ( n & 0x02 ):
+       f.append( 'NTFS' )
     if ( n & 0x04 ):
        f.append( 'HFS' )
     if ( n & 0x80 ): # on Peter's...
@@ -396,11 +396,11 @@ class Drobo:
             #       option is 'off' (the '^' at the beginning.)
             # sparse_super -- there are lots too many superblock copies made by default.
             #       safe enough with fewer.
-            fd.write( "parted -s %s mkpart ext2 0 100%%\n" % cd )
+            fd.write( "parted -s %s mkpart primary ext2 0 100%%\n" % cd )
             fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1\n' % cd )
         elif fstype == 'ntfs':
-            fd.write( "parted -s %s mkpart ntfs 0 100%%\n" % cd )
+            fd.write( "parted -s %s mkpart primary ntfs 0 100%%\n" % cd )
             fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mkntfs -f -L Drobo01  %s1\n' % cd )
         elif fstype == 'FAT32' or fstype == 'msdos':
@@ -1198,7 +1198,7 @@ field indices in li2:
            if l2[k] != 17 :
               print 'Warning: probably have not grokked the LUNINFO2 record correctly'
 
-           li.append( (l2[k+1], l2[k+2], l[j+4], _partscheme(l2[k+3]), _partformat(l2[k+4]) ) )
+           li.append( (l2[k+1], l2[k+2], l[j+4], _partscheme(l2[k+3]), _partformat(l2[k+5]) ) )
         else:
            li.append( (l[j+2], l[j+3], l[j+4]) )
         i=i+1
