@@ -62,8 +62,6 @@ def usage():
    print "\tdiagprint <file>  - print diagnostic file to stdout"
    print "\tformat\tPrepares a script to format LUNS from a device. Arguments:"
    print "\t\t<fstype>\tfile system type.  One of: ext3, ntfs, FAT32"
-   #print "\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you"
-   #print "\t\t\t\treally mean it"
    print "\t\tNote: This places a script in /tmp, which you must run."
    print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
    print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
@@ -80,8 +78,6 @@ def usage():
    print "\t\tIPAddress <Address> \tSet iSCSI IP address"
    print "\t\tlunsize\tSet the size of LUNS on device. Arguments:"
    print "\t\t\t<sz>\tinteger number of TiB to set the lunsize to"
-   #print "\t\t\t<confirmation>\tSpecify 'PleaseEraseMyData' if you"
-   #print "\t\t\t\treally mean it"
    print "\t\t\tNote: After execution, Drobo reboots, wait a few minutes"
    print "\t\t\tbefore accessing again"
    print "\t\tname <name> \tSet Drobo name"
@@ -241,6 +237,7 @@ except getopt.GetoptError, err:
 
 #ask for confirmation...
 confirmation='a'
+
 vendor_string=''
 for o, a in opts:
         if o in ("-c", "--command"):
@@ -359,9 +356,6 @@ for u in l:
      if what == "name": 
         d.Sync(args[2])          
      elif what == "lunsize" :
-        #if len(args) < 4 :
-        #    print 'This is guaranteed to erase your disk, so you must say: PleaseEraseMyData'
-        #    sys.exit()
         printstatus(d)
         setlunsize(d,args[2],confirmation)
 
