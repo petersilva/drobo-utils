@@ -175,8 +175,8 @@ def _partformat(n):
        f.append( 'HFS' )
     if ( n & 0x80 ): # on Peter's...
        f.append( 'EXT3' )
-    #if ( n & 0x08 ): # on Matthew Mastracci's
-    #   f.append( 'EXT3' )
+    if ( n & 0x08 ): # on Matthew Mastracci's
+       f.append( 'EXT3' )
     if ( n & 0xFF ) == 0:
        f.append( 'FAT32' )
 
@@ -413,11 +413,7 @@ class Drobo:
      fd.close()
      os.chmod(format_script,0700)
 
-     #if DEBUG & DBG_Simulation !=0:
      return format_script 
-     #fmt_process = subprocess.Popen( format_script, close_fds=True )
-     #pid, sts = os.waitpid(fmt_process.pid, 0)
-     
 
   def __getsubpage(self,sub_page,pack): 
     """Retrieve Sub page from drobo block device.
