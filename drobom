@@ -16,6 +16,8 @@ valid_print = ("config", "capacity", "protocol", "slots",
 
 opt_str = ', '.join(valid_print)
 
+valid_formats = ( "ext3", "ntfs", "msdos" )
+
 def togig(b):
    return b/(1000*1000*1000)
 
@@ -61,7 +63,7 @@ def usage():
    print "\tdiag \tdump diagnostics file into /tmp directory"
    print "\tdiagprint <file>  - print diagnostic file to stdout"
    print "\tformat\tPrepares a script to format LUNS from a device. Arguments:"
-   print "\t\t<fstype>\tfile system type.  One of: ext3, ntfs, FAT32"
+   print "\t\t<fstype>\tfile system type.  One of: " + str(valid_formats)
    print "\t\tNote: This places a script in /tmp, which you must run."
    print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
    print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
@@ -208,7 +210,7 @@ def setlunsize(d,newlunsize,confirmation):
      print 'WARNING: lun size > 2 TiB known not work in many cases under Linux' 
 
   print 'You asked to set the lunsize to %d ' % lunsize
-  if confirmed("WARNING: This will erase all your data. Are you sure? (y/n)", \
+  if confirmed("WARNING: Ready to destroy all you data. Continue? (y/n)", \
         confirmation ):
   	d.SetLunSize(lunsize)
         print '''Done... Drobo is likely now rebooting.  
@@ -312,23 +314,30 @@ for u in l:
      print "diagnostics in ", f
 
   elif cmd == "diagprint":
-     print d.decodeDiagnostics( args[1] )
+     if len(args) < 2:
+	print "error: diagnostics file required as argument" 
+     else:
+        print d.decodeDiagnostics( args[1] )
 
   elif cmd == "format":
 
-     printstatus(d)
-     print 'preparing a format script for a %s file system as you requested' % args[1]
-     d.format_script(args[1])
-     print 'OK, I built the script but nothing is erased yet...'
-     print 'You can have a look at it with: cat /tmp/fmtscript'
-     print 'If you are really sure, go ahead and do: sh /tmp/fmtscript'
-     if confirmed("WARNING: Ready to run the script which will destroy all your data. Are you sure? (y/n)", \
-        confirmation ):
-        print 'ok... firing it off...'
-        fmtproc = subprocess.Popen("/tmp/fmtscript", bufsize=0, shell=True )
-        fmtproc.wait()
+     if (len(args) < 2) or (args[1] not in valid_formats):
+	print "error: file system format required as argument"
+        print "       Choices are: " + str(valid_formats)
      else:
-	print 'Phew... You stopped just in time!'
+        printstatus(d)
+        print 'preparing a format script for a %s file system as you requested' % args[1]
+        d.format_script(args[1])
+        print 'OK, I built the script but nothing is erased yet...'
+        print 'You can have a look at it with: cat /tmp/fmtscript'
+        print 'If you are really sure, go ahead and do: sh /tmp/fmtscript'
+        if confirmed("WARNING: Ready to destroy all your data. Continue? (y/n)", \
+           confirmation ):
+           print 'ok... firing it off...'
+           fmtproc = subprocess.Popen("/tmp/fmtscript", bufsize=0, shell=True )
+           fmtproc.wait()
+        else:
+           print 'Phew... You stopped just in time!'
 
 
   elif cmd == 'fwcheck':
@@ -336,9 +345,12 @@ for u in l:
      print tuple[3]
 
   elif cmd == 'fwload':
-     if d.PickFirmware(args[1]):
-       d.writeFirmware(update)
-     d.Sync()
+     if len(args) < 2:
+	print "error: firmware file required as argument" 
+     else:
+        if d.PickFirmware(args[1]):
+          d.writeFirmware(update)
+          d.Sync()
 
   elif cmd == 'fwupgrade':
      if d.updateFirmwareRepository():
@@ -352,33 +364,37 @@ for u in l:
        info(d,valid_print)
 
   elif cmd == "set": 
-     what = args[1]
-     if what == "name": 
-        d.Sync(args[2])          
-     elif what == "lunsize" :
-        printstatus(d)
-        setlunsize(d,args[2],confirmation)
-
-     elif what == "time" :
-        d.Sync()
+     if len(args) < 2:
+	 print "error: set what?" 
+         usage()
      else:
-        options=d.GetOptions()
-        if args[1] in options.keys():
-           # TODO: are all options integers? no..
-           if args[2] == 'True':
-               value=True
-           elif args[2] == 'False':
-               value=False
-           elif args[1] == 'IPAddress' or args[1] == 'NetMask':
-               value=args[2]
-           else:
-               value=int(args[2])
+         what = args[1]
+         if what == "name": 
+            d.Sync(args[2])          
+         elif what == "lunsize" :
+            printstatus(d)
+            setlunsize(d,args[2],confirmation)
+    
+         elif what == "time" :
+            d.Sync()
+         else:
+            options=d.GetOptions()
+            if args[1] in options.keys():
+               # TODO: are all options integers? no..
+               if args[2] == 'True':
+                   value=True
+               elif args[2] == 'False':
+                   value=False
+               elif args[1] == 'IPAddress' or args[1] == 'NetMask':
+                   value=args[2]
+               else:
+                   value=int(args[2])
 
-           options[args[1]]=value
-        else:
-           print 'option not present: ', args[1]
+               options[args[1]]=value
+               d.SetOptions( options ) 
+            else:
+               print 'option not present: ', args[1]
 
-        d.SetOptions( options ) 
 
   elif cmd == "shutdown":
      d.Standby() 
