@@ -1,5 +1,4 @@
 
-
 .. raw:: html
    :file: sponsor.html
 
@@ -7,57 +6,89 @@
 Drobo-Utils: Drobo: API, CLI, &amp; Dashboard for linux
 =======================================================
 
+A Drobo is a cool little storage unit where you just put disks in, and it takes care
+of figuring out how to protect you from data loss.  You do not, like other raids, have 
+to install matching disks.  You do not, like other units, make arcane decisions about 
+how the data is laid out.  It pretends to be just a pile of storage, and does the smart 
+thing you would have done if you had taken the time to put your mind to it.
+
+So you bought a Drobo_ and you want to use it under linux.  Great!  Plug it in and Go!  
+Really! It can be used just as a normal disk.  Plug it in like any USB thumb drive.  
+If you are an old Linux hand, then just use a partitioner, such as parted, 
+and build an ext3 file system and set your mount point. if the above was gobbledygook, 
+no worries, there's a GUI to do it for you.  
+
 .. image:: droboview_prototype4.png
 
-So you bought a Drobo_ and you want to use it under linux.
+[ `Screen Shots`_  ] [ Download_ ]
 
+This site is the home page for a linux version of the 'dashboard' software that Data 
+Robotics provides with their Drobos for windows and Mac.
+You can use Drobos without any special software.  The blue capacity lights will fill up as 
+the disks fill.  When it gets too full, Drobo will ask for another drive with its drive 
+lights. Just feed it drives when it asks, and you are good to go. So what's the 
+dashboard good for?
 
-Great.  Plug it in and Go!  Really, it's just a normal disk in a lot of ways. 
-<P>
-[ Gallery_  ] [ Download_ - Where to get it]
+ * If you cannot see your Drobo, it can tell you what the lights would tell you.
+ * You can check if there is newer firmware available, and update it.
+ * You can see information about the hard drives in the Drobo without taking them out.
+ * You can change the drobo's settings from their defaults (like a 2 TiB LUN size)
+ * If you are using a DroboPro, then there are many settings (ip address?) you might
+   need in order to configure it properly for use.
 
-.. _Gallery: gallery.html
-.. _Group: http://groups.google.com/group/drobo-talk?hl=en">http://groups.google.com/group/drobo-talk?hl=en
-.. _Drobo: http://www.drobo.com  
-.. _Download: http://sourceforge.net/project/showfiles.php?group_id=222830
-.. _Project: http://sourceforge.net/projects/drobo-utils/
-.. _DroboSpace: http://drobospace.com
-.. _CHANGES.txt: CHANGES.html
+So that is where drobo-utils, the linux dashboard, comes in.
 
-<P>
+.. _README: 
+.. include:: README.txt
 
-.. contents::
+.. _`Manual Pages`:
+
+---------
+MAN PAGES
+---------
+
+  * drobom_  - the interface (command line + view for a GUI)
+
+.. _drobom: drobom.html
+
 
 -------------
 Links & Help!
 -------------
 
  * Project_ -- development home page.  source code there as a download too...
- * README_ - Documentation]
+ * README_ - Documentation for humans.
+ * `Manual Pages`_ - traditional unix style documentation (man pages)
  * Group_ - Discussion Forum 
  * Drobo_ - Who makes them
  * Project_ - SourceForge Project
- * DEVELOPERS_ Developer docs
+ * DEVELOPERS_ Developer documentation
  * DroboSpace_ - Vendor forum
- * CHANGES.txt_ - What's in each version
+ * CHANGES_ - What's in each version
 
 If you have questions, you can try the google groups or just post to drobo-utils-devel@sourceforge.net, but for now, it's just me... my email works too... Peter.A.Silva@gmail.com (help welcome!)
 
-.. _README: 
-.. include:: README.txt
+
+.. _`Screen Shots`: gallery.html
+.. _Group: http://groups.google.com/group/drobo-talk?hl=en">http://groups.google.com/group/drobo-talk?hl=en
+.. _Drobo: http://www.drobo.com  
+.. _Download: http://sourceforge.net/project/showfiles.php?group_id=222830
+.. _Project: http://sourceforge.net/projects/drobo-utils/
+.. _DroboSpace: http://drobospace.com
+.. _CHANGES: CHANGES.html
 
 .. _DEVELOPERS: 
 .. include:: DEVELOPERS.txt
 
+
 About This Page
 ---------------
 
-last revised: October 28th, 2009
+last revised: December 23rd, 2009
 
 copyright:
 
 Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
 Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 named COPYING in the root of the source directory tree.
-
 

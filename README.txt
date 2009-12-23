@@ -1,20 +1,19 @@
-==================
-Drobo Utils README
-==================
+
+------
+README
+------
 
 Drobo-utils is a set of linux tools to query and manage Data Robotics
-Drobo storage systems.  If you fire up droboview, it should look pretty
+Drobo storage systems.  If you fire up drobom view, it should look pretty
 familiar to those who have seen the dashboard on other operating systems. 
 Droboview is built on a little programmer interface which can be installed 
 on the system and used by other applications as well.
 
 For experienced Linux hands, there is a command line interface, drobom,
-which offers the same functionality as droboview.   For real hackers, fire
+which offers the same functionality as drobom view.   For real hackers, fire
 up a python interpreter, 'import Drobo', help(Drobo), and you are off to 
 the races...  Command-line access is also bundled into a set of improvements
 to a standards droboshare called 'Droboshare Augmented Root File System' (DARFS)
-
-
 
 .. contents::
 
@@ -26,8 +25,13 @@ Drobo utils installation.
 REQUIREMENTS
 ============
 
-Drobo-utils was developed on pre-release version of Kubuntu (Hardy, 
-Intrepid, and now Jaunty) Any similarly recent distro ought to do.
+Drobo-utils is developed on Kubuntu (Karmic) Any recent distro ought to do.
+as of Ubuntu 9.10, drobo-utils is included in the repositories, and installation
+is simply:
+
+  sudo apt-get install drobo-utils
+
+and it should pull in what you need.  
 
 To get drobo-utils running, you need packages something like (these are
 ubuntu packages, names may vary on other distros):
@@ -56,18 +60,15 @@ INSTALLING pre-requisites
 
 On ubuntu, it would typically look like so: Open a shell window. Enter the following package installation commands::
 
- % sudo aptitude install python-qt4 parted 
- % sudo aptitude install debhelper python2.5-dev
- % sudo aptitude install python-docutils
+ % sudo aptitude install parted 
+ % sudo aptitude install python-qt4 
 
-If you have received a pre-built binary package,then you only need the 
-first line.  If you want to build from source, then you need the second line.  
-The third line install what you need to build documentation.
-
-On redhat/fedora distros, it would more likely be 'yum' instead of 'aptitude' 
-and some of the package names will change.  A typical difference is that 
-packages for developers have the -devel suffix on Redhat derived 
-distributions, instead of the -dev favoured by debian derived ones.
+If you want to be able to partition disks using drobo-utils, parted is required.
+If you want a GUI, you need the QT toolkit package.  On redhat/fedora distros, it would 
+more likely be 'yum' instead of 'aptitude' and some of the package names will 
+change.  A typical difference is that packages for developers have the -devel 
+suffix on Redhat derived distributions, instead of the -dev favoured by debian 
+derived ones.
 
 here is an example from fedora 7 (courtesy of help4death on the google group)::
 
@@ -77,20 +78,36 @@ here is an example from fedora 7 (courtesy of help4death on the google group)::
 
 NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  the package should work fine on headless servers using only the command line.
 
+Install With no GUI
+===================
+
+Some linux users run Drobos on servers and do not want to pull in X and a desktop etc... 
+when they install drobo-utils.  While the drobo-utils component includes support for a 
+GUI, the debian packaging does not list python-qt4 (the GUI toolkit used) as a 
+pre-requisite, but only suggests the toolkit.  So a straight apt-get will not ruin your 
+tidy CLI only server.  It will pollute it with around 35 KB of python GUI code, 
+hopefully not a big problem.
+
 
 Install From Package
 ====================
-Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
-where current packages are available.  after downloading a .deb, it is simply a matter of:
 
-  dpkg -i drobo-utils-<version>.deb
+If you are running on a distro that is debian derived (such as ubuntu), this is your lucky day.  drobo-utils has been accepted in debian so installation is a matter of:
+
+ # apt-get install drobo-utils
+
+ from a root shell.
+
+On the other hand, the repositories might have some lag, in which case you might want to 
+Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
+where the most current packages are available.  after downloading a .deb, it is simply a matter of:
+
+  # dpkg -i drobo-utils-<version>.deb
 
 done!
 
-Install from Source
-===================
+Redhat/Fedora users.  You can try alien. I don't know if it works.  Someone to take on RPM packaging would be very welcome!
 
-See DEVELOPER.txt
 
 
 Try Out the CLI
@@ -123,24 +140,11 @@ Try Out the GUI
 Once the command line stuff that is working, and assuming you 
 have python-qt4 installed, try::
 
- % droboview
+ % drobom view
 
 which should start a GUI for each drobo attached to your machine, that
 you have permission to access (depends on the setup, usually USB devices 
 on desktops are accessible to users, so you can see them.  
-
-         
-
-
-Try Out the Python API
-======================
-
-   See DEVELOPERS.txt
-
-Building debian & ubuntu packages
-=================================
-
-   See DEVELOPERS.txt
 
 
 Setup Drobo with Linux
@@ -251,7 +255,7 @@ On my system the process looked like this::
  root@alu:~# mount /dev/sdz1 /mnt
 
 Drobo Not Detected
-------------------
+==================
 
 To find Drobo's on a system, drobo-utils queries all the attached devices for indications
 it is made by Data Robotics.  These strings change from product to product.
@@ -279,11 +283,6 @@ at the time this example was run.  so then try:
 as in, take the unknown vendor string and feed it as -s option to tweak detections
 of drobom.
 
-Getting Source 
-==============
-
-See DEVELOPERS.txt
- 
 
 Multiple LUNS
 =============
@@ -480,18 +479,18 @@ be upgradable to modern firmware using the dashboard.
 KNOWN BUGS
 ----------
 
-droboview isn't suited to run continuously for long periods, 
+drobom view isn't suited to run continuously for long periods, 
 as it has a memory leak...  total foot print starts out at 32M
 with a 15 MB resident set size, of which 10 MB are shared, so only 
 about 4M of real memory consumed.   but the RSS grows at about 
 2MB/hour.
 
-  29m  11m S    1  2.9   9:44.50 droboview
+  29m  11m S    1  2.9   9:44.50 drobom view
 
 best to restart it daily, or use it when necessary, but not leave it
 on for days.
 
-After you resize luns, droboview gets confused, you need to exit and
+After you resize luns, drobom view gets confused, you need to exit and
 restart.
 
 We have a report that dumping diagnostics does not work over firewire.
@@ -511,7 +510,7 @@ DARFS
 The Droboshare Augmented Root File System (darfs) is a 60 MB or so download 
 you can get from drobo-utils.sf.net.  There isn't any source code, because,
 well, nothing from any of the packages has been modified.  there are
-instructions on how to build DARFS in DEVELOPERS.html
+instructions on how to build DARFS in DEVELOPERS_
 
 DARFS is a standard droboshare root file system, with some packages added: 
 openssl, openssh, berkeleydb, bzip2, a fairly complete Python 2.6.2.  drobo-
@@ -555,10 +554,6 @@ right binary, but Dropbear doesn't know where to look for it.  the
 libexec directory isn't there on the droboshare, so there is no harm
 in creating it and linking into DARFS.)
 
-
-Building Droboshare applications
-================================
-    See DEVELOPERS.txt
 
 Droboshare Firmware
 ===================

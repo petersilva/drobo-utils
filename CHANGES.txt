@@ -1,11 +1,11 @@
 
-master
-  * TODO: looking at firmware based LUN creation/deletion & format.
-  * TODO: alerts.
-  * TODO: fix make_tarball to exclude .git and debian, like it is supposed to.
-  * TODO: review getSubPageStatus, DMIP seems better now.
-  * TODO: review unitstatus vs. diskpack status.
-  * TODO: make a daemon. reasons:
+TODO:
+  * looking at firmware based LUN creation/deletion & format.
+  * alerts.
+  * fix make_tarball to exclude .git and debian, like it is supposed to.
+  * review getSubPageStatus, DMIP seems better now.
+  * review unitstatus vs. diskpack status.
+  * make a daemon. reasons:
             -- updated for relay out progress.
             -- alerting 
 	    -- unified JSON interface for GUI & WUI.

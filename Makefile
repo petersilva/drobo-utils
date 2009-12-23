@@ -12,8 +12,7 @@ clean:
 doc:
 	groff -Thtml -man drobom.8 >drobom.html
 	groff -Thtml -man droboview.8 >droboview.html
-	rst2html README.txt >README.html
-	rst2html DEVELOPERS.txt >DEVELOPERS.html
+	rst2html index.txt >index.html
 	rst2html CHANGES.txt >CHANGES.html
 
 # Uncomment this to turn on verbose mode.

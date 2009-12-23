@@ -16,14 +16,24 @@ the device to operate on (default searches all devices and picks first one found
 \-h, \-\-help
 print a usage message
 .TP
+\-n, \-\-no
+answer all questions no (generally does not do any damage)
+.TP
+\-s, \-\-string \<string\>
+sometimes new models are not recognized by drobom. See documentation.
+.TP
 \-v, \-\-verbose
 verbosity, a bit-field to trigger increased output as needed, mostly for debugging. 
-1 - General, 2 - Hardware Dialog, 4 - Initiation, 8 - DMP layer, 16- Detection
+1 - General, 2 - Hardware Dialog, 4 - Initiation, 8 - Raw returns, 16- Detection
 64 will print everything... (default: 0, as terse as possible.)
 128 enables simulation mode (for testing when no Drobo is available. Dangerous!)
 .TP
 \-V, \-\-version
 print the version id.
+.TP
+ \-y, \-\-yes       
+answer all questions yes (generally overwrites stuff) 
+
 
 .SS command is one of:
 .TP
@@ -33,15 +43,17 @@ identify the drobo by making the lights blink
 diag
 dump diagnostics file into /tmp directory
 .TP
-diagprint <diagdumpfile>
+diagprint \<diagdumpfile\>
 print diagnostics file to standard output
 .sp
 .br
-<diagdumpfile>
-the diagnostic dump file to print.
+\<diagdumpfile\>
+the diagnostic dump file to read.
 .TP
 fwcheck query drobo.com for updates to firmware for the given Drobo
-fwload  load a specific firmware for the given Drobo. Arguments:
+.TP
+fwload  \<fwimage\>
+load a specific firmware for the given Drobo. Arguments:
 .sp
 .br
 <fwimage>
@@ -54,28 +66,25 @@ help
 print this text
 .TP
 info  <toprint>
-print information on a Drobo. The <toprint> argument is a comma separated list of the values below (default is to print all of them): config, capacity, protocol, settings, slots, firmware, status, options, luns
+print information on a Drobo. The <toprint> argument is a comma separated list of the values below (default is to print all of them): config, capacity, protocol, settings, slots, firmware, status, options, luns, scsi
 .TP
 list
 show device files for all Drobos found.
+.TP
+set \<options\> \<value\>
+set firmware options, such as ipaddress, etc... use 'info settings'
 .TP
 set name  <newname>
 Set the name of the Drobo to the given value ( only firmware > 1.3.0 supports this command )
 .TP
 set lunsize  Set the size of LUNS on device. Arguments:
 .sp
-<sz>
+\<sz\>
 integer number of TiB to set the lunsize to
-.sp
-<confirmation>
-Specify 'PleaseEraseMyData' if you really mean it
 .sp
 Note: After execution, Drobo reboots, wait a few minutes before accessing again
 .TP
 set time - sets various Drobo's clock to UTC
-.TP
-set <options> - Change the value of Drobo Options, 
-See 'info options' output. 
 .TP
 shutdown
 shutdown drobo (DRI calls this 'standby')
@@ -85,6 +94,10 @@ report how is the Drobo doing
 .SS
 device
 raw block device of a drobo (i.e. /dev/sdz) . If not given, assumes all attached drobos.
+.TP
+view
+Start up the graphical user interface.
+
 .SH AUTHOR
 This manual page was written by Chris AtLee <chris@atlee.ca> for the Debian
 project (but may be used by others).

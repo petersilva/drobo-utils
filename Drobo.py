@@ -154,16 +154,11 @@ def _unitstatus(n):
 def _partformat(n):
     """ return Drobo's idea of what the partition type is
 
-        STATUS: working with ERRATA: 
-           the codes are wonky...
+        STATUS: working 
+        
+        worrisome... when multiple partitions present of different types, the
+       bit field is set to: NO FORMAT.
 
-           dmp.h says 0x08 for EXT3, but my Drobo says, 0x80 
-                 says 0x01 is 'no format', but my Drobo says that is NTFS.
-           tried added >>4 but that
-
-	   says only one bit is supposed to be set, but, I dunno if I trust it.
-
-           returning a tuple for now.
     """
     f = []
     
@@ -531,9 +526,9 @@ class Drobo:
     """ Set Options.
         accepts a set of options as returned by GetOptions
 
-    STATUS:  UNTESTED!
+    STATUS: working. 
          basic thresholds work on Drobo v1.
-         OPTIONS2 is just a guess, have no Pro, cannot test.
+         OPTIONS2 tested by folks on the internet.  Seem OK.
 
     """
     # v1 Options first...
@@ -881,6 +876,7 @@ class Drobo:
 
        & 0xffffffffL is a kludge to work around CRC32 returning different values on 32 vs. 64 bit platforms.
        can remove once py3k arrives.  (see: http://bugs.python.org/issue1202)
+
        STATUS: working.
 
     """
@@ -944,7 +940,7 @@ class Drobo:
       Compare the current running firmware against the appropriate file 
       in the local repository
 
-      STATUS: working...
+      STATUS: working.
 
     """
     (fwarch, fwversion, hwlevel, fwpath ) = self.PickLatestFirmware()
@@ -1250,7 +1246,6 @@ class Drobo:
       Errata: 
       spec says a single byte.
       dmp.h says two longs:  (Status, RelayOutCount)
-      Drobo always returns 0 for second Long.
       when I remove a disk, I get [ 'No Redundancy', 'Relay out in progress'],
       but when I format, it stays empty...
      """

@@ -1,8 +1,7 @@
-----------------
-DEVELOPERS NOTES
-----------------
 
-.. contents::
+---------------
+DEVELOPER NOTES
+---------------
 
 
 This software is copyright under GPL.  See near end file for details...
@@ -35,6 +34,18 @@ git clone ssh://username@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/dro
 Before doing Any commits, ensure that the author fields are 
 appropriately set.  One can obtain patches applied to the branch 
 with git pull, and commit patches for distribution with git push.
+
+
+Build Dependencies
+------------------
+
+To build the package from source, there are a number of other packages needed:
+ 
+ % sudo aptitude install debhelper python2.5-dev
+ % sudo aptitude install python-docutils
+
+The second line is to build documentation.
+
 
 
 GIT Configure Patch Author
@@ -217,32 +228,11 @@ Have a look here:
 
 http://groups.google.com/group/drobo-talk/web/building-droboshare-apps-on-debianish-os?hl=en
 
-TODO
-----
 
-Tasks which would be cool to get done, in no particular order:
-
-Option setting... especially for DroboPro IP Address & netmask.
-
-CentOS support.  Fedora is likely fine, but should build a VM with CentOS on it, and build an rpm.  RHEL has an ancient python (2.4?) with no ctypes by default, so could be interesting.
-
-GUI - handle when Drobo disappears...
-
-Refuse known non-working feature bits... firmware (review 2009 SDK release)
-   Review feature bits, mis-marked? 28
-
-Add Alerting to GUI & CLI
-	-- save config...
-	.. SMTP forwarder:
-        .. address 
-        .. authentication.? u+p
-	.. 
-
-Droboshare bugs
-        -- don't dump diags to /tmp, they don't fit.
-        -- don't 
 
 BUGS: 
+-----
+
   when running two fw uploads, the second one will not run easily.
   need to wait for transaction to timeout...  perhaps randomize id?
   did randomization, did not change anything...
