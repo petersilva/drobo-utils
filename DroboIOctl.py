@@ -93,10 +93,11 @@ class DroboIOctl:
       
     
      """
-     k=create_string_buffer(8) 
+     sfmt="l"
+     k=create_string_buffer(struct.calcsize(sfmt)) 
      if ioctl(self.sg_fd, sg_io_hdr.SG_GET_VERSION_NUM, k) < 0 :
         print "%s is not an sg device, or old sg driver\n" % char_dev_file
-     num=struct.unpack("l",k) 
+     num=struct.unpack(sfmt,k) 
      return num[0]
 
   def closefd(self):
@@ -182,12 +183,9 @@ class DroboIOctl:
     i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr)
 
     if self.debug & Drobo.DBG_HWDialog:
-      print "5 after ioctl, result=", i
-      print "status: ", io_hdr.status
-      print "driver_status: ", io_hdr.driver_status
-      print "host_status: ", io_hdr.host_status
-      print "sb_len_wr: ", io_hdr.sb_len_wr
-      print "resid: ",  io_hdr.resid
+      print "5 after ioctl, result=%d status: %d driver_status: %d host_status: %d sb_len_wr: %d resid: %d" % \
+         ( i, io_hdr.status, io_hdr.driver_status, \
+            io_hdr.host_status, io_hdr.sb_len_wr, io_hdr.resid )
 
     if i < 0:
         raise IOError("Drobo get_mode_page SG_IO ioctl error")
