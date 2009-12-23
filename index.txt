@@ -1,0 +1,63 @@
+
+
+.. raw:: html
+   :file: sponsor.html
+
+=======================================================
+Drobo-Utils: Drobo: API, CLI, &amp; Dashboard for linux
+=======================================================
+
+.. image:: droboview_prototype4.png
+
+So you bought a Drobo_ and you want to use it under linux.
+
+
+Great.  Plug it in and Go!  Really, it's just a normal disk in a lot of ways. 
+<P>
+[ Gallery_  ] [ Download_ - Where to get it]
+
+.. _Gallery: gallery.html
+.. _Group: http://groups.google.com/group/drobo-talk?hl=en">http://groups.google.com/group/drobo-talk?hl=en
+.. _Drobo: http://www.drobo.com  
+.. _Download: http://sourceforge.net/project/showfiles.php?group_id=222830
+.. _Project: http://sourceforge.net/projects/drobo-utils/
+.. _DroboSpace: http://drobospace.com
+.. _CHANGES.txt: CHANGES.html
+
+<P>
+
+.. contents::
+
+-------------
+Links & Help!
+-------------
+
+ * Project_ -- development home page.  source code there as a download too...
+ * README_ - Documentation]
+ * Group_ - Discussion Forum 
+ * Drobo_ - Who makes them
+ * Project_ - SourceForge Project
+ * DEVELOPERS_ Developer docs
+ * DroboSpace_ - Vendor forum
+ * CHANGES.txt_ - What's in each version
+
+If you have questions, you can try the google groups or just post to drobo-utils-devel@sourceforge.net, but for now, it's just me... my email works too... Peter.A.Silva@gmail.com (help welcome!)
+
+.. _README: 
+.. include:: README.txt
+
+.. _DEVELOPERS: 
+.. include:: DEVELOPERS.txt
+
+About This Page
+---------------
+
+last revised: October 28th, 2009
+
+copyright:
+
+Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
+named COPYING in the root of the source directory tree.
+
+
