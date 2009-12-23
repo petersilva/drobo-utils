@@ -756,19 +756,20 @@ class Drobo:
 
     cmdout = self.fd.get_sub_page(paklen, modepageblock,0, DEBUG)
     if ( len(cmdout) == paklen ):
-      return struct.unpack(mypack, cmdout)
+      ret = struct.unpack(mypack, cmdout)
     else:
       print 'uh, oh... scsi inquire returned %d, bytes instead of %d expected.' % ( len(cmdout), paklen)
       if ( len(cmdout) == 36 ): # we have a PRO...
-        return struct.unpack(dpropack, cmdout)
-
-      raise DroboException
-
-
+        ret = struct.unpack(dpropack, cmdout)
+      else:
+        raise DroboException
+    if DEBUG & DBG_RawReturn :
+        print "inquiry response: ", str(ret)
+    return ret
     
   def PickLatestFirmware(self):
     """
-       fetch firmware from web site. ... should be a .tdf file.
+       fetch firmware from web site. ... should be a .tdf or .tdz file.
        validate firmware from header...
  
        sets self.fwdata
@@ -1117,63 +1118,23 @@ class Drobo:
 
   def GetSubPageLUNs(self):
      """
-         returns  for each LUN  returns detailed info:
-             ( LUNID, LUN total Capacity, LUN Used Capacity, PartitionScheme*, Partition Count*, Format* )
+         For each LUN, returns detailed information tuple:
+            [ ( LUNID, LUN total Capacity, LUN Used Capacity, PartitionScheme*, Format* ),
+		... ]
 
          *only returned if firmware: SUPPORTS_NEW_LUNINFO2 (essentially >=1.1.0)
 
-      N.B. must run getSubPageFirmware before the first time you
-         calling this routine, or it will fail by returning the empty set.
-
-
-      STATUS: works, with ERRATA:
-
-         report from matthew mastracci that this doesn't work for him... should be +6,
-         and the value for ext3 should be 0.0x8, and not 0x80...
-         haven't understood it yet...
+      STATUS: works, with worries and omissions:
 
       question: is it correct to mix 'used capacity' from luninfo, with 
       total capacity from luninfo2?
 
-      for old luninfo, the spec and dmp.h agree... 
-      spec says:   
-      dmp.h says:  len ( 8* H-len, B-id, Q-cap, Q-used ) 
+      parameter luninfo2[k+4] is supposed to be partcount...
+      but 'PartCount' is odd. Seems to always be 128 (0x80)
+ 	once partitions are set on my v1.  perhaps indicates maximum?
 
-         returns  for each LUN  returns detailed info:
-             ( LUNID, LUN total Capacity, PartitionScheme, PartitionCount, Format )
-
-      for Luninfo2.. works, but 'PartCount' is odd.
-
-      my guess after much experiments: PartitionCount and format are
-      inverted vs. dmp.h. the count is last(6th), and the format is 5th..
-
-      even that doesn't work right, because I get partcount=1 when there
-      are none, and it stays 1 when I add one.  now there are 8 when there is
-      only one... unless 8 is ext2 fs. and I guessed wrong about part types...
-
-      See also ERRATA for _partscheme
-
-      dmp.h says
-      struct _DroboLunInfo2DetailStruct
-      {
-        uint16 StructLength;
-        uint8 LunId;
-        uint64 TotalCapacity;
-        uint8 PartitionScheme;
-        uint8 PartitionCount;
-        uint8 FormatType;
-        uint8 Reserved[5];
-      } ATTRIBUTE_PACKED;
-
-      revised 2009 DMIP says:
-      8 x H-length, B-LunID, Q-TotalCapacity, B-PartScheme, B-PartCount, B-Format, H-unique LUNID 3B-rsvd 
-          2         1        8                1             1            1         2 = 16
-field indices in li2:
-          k         1        2                3             4            5         6              7,8,9,
-
-     would appear that Format is actually li2[4] rather than li2[5] as per documentation.
-     
-     li[5] would appear to be always 8.  so maybe it indicates a maximum partition count?
+      if you mix partition types within a single Drobo, Drobo tends to give up
+      and claim "no partitions" rather than reporting the union of the types.
      """
      if DEBUG & DBG_Simulation:
        return [(0, 2199023251456, 5092651008, 'GPT', 1, ['EXT3'])]

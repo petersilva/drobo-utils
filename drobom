@@ -3,6 +3,7 @@
 
 import sys
 import Drobo
+import DroboIOctl
 import time
 import getopt
 import string
@@ -11,7 +12,7 @@ import types
 import textwrap
 import subprocess
 
-valid_print = ("config", "capacity", "protocol", "slots",
+valid_print = ("config", "capacity", "protocol", "scsi", "slots",
            "firmware", "status", "options", "luns")
 
 opt_str = ', '.join(valid_print)
@@ -93,6 +94,12 @@ def usage():
    print "\tstatus\treport how the Drobo is doing"
    print "\tview\tstart up a management dashboard GUI"
 
+'''
+  print* routines all print portions of information about the drobo.
+  they can be invoked one,many or all at a time (default: all)
+  The master routine 'info' does the choosing and invocation.
+
+'''
 
 def printconfig(d):
   config=d.GetSubPageConfig()
@@ -136,6 +143,24 @@ def printfirmware(d):
   else:
     print firmware
   
+def printscsi(d):
+  print "SCSI emulation information:"
+  s=d.inquire()
+  if Drobo.DEBUG & Drobo.DBG_Chatty:
+      print "Vendor: %-8s  Model: %15s Revision: %s"  % ( s[8], s[9], s[10] )
+  else:
+      print str( (s[8],s[9],s[10]) )
+  for c in d.char_devs:
+      dio = DroboIOctl.DroboIOctl(c,0,Drobo.DEBUG)
+      version = dio.version()
+      ( host, channel, id, lun, vendor ) = dio.identifyLUN()
+      if Drobo.DEBUG & Drobo.DBG_Chatty:
+         print "%s: bus=scsi%d channel=%d id=%d lun=%d (vendor=%s, version=%d)" % \
+           ( c, host, channel, id, lun, vendor, version )
+      else:
+         print  str( (c, host, channel, id, lun, vendor, version) )
+
+
 def printstatus(d):
      #  status=d.GetSubPageStatus()
      #  if Drobo.DEBUG & Drobo.DBG_Chatty:
@@ -177,6 +202,8 @@ def printluns(d):
     for i in luninfo:
        print i
  
+
+
 def info(d,choices):
   if debug & Drobo.DBG_Chatty:
     s = d.GetSubPageSettings()
@@ -200,6 +227,9 @@ def update(pct):
   print "write is %2d%% done." % ( pct )
 
 def setlunsize(d,newlunsize,confirmation):
+  ''' trigger a change of lunsize on the drobo.  Destructive operation.
+      Prompts for confirmation.
+  '''
   lunsize=int(newlunsize)
 
   if lunsize not in (1, 2, 4, 8, 16):

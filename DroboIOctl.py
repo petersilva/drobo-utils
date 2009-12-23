@@ -90,13 +90,14 @@ class DroboIOctl:
   
   def version(self):
      """
+      
     
      """
      k=create_string_buffer(8) 
      if ioctl(self.sg_fd, sg_io_hdr.SG_GET_VERSION_NUM, k) < 0 :
         print "%s is not an sg device, or old sg driver\n" % char_dev_file
      num=struct.unpack("l",k) 
-     return num
+     return num[0]
 
   def closefd(self):
      if self.sg_fd > 0:
@@ -168,13 +169,11 @@ class DroboIOctl:
 
     sense_buffer = create_string_buffer(64)
     self.mx_sb_len = len(sense_buffer)
-    #io_hdr.sbp=addressof(sense_buffer)
     io_hdr.sbp=cast(sense_buffer,c_char_p)
     io_hdr.sb_len_wr = 0 # initialize just in case...
     
     page_buffer=create_string_buffer(sz)
     io_hdr.dxfer_len = sz
-    #io_hdr.dxferp = addressof(page_buffer)
     io_hdr.dxferp = cast(page_buffer,c_char_p)
 
     if self.debug & Drobo.DBG_HWDialog:

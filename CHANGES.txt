@@ -2,7 +2,6 @@
 master
   * TODO: looking at firmware based LUN creation/deletion & format.
   * TODO: alerts.
-  * TODO: review format queries (NTFS/GPT/MBR, etc...)
   * TODO: fix make_tarball to exclude .git and debian, like it is supposed to.
   * TODO: review getSubPageStatus, DMIP seems better now.
   * TODO: review unitstatus vs. diskpack status.
@@ -18,6 +17,10 @@ master
   * GUI Option setting, thresholds, etc...
   * changed command line syntax to more consistently set <item>
   * documented option setting in CLI
+  * more input checking to CLI.
+  * improved LUN info display accuracy.
+  * debugged DroboPRO support (debugged via google group. Thanks All!)
+  * added scsi to info printing options in CLI.
 
 0.6.1: October 7th, 2009
   * DroboPro identification fix by spobole, 
