@@ -147,6 +147,8 @@ you have permission to access (depends on the setup, usually USB devices
 on desktops are accessible to users, so you can see them.  
 
 
+.. Setup:
+
 Setup Drobo with Linux
 ----------------------
 
@@ -257,7 +259,7 @@ On my system the process looked like this::
 Drobo Not Detected
 ==================
 
-To find Drobo's on a system, drobo-utils queries all the attached devices for indications
+To find Drobo on a system, drobo-utils queries all the attached devices for indications
 it is made by Data Robotics.  These strings change from product to product.
 If your (new model) of Drobo is not detected, then run the command line interface
 with the hardware detection debugging output turned out.  like so:
@@ -280,8 +282,8 @@ at the time this example was run.  so then try:
 
  # drobom -s Drobo status
 
-as in, take the unknown vendor string and feed it as -s option to tweak detections
-of drobom.
+Take the unknown vendor string and feed it as -s option to tweak detection
+of drobom.  Your drobo will likely then be picked up.
 
 
 Multiple LUNS
