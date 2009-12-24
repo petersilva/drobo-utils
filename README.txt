@@ -6,7 +6,7 @@ README
 Drobo-utils is a set of linux tools to query and manage Data Robotics
 Drobo storage systems.  If you fire up drobom view, it should look pretty
 familiar to those who have seen the dashboard on other operating systems. 
-Droboview is built on a little programmer interface which can be installed 
+Drobom view is built on a little programmer interface which can be installed 
 on the system and used by other applications as well.
 
 For experienced Linux hands, there is a command line interface, drobom,
@@ -303,7 +303,7 @@ might have a look at some kernel settings:
 make sure that scsi_mod kernel module is loaded, make 
 sure /sys/module/scsi_mod/parameters/max_luns is > 1.
 
-Droboview will start up one GUI per drobo, regardless of the number
+Drobom view will start up one GUI per drobo, regardless of the number
 of LUNS.  If asked to format, all LUNS for the device will be formatted.
 
 

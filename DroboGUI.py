@@ -756,17 +756,12 @@ class DroboGUI(QtGui.QMainWindow):
         help.addAction(dmmanpage)
         self.connect(dmmanpage, QtCore.SIGNAL('triggered()'), self.dmmanpagedialog.show)
 
-        dvmanpage = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Droboview man-page', self)
-        self.dvmanpagedialog = ShowText("droboview.html")
-        help.addAction(dvmanpage)
-        self.connect(dvmanpage, QtCore.SIGNAL('triggered()'), self.dvmanpagedialog.show)
-
         chgmanual = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Change log', self)
         self.chgmanualdialog = ShowText("CHANGES.html")
         help.addAction(chgmanual)
         self.connect(chgmanual, QtCore.SIGNAL('triggered()'), self.chgmanualdialog.show)
 
-        about = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'About DroboView', self)
+        about = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'About Drobom view', self)
         self.aboutdialog = DroboAbout()
         help.addAction(about)
         self.connect(about, QtCore.SIGNAL('triggered()'), self.aboutdialog.show)
