@@ -226,7 +226,7 @@ def _unitfeatures(norig):
           n = n & ~ feature[0]
           f.append( feature[1] )
     if n != 0:
-        f.append( "leftovers (%04x)" % n )
+        f.append( "leftovers (0x%04x)" % n )
 
     return f
 
