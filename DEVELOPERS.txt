@@ -136,6 +136,8 @@ The debian/ setup puts stuff in /usr/sbin while setup.py puts things in /usr/bin
 Making a Release
 ----------------
 
+Procedure::
+
   1 - make a branch
    # assuming you have a local repository...
    git branch <branch>  # creates the branch, from the cwd (ought to be master)
