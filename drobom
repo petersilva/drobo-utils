@@ -216,7 +216,7 @@ def info(d,choices):
      if c in valid_print:
         eval( "print" + c + "(d)"  )
      else:
-        print 'invalid info option: %s' % c
+        print 'no such option: %s' % c
         print 'valid options: ', opt_str
 
   if debug & Drobo.DBG_Chatty:

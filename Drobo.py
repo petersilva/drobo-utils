@@ -361,7 +361,7 @@ class Drobo:
              That would be bad!
 
         for l in LUN:
-            parted /dev/sd?? mklabel gpt mkpart pri ext2 0 -1
+            parted /dev/sd?? mklabel gpt mkpart pri ext3 0 -1
             mke2fs -j ... /dev/sd??
 
      """    
@@ -391,7 +391,7 @@ class Drobo:
             #       option is 'off' (the '^' at the beginning.)
             # sparse_super -- there are lots too many superblock copies made by default.
             #       safe enough with fewer.
-            fd.write( "parted -s %s mkpart primary ext2 0 100%%\n" % cd )
+            fd.write( "parted -s %s mkpart primary ext3 0 100%%\n" % cd )
             fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode %s1\n' % cd )
         elif fstype == 'ntfs':
