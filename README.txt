@@ -1,215 +1,234 @@
 
-------
-README
-------
+-----------
+Drobo-Utils
+-----------
 
 Drobo-utils is a set of linux tools to query and manage Data Robotics
-Drobo storage systems.  If you fire up drobom view, it should look pretty
+Drobo storage systems.  If you fire up drobom view, it should look 
 familiar to those who have seen the dashboard on other operating systems. 
 Drobom view is built on a little programmer interface which can be installed 
-on the system and used by other applications as well.
+on the system and used by other applications as well.  For experienced Linux hands, 
+there rest of the command line interface is provided by other sub-commands of 
+drobom, and offer the same functionality as the view graphical interface.  
+There is also a python API. 
 
-For experienced Linux hands, there is a command line interface, drobom,
-which offers the same functionality as drobom view.   For real hackers, fire
-up a python interpreter, 'import Drobo', help(Drobo), and you are off to 
-the races...  Command-line access is also bundled into a set of improvements
-to a standards droboshare called 'Droboshare Augmented Root File System' (DARFS)
 
-.. contents::
+INSTALLATION: Easiest
+---------------------
 
-INSTALLATION
-------------
+On Ubuntu 9.10 [#Distro]_ or later (or Debian unstable or other debian derived distributions), 
+drobo-utils is included in the repositories, and installation from a shell prompt is simply::
 
-Drobo utils installation.
+  % sudo apt-get install drobo-utils
 
-REQUIREMENTS
+to run at least the command line utility.  Users on servers often want only command line 
+functionality.  On the other hand, to enable the graphical user interface, one more package 
+must be installed::
+
+  % sudo apt-get install python-qt4
+
+That is the easiest installation method, this method ensures that any packages required
+are automatically installed on the system as part of the above installation.  On other 
+distributions, or if the version in the repositories is too old, more complicated methods
+might be needed.  For all other installation methods, one must ensure the packages that 
+drobo-utils requires are installed.  These packages are called Dependencies.
+
+.. [#Distro] Drobo-utils is developed for release on the stable version of Kubuntu at the time
+   it is released.  Development started on kubuntu 7.10 and continued to 9.10 at the
+   end of 2009.  Any similarly recent distribution ought to do.  The package is
+   accepted into Debian unstable, so all debian derived distributions (debian, \*ubuntu, 
+   MEPIS, PCLinux-OS, etc...) should inherit the package in due course.  
+
+
+Dependencies
 ============
 
-Drobo-utils is developed on Kubuntu (Karmic) Any recent distro ought to do.
-as of Ubuntu 9.10, drobo-utils is included in the repositories, and installation
-is simply:
+Before one can install drobo-utils itself, the other packages needed are something like those 
+below (these examples are ubuntu packages, names may vary on other distributions)::
 
-  sudo apt-get install drobo-utils
+     python      -- interpreter for python language
+     parted      -- partitioner, usually included with the distro.
 
-and it should pull in what you need.  
+If using Redhat Enterprise Linux (RHEL, aka. CentOS, Scientific Linux etc...), which have 
+python 2.4 [#python]_, then the following are necessary::
 
-To get drobo-utils running, you need packages something like (these are
-ubuntu packages, names may vary on other distros):
-
-essential::
-  python      -- interpreter for python language
-  parted      -- partitioner, usually included with the distro.
-
-  if using RHEL, which has python 2.4...
      python-ctypes -- module for C-interface
 
-for the GUI:
-  python-qt4  -- the python bindings for version 4 of the QT toolkit
+.. [#python] I'm not sure that python-2.4 will work, for other reasons.  the utility is built on 
+   python-2.5 and python-2.6 and it should work on them.  python-2.4 is not tested.  python-3 will
+   definitely not work.
 
-To get a complete list, it is best to use a shell window to grep in the 
-Debian package control file (which defines what the dependencies are for the
-build system)::
+On RPM-based distros (such as Redhat & SuSe), it would more likely be 'yum' instead of 
+'aptitude' and some of the package names will change.  A typical difference is that 
+packages for developers have the -devel suffix on Redhat derived distributions, instead 
+of the -dev favoured by debian derived ones.
 
- peter@pepino% grep Depend debian/control
- Build-Depends: debhelper (>= 5), python2.5-dev, python-docutils
- Depends: ${shlibs:Depends}, ${misc:Depends}, parted
- peter@pepino%      
+Here is an example from fedora 7 (courtesy of help4death on the google group)::
 
-INSTALLING pre-requisites  
-=========================
+    % yum install python
+    % yum install PyQt4
+    % yum install python-devel
 
-On ubuntu, it would typically look like so: Open a shell window. Enter the following package installation commands::
-
- % sudo aptitude install parted 
- % sudo aptitude install python-qt4 
-
-If you want to be able to partition disks using drobo-utils, parted is required.
-If you want a GUI, you need the QT toolkit package.  On redhat/fedora distros, it would 
-more likely be 'yum' instead of 'aptitude' and some of the package names will 
-change.  A typical difference is that packages for developers have the -devel 
-suffix on Redhat derived distributions, instead of the -dev favoured by debian 
-derived ones.
-
-here is an example from fedora 7 (courtesy of help4death on the google group)::
-
- % yum install python
- % yum install PyQt4
- % yum install python-devel
-
-NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  the package should work fine on headless servers using only the command line.
-
-Install With no GUI
-===================
-
-Some linux users run Drobos on servers and do not want to pull in X and a desktop etc... 
-when they install drobo-utils.  While the drobo-utils component includes support for a 
-GUI, the debian packaging does not list python-qt4 (the GUI toolkit used) as a 
-pre-requisite, but only suggests the toolkit.  So a straight apt-get will not ruin your 
-tidy CLI only server.  It will pollute it with around 35 KB of python GUI code, 
-hopefully not a big problem.
+NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  
+the package should work fine on headless servers using only the command line.
 
 
 Install From Package
 ====================
 
-If you are running on a distro that is debian derived (such as ubuntu), this is your lucky day.  drobo-utils has been accepted in debian so installation is a matter of:
+Once dependencies are satisfied,  one can install the latest stable package manually.
 
- # apt-get install drobo-utils
+Point a browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
 
- from a root shell.
-
-On the other hand, the repositories might have some lag, in which case you might want to 
-Point your browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
-where the most current packages are available.  after downloading a .deb, it is simply a matter of:
+where the most current packages are available.  after downloading a .deb, it is simply a matter of::
 
   # dpkg -i drobo-utils-<version>.deb
 
 done!
 
-Redhat/Fedora users.  You can try alien. I don't know if it works.  Someone to take on RPM packaging would be very welcome!
+Redhat/Fedora users.  alien may be used to convert the package. I don't know if it works.  Someone to take on RPM packaging would be very welcome!  This is a pure python package, so the chances are good that it does work without issue.
+
+Install From TAR file
+=====================
+
+Assuming the dependencies are installed/satisfied, the package will actually run fine 
+without being installed in any systemish places.  Source code can be directly downloaded
+run it explicitly from the directory.  
+
+Point a browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
+
+download the .tgz preferred. then untar it::
+
+  # tar -xzvf drobo-utils-<version>.tgz
+  # cd drobo-utils-<version>
+  # ./drobom status
+
+for all of the examples in the manual one just needs to prepend './' before drobom.  
 
 
+Install from GIT
+================
+
+When a new model comes out, or the stable version is missing a feature, one may elect to
+follow along with the latest development version.  installation of git_, is necessary,
+then use it can be used to get a copy of the source tree::
+
+  # apt-get install git
+  # git clone git://drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils
+  # cd droo-utils
+  # ./drobom status
+  # git pull
+
+This gives a read-only copy of the source code that can be updated with the latest 
+changes with 'git pull'.  One can also select any stable version of drobo-utils by use of
+'git branch -r', and 'git checkout'.  For details, consult git documentation.
+
+So, one way or another, drobo-utils is installed. The next step is to try it out.
+
+.. _git: http://www.git-scm.com
 
 Try Out the CLI
 ===============
 
-Assuming you have all of the above parts, in the directory where you
-downloaded the source, you should be able to invoke the command line 
-interface as follows::
-
-         drobom status 
-
-see if something sensible happens... on my system with a drobo
-the following happens::
+The first item to verify after installation is to invoke the 
+command line interface (CLI.) and see if something sensible happens... 
+on my system with a drobo[#sdz] the following happens::
 
  % sudo drobom status
  /dev/sdz /drobo01 100% full ( ['Red alert', 'Bad disk', 'No redundancy'], 0 )
  %
 
-Note: drive changed to sdz to avoid copy/paste errors.
+.. [#sdz] in examples, drive always changed to sdz to avoid copy/paste errors.
 
-very scary, but my drobo is in bad shape right now... you should just get []
+very scary, but my drobo is in bad shape right now... normal result is: []
 as a status, which means there is nothing wrong.   To get all kinds of 
-information on your drobo, try 'drobom info.'  You can then invoke it 
+information about the drobo, try 'drobom info.'  You can then invoke it 
 with no arguments at all which will cause it to print out a list of the 
 commands available through the command line interface.
 
 Try Out the GUI
 ===============
 
-Once the command line stuff that is working, and assuming you 
-have python-qt4 installed, try::
+Once the command line functionality is verified, and assuming 
+python-qt4 is installed::
 
- % drobom view
+ # drobom view
 
-which should start a GUI for each drobo attached to your machine, that
-you have permission to access (depends on the setup, usually USB devices 
-on desktops are accessible to users, so you can see them.  
+as root starts a GUI for each drobo attached to a computer.
+There are various tabs to allow one to obtain information from the Drobo,
+and also change its configuration.  For example, one can use the Format 
+tab of the GUI to partition the device and create a single file system 
+for a given LUN.  
 
+There are two choices to make when setting up a Drobo: file system type, and LUN size.
+For a discussion of these choices, please consult:  `LUNSIZE fits all`_ 
+and `Filesystem Choice`_.
 
-.. Setup:
+.. _Setup:
 
-Setup Drobo with Linux
-----------------------
+Manual Setup Drobo with Linux
+-----------------------------
 
-One can use the Format tab of the GUI to partition the device
-and create a single file system for a given LUN.  
+This section provides an illustrative example of the most common configuration.
+An ext3 file system is built on a Drobo with whatever LUNSIZE is already in place.
+The GUI and line modes produce exactly the same result, and simply
+execute standard linux partitioning using parted, and the appropriate
+file system builder for the type in question. Sample CLI run::
 
-NOTE:  mke2fs takes a very long time to run, on the order of ten minutes 
-per Terabyte. the display format button just turns red while the format
-is in progress,and you have to wait until it finishes.  Have not
-determined a method to monitor progress yet.  other file systems are
-much more quickly created, so less of an issue.
+ PleaseEraseMyData# drobom -d /dev/sdz format ext3 
+ peter@pepino:~/drobo/drobo-utils$ sudo ./drobom format ext3
+ /dev/sdz - Drobo disk pack 00% full - ([], 0)
+ preparing a format script for a ext3 file system as you requested
+ OK, I built the script but nothing is erased yet...
+ You can have a look at it with: cat /tmp/fmtscript
+ If you are really sure, go ahead and do: sh /tmp/fmtscript
+ WARNING: Ready to destroy all your data. Continue? (y/n) n
+ Phew... You stopped just in time!
+ peter@pepino:~/drobo/drobo-utils$
 
-I actually prefer to use the system tools manually, as described below:
+ # cat /tmp/fmtscript
+ #!/bin/sh
+ parted /dev/sdz mklabel gpt
+ parted /dev/sdz mkpart pri ext3 0 100%
+ parted /dev/sdz print; sleep 5
+ mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdz1
 
-Drobos with firmware 1.1.1 or later work well under linux with ext3.
-You can, of course set up an NTFS or HPS+ or FAT32 if you really want,
-but it seems actively counter-intuitive on Linux.  Have not tested
-HPS, but ntfs-3g worked fine initially.  However, unless you are
-going to physically move the disk to between systems, the native (ext3) 
-format has many advantages.  The ´coffee is hot´ disclaimer is 
-necessary at this point::
+The above sets up the drobo as one big partition, with a label that says
+it ought to contain an ext3[#mke3fs] file system.  For an NTFS file system,
+write ´ntfs´ in place of ext3.  The next step is to add the file
+system into the partition.  while parted's are instantaneous, the mke2fs 
+takes a while, just have a little patience, it´ll be fine.
+The ´coffee is hot´ disclaimer is necessary at this point::
 
- WARNING: THE FOLLOWING 4 LINES WILL ERASE ALL DATA ON YOUR DROBO!
+ WARNING: THE FOLLOWING LINES WILL ERASE ALL DATA ON YOUR DROBO!
  WARNING: NO, IT WILL NOT ASK ANY QUESTIONS!
  WARNING: ASK YOURSELF, before you start: ARE YOU SURE? 
  WARNING: AFTER THE SECOND LINE, YOU ARE TOAST.
  WARNING: BEST TO BACKUP YOUR DATA BEFOREHAND...
 
-If you didn't use the GUI, Here is what you have to type::
-
- # drobom -d /dev/sdz format ext3 PleaseEraseMyData
- You asked nicely, so I will format ext3 as you requested
- if you are really sure, go ahead and do: sh /tmp/fmtscript
-
- # cat /tmp/fmtscript
- #!/bin/sh
- parted /dev/sdz mklabel gpt
- parted /dev/sdz mkpart ext2 0 100%
- parted /dev/sdz print; sleep 5
- mke2fs -j -i 262144 -L Drobo01 -m 0 -O sparse_super,^resize_inode /dev/sdz1
-
-
-The above sets up the drobo as one big partition, with a label that says
-it ought to contain an ext2 file system.  If you want an NTFS file system,
-then write ´ntfs´ in place of ext2.  The next step is to add the file
-system into the partition.  while parted's are instantaneous, the mke2fs 
-takes a while, just have a little patience, it´ll be fine.
-
  sh -x /tmp/fmtscript
 
-(If you want an ntfs file system, then mkntfs -f -L Drobo01 /dev/sdz1 
-ought to work too... ) 
+(For an ntfs file system, use mkntfs -f -L Drobo01 /dev/sdz1 
+... For ext3, be prepared to wait[#mkext3time]_ ) 
 
-On my system the process looked like this::
+.. [#mke3fs] The proper command to build an ext3 file system is mke2fs -j.  This
+   confuses people who wonder why one doesn't use some sort of ext3 mkfs.  There isn't one,
+   an ext3 is an ext2 with a journal.
+
+.. [#mkext3_time] mke2fs takes a very long time to run, on the order of ten minutes 
+   per Terabyte. the display format button just turns red while the format
+   is in progress. Have not determined a method to monitor progress yet from
+   the GUI yet.  other file systems are much more quickly created, so less of 
+   an issue.
+
+Sample run::
 
  root@alu:~# parted -i /dev/sdz
  GNU Parted 1.7.1
  Using /dev/sdz
  Welcome to GNU Parted! Type 'help' to view a list of commands.
  (parted) mklabel gpt
- (parted) mkpart ext2 0 100%
+ (parted) mkpart pri ext2 0 100%
  (parted) quit
  root@alu:~# fdisk /dev/sdz
  GNU Fdisk 1.0
@@ -256,56 +275,23 @@ On my system the process looked like this::
  root@alu:~#
  root@alu:~# mount /dev/sdz1 /mnt
 
-Drobo Not Detected
-==================
 
-To find Drobo on a system, drobo-utils queries all the attached devices for indications
-it is made by Data Robotics.  These strings change from product to product.
-If your (new model) of Drobo is not detected, then run the command line interface
-with the hardware detection debugging output turned out.  like so:
+.. _`LUNSIZE fits all`:
 
- # drobom -v 16 status 
- examining:  /dev/sda 
- id:  (0, 0, 0, 0, 'ATA     ') 
- rejected: vendor is ATA      (not from DRI) 
- examining:  /dev/sdb 
- id:  (2, 0, 0, 0, 'ATA     ') 
- rejected: vendor is ATA      (not from DRI) 
- examining:  /dev/sdc 
- id:  (8, 0, 0, 0, 'Drobo   ') 
- rejected: vendor is Drobo    (not from DRI) 
- returning list:  [] 
- No Drobos discovered 
+LUNSIZE Fits All?
+=================
 
-Here you see that the vendor string is 'Drobo' which was not a known vendor string
-at the time this example was run.  so then try:
+By default, Drobo creates a separate 'disk' visible to the computer for every 2 Terabytes (TiB) 
+of parity-protected capacity on the unit.   The natural usage that a drobo invites in users is
+to have a single, large device covering all the data on device.  For example, on Mac OS/X, users 
+often create 16 TB LUNS on HPFS.  This allows all the storage to fit on one large pool.  The 
+downside of larger LUNS has to do with startup time, and the time to perform a file system
+check.
 
- # drobom -s Drobo status
-
-Take the unknown vendor string and feed it as -s option to tweak detection
-of drobom.  Your drobo will likely then be picked up.
-
-
-Multiple LUNS
-=============
-
-LUN is an abbreviation of 'Logical UNit'. The origin of the term is SCSI terminology.
-When RAID units became too large for support in the past, and were sub-divided 
-to present smaller units the operating system.  The default LUNSIZE on Drobos 
-is 2 TiB (adjustable using the tools.) If more disk space (after 
-allowing for parity/redundancy) than LUNSIZE is installed in a 
-unit, Drobo will show a second (or even third) LUN.  Each LUN 
-shows up in Linux as a separate disk (examples if the first
-LUN shows up as /dev/sde, the next will be /dev/sdf, then /dev/sdg.)
-
-If you think you should see multiple LUNS and you don't, you
-might have a look at some kernel settings:
-make sure that scsi_mod kernel module is loaded, make 
-sure /sys/module/scsi_mod/parameters/max_luns is > 1.
-
-Drobom view will start up one GUI per drobo, regardless of the number
-of LUNS.  If asked to format, all LUNS for the device will be formatted.
-
+Under Linux unfortunately, If you have a first generation Drobo, you should limit the volume size 
+to 2 TiB[#gen12TB]_.  It is hoped, but not confirmed, that later products support LUNS larger 
+than 2 TiB on Linux.  Drobom view therefore limits lunsize to 2 TiB for the moment.  The 
+command line interface can be used to create larger LUNS, at your own risk...
 
 ON LUNSIZES >= 2TB:
  -- On older distributions, there are a couple of gotchas related to 
@@ -318,14 +304,35 @@ ON LUNSIZES >= 2TB:
            as libparted is fine, and other tools based on it
            still work. 
 
-  -- on linux kernel < 2.6.24 supposedly, the USB layer won't let one address 
+  -- on linux kernel < 2.6.24, the USB layer won't let one address 
      LUNs/offsets > 2 TB.  For example, Ubuntu hardy (8.04) released in Spring 
      2008 has a 2.6.24, and so is OK.  I've never been able to test this problem. 
+
+  -- On linux kernel < 2.6.31 there is are reported firewire problem that will
+     prevent devices > 2 TiB from working.
 
   -- ext3 with 4K blocks is supposed to allow file system capacity of 8 TiB.
      4K blocks seem to be assigned by default. So I think a good max. 
      It would be fun to set the LunSIZE to 8 TiB and test it out...
 
+  -- Windows XP does not support LUNS > 2 TiB 
+
+.. [#gen12TiB] Many tests have been performed with first generation products and several 
+   different failure modes have been found when exceeding 2 TiB.  Data Robotics has addressed 
+   several failure modes, via fixes to the kernel in 2.6.24, and for firewire in 2.6.31,
+   and continues to address them in later generation products.
+
+
+.. _`Filesystem Choice`:
+
+What Kind of File System?
+=========================
+
+Drobos work well under linux with ext3.  You can, of course set up an NTFS or 
+HPFS+ or FAT32 if you really want, but it seems actively counter-intuitive on Linux.  
+Have not tested HPFS, but ntfs-3g works fine as well.  Unless you are 
+going to physically move the disk to between systems, the native (ext3) format 
+has many advantages, most significant being speed. 
 
 Drobo Pro
 =========
@@ -333,32 +340,34 @@ Drobo Pro
 Drobo-utils depends on the linux generic scsi layer.  I suspect that 
 there is just a basic ethernet connection now, and you a few additional driver layers
 set up before it will work.   You need to configure the iscsi driver to recognize 
-the device.  Lemonizer on the Google Group 2009/05/16 reported good luck with:
+the device.  (This information is based on a post by Lemonizer on the Google Group 2009/05/16) 
 
-I had to manually configure the ip of the dbpro from the Drobo
-Dashboard on my macbook to do this as I'm not sure how to get the
-portal ip for iscsiadm. In my case it was 192.168.2.80 port 3260 and
-I'll use that ip in the example below
+First, connect the Pro via USB, and manually configure the ip of the dbpro:: 
 
-1. Configure iscsi ip address via drobo dashboard on win/osx
-2. Install open-iscsi (http://www.open-iscsi.org/): sudo apt-get install open-iscsi
-3. Connect the dbpro to host machine via iscsi
-4. Query dbpro's id: sudo iscsiadm --mode discovery --type sendtargets --portal 192.168.2.80
-5. Copy the id string returned by iscsiadm, something like "iqn.2005-06.com.datarobotics:drobopro.tdb091840080.node0"
-6. Connect to the dbpro: sudo iscsiadm --mode node --targetname iqn.2005-06.com.datarobotics:drobopro.tdb091840080.node0 --portal 192.168.2.80:3260 --login
+  # drobom info settings
+  # drobom set IPAddress 192.168.2.80
+  # drobom set NetMask   255.255.255.0
+  # drobom set UseStaticIPAddress True
 
-If everything went well, your dbpro should show up under /dev. Also
-check /var/log/messages to confirm that the iscsi device connected
-successfully.
+The next step is to  disconnect USB, and connect by iSCSI::
 
-After that, drobo-utils should be able to detect the Drobo and manage
-it over ethernet.
+  2. Install open-iscsi (http://www.open-iscsi.org/): sudo apt-get install open-iscsi
+  3. Connect the dbpro to host machine via iscsi
+  4. Query dbpro's id: sudo iscsiadm --mode discovery --type sendtargets --portal 192.168.2.80
+  5. Copy the id string returned by iscsiadm, something like "iqn.2005-06.com.datarobotics:drobopro.tdb091840080.node0"
+  6. Connect to the dbpro: sudo iscsiadm --mode node --targetname iqn.2005-06.com.datarobotics:drobopro.tdb091840080.node0 --portal 192.168.2.80:3260 --login
+
+If everything went well, your dbpro should show up under /dev. Also check /var/log/messages to 
+confirm that the iscsi device connected successfully.  After that, drobo-utils should be able 
+to detect the Drobo and manage it over ethernet/iSCSI.
 
 (source: http://groups.google.com/group/drobo-talk/browse_frm/thread/453e02e105e9b41?hl=en )
 
 Some people reported data corruption.  This link claims to fix one such
 issue:
 http://www.drobospace.com/forum/thread/13951/Dropped-iSCSI-connections/?page=2#24792
+
+
 
 
 Drobo Firmware
@@ -451,19 +460,23 @@ Compatibility
 Drobo has been tested with every old firmware version. Any Drobo should
 be upgradable to modern firmware using the dashboard.
 
+for Drobo v1's (only models available to me used for QA)
+
    NOTE: really need at least 1.1.1 to use Linux & ext3.
          just use the tools to upgrade your firmware ASAP.
 
    1.01  - very old... bad idea to install this, need to write
            a script to get out, because it isn't in the revision
-           table.
-           not much works except firmware upgrade.
+           table.  not much works except firmware upgrade.
+           DO NOT USE. UPGRADE ASAP
 
    1.0.2 - works ok in CLI And GUI to view, and upgrade firmware.
+           DO NOT USE. UPGRADE ASAP
 
    1.0.3 - GUI and CLI work OK, can upgrade firmware.
            Used ntfs3g for a few months under ubuntu 7.10 Linux.
            Used 2 TB LUN, with 1.5 TB of physical space available.
+           DO NOT USE. UPGRADE ASAP
             
    1.1.0 - dashboard works no issues.
          - from this point, you don't seem to need to unplug the USB
@@ -475,11 +488,72 @@ be upgradable to modern firmware using the dashboard.
            ('name' not supported by firmware)
 
    1.3.0 - works without issues.
+   1.3.5 - works without issues.
+
+
+Troubleshooting
+---------------
+
+No Drobos Discovered 
+====================
+
+To find Drobo on a system, drobo-utils queries all the attached devices for indications
+it is made by Data Robotics.  These strings change from product to product.
+If your (new model) of Drobo is not detected, then run the command line interface
+with the hardware detection debugging output turned out.  like so::
+
+ # drobom -v 16 status 
+ examining:  /dev/sda 
+ id:  (0, 0, 0, 0, 'ATA     ') 
+ rejected: vendor is ATA      (not from DRI) 
+ examining:  /dev/sdb 
+ id:  (2, 0, 0, 0, 'ATA     ') 
+ rejected: vendor is ATA      (not from DRI) 
+ examining:  /dev/sdc 
+ id:  (8, 0, 0, 0, 'Drobo   ') 
+ rejected: vendor is Drobo    (not from DRI) 
+ returning list:  [] 
+ No Drobos discovered 
+
+Here you see that the vendor string is 'Drobo' which was not a known vendor string
+at the time this example was run.  so then try::
+
+ # drobom -s Drobo status
+
+In other words, take the unknown vendor string and feed it as -s option to tweak detection
+of drobom.  Your drobo will likely then be picked up.
+
+
+Only One LUN?
+=============
+
+LUN is an abbreviation of 'Logical UNit'. The origin of the term is SCSI[#SCSI]_ terminology.
+When RAID units became too large for support in the past, and were sub-divided 
+to present smaller units the operating system.  The default LUNSIZE on Drobos 
+is 2 TiB (adjustable using the tools.) If more disk space (after allowing for 
+parity/redundancy) than LUNSIZE is installed in a unit, Drobo will show a 
+second (or even third) LUN.  Each LUN shows up in Linux as a separate disk 
+(examples if the first LUN shows up as /dev/sde, the next will be /dev/sdf, 
+then /dev/sdg.)
+
+If you think you should see multiple LUNS and you don't, you might have a look at 
+some kernel settings: make sure that scsi_mod kernel module is loaded, make 
+sure /sys/module/scsi_mod/parameters/max_luns is > 1.
+
+Drobom view will start up one GUI per drobo, regardless of the number
+of LUNS.  If asked to format, all LUNS for the device will be formatted.
+
+.. [#SCSI] Small Computer System Interface. A ubiquitous standard for computers to
+   communicate with storage hardware.  SCSI includes hardware cabling specifications,
+   which are mostly obsolete, but what remains is the "command set", the language used
+   by the computer to make requests to the device.  In that sense, All Drobos are SCSI devices.
+   The SCSI commands are tunnelled within other protocols used to transport data between
+   computer and device (Firewire, USB, eSATA, and, yes... ISCSI)
 
 
    
 KNOWN BUGS
-----------
+==========
 
 drobom view isn't suited to run continuously for long periods, 
 as it has a memory leak...  total foot print starts out at 32M
@@ -504,8 +578,10 @@ Droboshare Support
 
 Droboshare is not directly supported by drobo utils running on a linux host.
 However, the droboshare itself is a linux host, and it is possible to run
-drobo-utils un-modified on the droboshare itself.  In order to do run drobo-utils, you need to build a python interpreter.  A python interpreter has, itself,
-a bunch of dependencies.  So you need to install a whack of packages on the droboshare in order to get a working drobo-utils.  This is where DARFS comes in.
+drobo-utils un-modified on the droboshare itself.  A python interpreter is needed
+to run drobo-utils.  A python interpreter has, itself, a number of dependencies.  
+So you number of packages need to be installed on the droboshare.
+This is where DARFS comes in.
 
 DARFS
 =====
@@ -578,7 +654,10 @@ who did what::
  Joe Krahn:      lots of inspiration.
  Andy Grover:    some elegance cleanups. 
 
+Testers (of DroboPRO):
+Sebastian Sobolewski, robj, Sebastian (aka Tom Green), ElliotA, Andrew Chalaturnyk 
 
+ 
 Administrivia
 -------------
 

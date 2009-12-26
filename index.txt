@@ -3,10 +3,10 @@
    :file: sponsor.html
 
 =======================================================
-Drobo-Utils: Drobo: API, CLI, &amp; Dashboard for linux
+Drobo-Utils: Drobo: API, CLI, &amp; Dashboard for Linux
 =======================================================
 
-A Drobo is a cool little storage unit where you just put disks in, and it takes care
+A Drobo_ is a cool little storage unit where you just put disks in, and it takes care
 of figuring out how to protect you from data loss.  You do not, like other raids, have 
 to install matching disks.  You do not, like other units, make arcane decisions about 
 how the data is laid out.  It pretends to be just a pile of storage, and does the smart 
@@ -15,18 +15,17 @@ thing you would have done if you had taken the time to put your mind to it.
 So you bought a Drobo_ and you want to use it under linux.  Great!  Plug it in and Go!  
 Really! It can be used just as a normal disk.  Plug it in like any USB thumb drive.  
 If you are an old Linux hand, then just use a partitioner, such as parted, 
-and build an ext3 file system and set your mount point. if the above was gobbledygook, 
-no worries, there's a GUI to do it for you.  
+and build an ext3 file system and set your mount point.  see the Setup_ section for 
+details on manually setting things up from the command line without any special software.
+For those with other tastes, there is also a GUI that can take care of it:
 
 .. image:: droboview_prototype4.png
 
-[ `Screen Shots`_  ] [ Download_ ]
+[ `Screen Shots`_  ] [ Download_ ][ `Table of Contents`_]
 
-This site is the home page for a linux version of the 'dashboard' software that Data 
-Robotics provides with their Drobos for windows and Mac.
 You can use Drobos without any special software.  The blue capacity lights will fill up as 
 the disks fill.  When it gets too full, Drobo will ask for another drive with its drive 
-lights. Just feed it drives when it asks, and you are good to go. So what's the 
+lights. Just feed it drives when it asks, and you are good to go. So what is the 
 dashboard good for?
 
  * If you cannot see your Drobo, it can tell you what the lights would tell you.
@@ -52,6 +51,15 @@ MAN PAGES
 .. _drobom: drobom.html
 
 
+.. _DEVELOPERS: 
+.. include:: DEVELOPERS.txt
+
+.. _CHANGES:
+
+Below are highlights included in each release.
+
+.. include:: CHANGES.txt
+
 -------------
 Links & Help!
 -------------
@@ -64,7 +72,6 @@ Links & Help!
  * Project_ - SourceForge Project
  * DEVELOPERS_ Developer documentation
  * DroboSpace_ - Vendor forum
- * CHANGES_ - What's in each version
 
 If you have questions, you can try the google groups or just post to drobo-utils-devel@sourceforge.net, but for now, it's just me... my email works too... Peter.A.Silva@gmail.com (help welcome!)
 
@@ -75,11 +82,10 @@ If you have questions, you can try the google groups or just post to drobo-utils
 .. _Download: http://sourceforge.net/project/showfiles.php?group_id=222830
 .. _Project: http://sourceforge.net/projects/drobo-utils/
 .. _DroboSpace: http://drobospace.com
-.. _CHANGES: CHANGES.html
 
-.. _DEVELOPERS: 
-.. include:: DEVELOPERS.txt
+.. _`Table of Contents`:
 
+.. contents::
 
 About This Page
 ---------------

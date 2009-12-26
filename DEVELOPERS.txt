@@ -6,7 +6,7 @@ DEVELOPER NOTES
 
 This software is copyright under GPL.  See near end file for details...
 
-Random useful bits for developers.  (aka notes to myself ;-)
+This is a pile of random useful bits for developers.  (aka notes to myself ;-)
 
 
 Working With Source
@@ -39,12 +39,21 @@ with git pull, and commit patches for distribution with git push.
 Build Dependencies
 ------------------
 
-To build the package from source, there are a number of other packages needed:
+To build the package from source, there are a number of other packages needed::
  
- % sudo aptitude install debhelper python2.5-dev
- % sudo aptitude install python-docutils
+ boule% sudo aptitude install debhelper python2.5-dev
+ boule% sudo aptitude install python-docutils
+ boule%
 
-The second line is to build documentation.
+The second line only required to build documentation.  On the other hand,
+to get a complete list of packages you need, it is best to use a shell window 
+to grep in the Debian package control file (which defines what the 
+dependencies are for the build system)::
+
+     peter@pepino% grep Depend debian/control
+     Build-Depends: debhelper (>= 5), python2.5-dev, python-docutils
+     Depends: ${shlibs:Depends}, ${misc:Depends}, parted
+     peter@pepino%
 
 
 
@@ -149,7 +158,7 @@ Quality Assurance (QA.txt)
 QA.txt is a quality assurance log.  The version on the trunk of the releases 
 indicates the QA procedure to be applied to the next version during the 
 release process.  Since a branch is created for each release, the version 
-of QA.txt acts as a quality log for that release.  so one can do an git 
+of QA.txt acts as a quality log for that release.  so one can do a git 
 checkout, or git export to get the quality log for any release (QA.txt 
 introduce in version 0.4.0)
 
@@ -160,7 +169,7 @@ Building Debian & Ubuntu Packages
 Assumes you have installed the Build dependencies::
 
  # obtain a fresh tree 
- % git clone ssh://peter_silva@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/<version> drobo-utils-<version>
+ % git clone ssh://user@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/<version> drobo-utils-<version>
  % cd drobo-utils-<version>
  % rm -rf .git  # get rid of Git cruft, yielding a raw source tree.
  % chmod 755 debian/rules  # I dunno why the permissions are wrong...
