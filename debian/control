@@ -11,9 +11,8 @@ XS-Python-Version: all
 
 Package: drobo-utils
 Architecture: all
-Recommends: parted, sudo
-Suggests: gparted, python-qt4
-Depends: ${misc:Depends}, ${python:Depends}, python-ctypes
+Suggests: python-qt4
+Depends: ${misc:Depends}, ${python:Depends}, python-ctypes, parted
 XB-Python-Version: ${python:Versions}
 Description: manage data robotics storage units (drobos)
  Provides utilities for managing Data Robotics storage units, also known as

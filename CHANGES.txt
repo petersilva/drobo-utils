@@ -1,5 +1,7 @@
 
 TODO:
+  * add python version testing to test suite (2.4, 2.5, 2.6)
+  * add LUN test procedure to DEVELOPERS.txt
   * looking at firmware based LUN creation/deletion & format.
   * alerts.
   * fix make_tarball to exclude .git and debian, like it is supposed to.
