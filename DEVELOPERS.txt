@@ -152,7 +152,14 @@ Procedure::
   3 - Build packages for testing & Install them. (see separate recipe.)
 
   4 - Run QA.
-   Record results of release tests in the branch (QA.txt) As new tests are created, modify QA.txt on trunk for to keep references for the next release.
+   Record results of release tests in the branch (QA.txt) As new tests are created, 
+   modify QA.txt on trunk for to keep references for the next release.
+
+  5 - Commit & Push QA'd branch
+
+    git commit -a
+    git push origin origin:refs/heads/<branch>
+
 
 Quality Assurance (QA.txt)
 ==========================
