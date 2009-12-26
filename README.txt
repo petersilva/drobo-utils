@@ -70,7 +70,7 @@ Here is an example from fedora 7 (courtesy of help4death on the google group)::
     % yum install python-devel
 
 NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  
-the package should work fine on headless servers using only the command line.
+The package should work fine on headless servers using only the command line.
 
 
 Install From Package
@@ -97,7 +97,7 @@ run it explicitly from the directory.
 
 Point a browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
 
-download the .tgz preferred. then untar it::
+download the .tgz preferred, then unpack it::
 
   # tar -xzvf drobo-utils-<version>.tgz
   # cd drobo-utils-<version>
@@ -653,9 +653,10 @@ who did what::
  Brad Guillory:  some help with diagnostics and patches.
  Joe Krahn:      lots of inspiration.
  Andy Grover:    some elegance cleanups. 
+ Sebastian Sobolewski:  DroboPro patches, and testing.
 
 Testers (of DroboPRO):
-Sebastian Sobolewski, robj, Sebastian (aka Tom Green), ElliotA, Andrew Chalaturnyk 
+robj, Sebastian (aka Tom Green), ElliotA, Andrew Chalaturnyk 
 
  
 Administrivia

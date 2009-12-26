@@ -19,9 +19,9 @@ and build an ext3 file system and set your mount point.  see the Setup_ section 
 details on manually setting things up from the command line without any special software.
 For those with other tastes, there is also a GUI that can take care of it:
 
+[ `Screen Shots`_  ] [ Download_ ][`Links and Help`_][ `Index`_]
 .. image:: droboview_prototype4.png
 
-[ `Screen Shots`_  ] [ Download_ ][ `Table of Contents`_]
 
 You can use Drobos without any special software.  The blue capacity lights will fill up as 
 the disks fill.  When it gets too full, Drobo will ask for another drive with its drive 
@@ -38,6 +38,9 @@ dashboard good for?
 So that is where drobo-utils, the linux dashboard, comes in.
 
 .. _README: 
+
+[`Index`_]
+
 .. include:: README.txt
 
 .. _`Manual Pages`:
@@ -46,34 +49,44 @@ So that is where drobo-utils, the linux dashboard, comes in.
 MAN PAGES
 ---------
 
+Drobom
+------
+
   * drobom_  - the interface (command line + view for a GUI)
 
 .. _drobom: drobom.html
 
 
 .. _DEVELOPERS: 
+
+[`Index`_]
+
 .. include:: DEVELOPERS.txt
 
 .. _CHANGES:
 
+[`Index`_]
 Below are highlights included in each release.
 
 .. include:: CHANGES.txt
 
+.. _`Links and Help`:
 -------------
 Links & Help!
 -------------
 
+If more information is needed, then there are a number of resources available:
+
  * Project_ -- development home page.  source code there as a download too...
  * README_ - Documentation for humans.
  * `Manual Pages`_ - traditional unix style documentation (man pages)
- * Group_ - Discussion Forum 
+ * Group_ - The Google groups is the most active discussion forum 
  * Drobo_ - Who makes them
  * Project_ - SourceForge Project
  * DEVELOPERS_ Developer documentation
  * DroboSpace_ - Vendor forum
-
-If you have questions, you can try the google groups or just post to drobo-utils-devel@sourceforge.net, but for now, it's just me... my email works too... Peter.A.Silva@gmail.com (help welcome!)
+ * Email_ - The developers list, one of us will surely answer.
+ * `Email Me`_ - one can email me directly.
 
 
 .. _`Screen Shots`: gallery.html
@@ -82,15 +95,18 @@ If you have questions, you can try the google groups or just post to drobo-utils
 .. _Download: http://sourceforge.net/project/showfiles.php?group_id=222830
 .. _Project: http://sourceforge.net/projects/drobo-utils/
 .. _DroboSpace: http://drobospace.com
+.. _Email: drobo-utils-devel@sourceforge.net
+.. _`Email me`: Peter.A.Silva@gmail.com
 
-.. _`Table of Contents`:
+.. _`Index`:
 
 .. contents::
+
 
 About This Page
 ---------------
 
-last revised: December 23rd, 2009
+last revised: December 26th, 2009
 
 copyright:
 
