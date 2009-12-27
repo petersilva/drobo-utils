@@ -1,6 +1,8 @@
 /*
 This style sheet is a slight modification of voidspace.css.
 
+
+
 Voidspace.css authors:
 :Authors: Ian Bicking, Michael Foord
 :Contact: fuzzyman@voidspace.org.uk
@@ -79,6 +81,8 @@ h1, h2, h3, h4, h5, h6 {
   padding: 4px;
   background-color: black;
   color: white;
+  width: 70%;
+  text-align: center;
 }
 
 h1 {

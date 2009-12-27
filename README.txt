@@ -4,7 +4,7 @@ Drobo-Utils
 -----------
 
 Drobo-utils is a set of linux tools to query and manage Data Robotics
-Drobo storage systems.  If you fire up drobom view, it should look 
+Drobo storage systems.  Fire up drobom view, and it should look 
 familiar to those who have seen the dashboard on other operating systems. 
 Drobom view is built on a little python programmer interface which can be installed 
 on the system and used by other applications as well.  For experienced Linux hands, 
@@ -141,8 +141,8 @@ on my system with a drobo[#sdz] the following happens::
 
 very scary, but my drobo is in bad shape right now... normal result is: []
 as a status, which means there is nothing wrong.   To get all kinds of 
-information about the drobo, try 'drobom info.'  You can then invoke it 
-with no arguments at all which will cause it to print out a list of the 
+information about the drobo, try 'drobom info.'  Invocation  
+without arguments at all which will cause it to print out a list of the 
 commands available through the command line interface.
 
 Try Out the GUI
@@ -287,10 +287,10 @@ often create 16 TB LUNS on HFS.  This allows all the storage to fit on one large
 downside of larger LUNS has to do with startup time, and the time to perform a file system
 check.
 
-Under Linux unfortunately, If you have a first generation Drobo, you should limit the volume size 
+Under Linux unfortunately, with a first generation Drobo, one should limit the volume size 
 to 2 TiB[#gen12TiB]_.  It is hoped, but not confirmed, that later products support LUNS larger 
 than 2 TiB on Linux.  Drobom view therefore limits lunsize to 2 TiB for the moment.  The 
-command line interface can be used to create larger LUNS, at your own risk...
+command line interface can be used to create larger LUNS, they just might not work.
 
 ON LUNSIZES >= 2TB:
  -- On older distributions, there are a couple of gotchas related to 
@@ -327,20 +327,19 @@ ON LUNSIZES >= 2TB:
 What Kind of File System?
 =========================
 
-Drobos work well under linux with ext3.  You can, of course set up an NTFS or 
-HFS+ or FAT32 if you really want, but it seems actively counter-intuitive on Linux.  
-Developers of Drobo-utils have not tested HFS.  Good success is reported with Ntfs-3g,
+Drobos work well under linux with ext3.  One can, of course, set up an NTFS or 
+HFS+ or FAT32 if necessary, but it seems actively counter-intuitive on Linux.  
+Developers of Drobo-utils have not tested HFS.  Linux does not write to Journalled HFS+
+at this point, so HFS support is not present.  Good success is reported with Ntfs-3g,
 but the performance is much lower than what is typically reported with ext3.
-Unless physically movement of the disk to between systems is required, the 
+Unless physical movement of the disk to between systems is required, the 
 native (ext3) format is the best option.
 
 Drobo Pro
 =========
 
-Drobo-utils depends on the linux generic scsi layer.  I suspect that 
-there is just a basic ethernet connection now, and you a few additional driver layers
-set up before it will work.   You need to configure the iscsi driver to recognize 
-the device.  (This information is based on a post by Lemonizer on the Google Group 2009/05/16) 
+This is a procedure for configuring a Drobo Pro for access via iSCSI.
+(This information is based on a post by Lemonizer on the Google Group 2009/05/16) 
 
 First, connect the Pro via USB, and manually configure the ip of the dbpro:: 
 
@@ -357,7 +356,7 @@ The next step is to  disconnect USB, and connect by iSCSI::
   5. Copy the id string returned by iscsiadm, something like "iqn.2005-06.com.datarobotics:drobopro.tdb091840080.node0"
   6. Connect to the dbpro: sudo iscsiadm --mode node --targetname iqn.2005-06.com.datarobotics:drobopro.tdb091840080.node0 --portal 192.168.2.80:3260 --login
 
-If everything went well, your dbpro should show up under /dev. Also check /var/log/messages to 
+If everything went well, your drobopro should show up under /dev. Also check /var/log/messages to 
 confirm that the iscsi device connected successfully.  After that, drobo-utils should be able 
 to detect the Drobo and manage it over ethernet/iSCSI.
 
@@ -366,8 +365,6 @@ to detect the Drobo and manage it over ethernet/iSCSI.
 Some people reported data corruption.  This link claims to fix one such
 issue:
 http://www.drobospace.com/forum/thread/13951/Dropped-iSCSI-connections/?page=2#24792
-
-
 
 
 Drobo Firmware
@@ -409,7 +406,7 @@ you you can see how it is progressing.  Have patience::
  writeFirmware Done.  i=2938036, len=2938036
  root@pepino:/home/peter/drobo/drobo-utils/trunk# 
 
-when it's done, you can check if it worked using::
+when it's done, check if it worked using::
 
  root@pepino# drobom status
  /dev/sdf - 00% full - (['New firmware installed'], 0)
@@ -422,12 +419,11 @@ lights will flash etc... wait until Drobo goes dark.
 Wait another five seconds, then un-plug the USB / connector.
    
 Plug it back in, and wait 10 seconds.
-it should start up with the latest firmware available for your drobo.
+it should start up with the latest firmware available for the drobo.
    
 The drobom commands, like DRI's dashboard, will normally
-get the latest and greatest firmware and upgrade.  If you have
-the need, you can load arbitrary firmware from the CLI with
-fwload command.
+get the latest and greatest firmware and upgrade.  If necessary 
+one can load arbitrary firmware from the CLI with fwload command.
 
 
 SAFETY
@@ -445,9 +441,9 @@ from the currently active one, and if activation of the new firmware fails,
 the drobo will simply boot the old one.  
  
 On the other hand, common sense rules do apply.  Setting the LUN size, or 
-re-formatting a Drobo will erase all your data whether you do it on Linux or 
+re-formatting a Drobo will erase all data whether it is done on Linux or 
 any other operating system.  These are power tools, and they can do some 
-damage to your data if used without proper care.  For example, the reliability 
+damage data if used without proper care.  For example, the reliability 
 of any storage unit does not reduce the need for backups it only makes doing them 
 easier. A Drobo is an excellent place to put backups, but not a substitute for 
 them.  Backups are the only way to address error 18 (the number of inches in 
@@ -463,7 +459,7 @@ be upgradable to modern firmware using the dashboard.
 for Drobo v1's (only models available to me used for QA)
 
    NOTE: really need at least 1.1.1 to use Linux & ext3.
-         just use the tools to upgrade your firmware ASAP.
+         just use the tools to upgrade firmware ASAP.
 
    1.01  - very old... bad idea to install this, need to write
            a script to get out, because it isn't in the revision
@@ -499,7 +495,7 @@ No Drobos Discovered
 
 To find Drobo on a system, drobo-utils queries all the attached devices for indications
 it is made by Data Robotics.  These strings change from product to product.
-If your (new model) of Drobo is not detected, then run the command line interface
+If the (new model) Drobo is not detected, then run the command line interface
 with the hardware detection debugging output turned out.  like so::
 
  # drobom -v 16 status 
