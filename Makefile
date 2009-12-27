@@ -6,16 +6,16 @@ build: doc
 clean:
 	-python setup.py clean
 	-find . -name "*\.pyc" -delete
-	-rm CHANGES.html DEVELOPERS.html README.html drobom.html droboview.html
+	-rm *.html
 	-rm -rf build*
 
 doc:
 	groff -Thtml -man drobom.8 >drobom.html
 	groff -Thtml -man droboview.8 >droboview.html
-	rst2html README.txt >README.html
-	rst2html DEVELOPERS.txt >DEVELOPERS.html
-	rst2html CHANGES.txt >CHANGES.html
-	rst2html index.txt >index.html
+	rst2html --stylesheet-path=drobo-utils.css README.txt >README.html
+	rst2html --stylesheet-path=drobo-utils.css DEVELOPERS.txt >DEVELOPERS.html
+	rst2html --stylesheet-path=drobo-utils.css CHANGES.txt >CHANGES.html
+	rst2html --stylesheet-path=drobo-utils.css index.txt >index.html
 
 # Uncomment this to turn on verbose mode.
 

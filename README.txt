@@ -6,11 +6,10 @@ Drobo-Utils
 Drobo-utils is a set of linux tools to query and manage Data Robotics
 Drobo storage systems.  If you fire up drobom view, it should look 
 familiar to those who have seen the dashboard on other operating systems. 
-Drobom view is built on a little programmer interface which can be installed 
+Drobom view is built on a little python programmer interface which can be installed 
 on the system and used by other applications as well.  For experienced Linux hands, 
-there rest of the command line interface is provided by other sub-commands of 
+the rest of the command line interface is provided by other sub-commands of 
 drobom, and offer the same functionality as the view graphical interface.  
-There is also a python API. 
 
 
 INSTALLATION: Easiest
@@ -284,12 +283,12 @@ LUNSIZE Fits All?
 By default, Drobo creates a separate 'disk' visible to the computer for every 2 Terabytes (TiB) 
 of parity-protected capacity on the unit.   The natural usage that a drobo invites in users is
 to have a single, large device covering all the data on device.  For example, on Mac OS/X, users 
-often create 16 TB LUNS on HPFS.  This allows all the storage to fit on one large pool.  The 
+often create 16 TB LUNS on HFS.  This allows all the storage to fit on one large pool.  The 
 downside of larger LUNS has to do with startup time, and the time to perform a file system
 check.
 
 Under Linux unfortunately, If you have a first generation Drobo, you should limit the volume size 
-to 2 TiB[#gen12TB]_.  It is hoped, but not confirmed, that later products support LUNS larger 
+to 2 TiB[#gen12TiB]_.  It is hoped, but not confirmed, that later products support LUNS larger 
 than 2 TiB on Linux.  Drobom view therefore limits lunsize to 2 TiB for the moment.  The 
 command line interface can be used to create larger LUNS, at your own risk...
 
@@ -329,10 +328,11 @@ What Kind of File System?
 =========================
 
 Drobos work well under linux with ext3.  You can, of course set up an NTFS or 
-HPFS+ or FAT32 if you really want, but it seems actively counter-intuitive on Linux.  
-Have not tested HPFS, but ntfs-3g works fine as well.  Unless you are 
-going to physically move the disk to between systems, the native (ext3) format 
-has many advantages, most significant being speed. 
+HFS+ or FAT32 if you really want, but it seems actively counter-intuitive on Linux.  
+Developers of Drobo-utils have not tested HFS.  Good success is reported with Ntfs-3g,
+but the performance is much lower than what is typically reported with ext3.
+Unless physically movement of the disk to between systems is required, the 
+native (ext3) format is the best option.
 
 Drobo Pro
 =========
@@ -549,6 +549,24 @@ of LUNS.  If asked to format, all LUNS for the device will be formatted.
    by the computer to make requests to the device.  In that sense, All Drobos are SCSI devices.
    The SCSI commands are tunnelled within other protocols used to transport data between
    computer and device (Firewire, USB, eSATA, and, yes... ISCSI)
+
+
+FAQ
+===
+
+Q: How come the command to build a file system builds an ext2 file system?
+
+A: because an ext3 file systems is an ext2 file system with a journal.  the normal command to build an ext3 file system is mke2fs -j.  
+
+Q: If you are going to use your Drobo as a single file system, can't you just mke2fs
+on the device file for the whole disk and skip partitioning altogether?
+
+A: I do not know, have not properly researched that yet.
+
+Q: Can you mix and match file systems ?
+
+A: from DRI: Yes, you can have multiple partitions per LUN. 
+
 
 
    

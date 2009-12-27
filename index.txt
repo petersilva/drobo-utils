@@ -1,16 +1,19 @@
 
 .. raw:: html
-   :file: sponsor.html
+   :file: sponsor.js
 
-=======================================================
-Drobo-Utils: Drobo: API, CLI, &amp; Dashboard for Linux
-=======================================================
+=========================
+Drobo Dashboard for Linux
+=========================
 
 A Drobo_ is a cool little storage unit where you just put disks in, and it takes care
 of figuring out how to protect you from data loss.  You do not, like other raids, have 
 to install matching disks.  You do not, like other units, make arcane decisions about 
 how the data is laid out.  It pretends to be just a pile of storage, and does the smart 
-thing you would have done if you had taken the time to put your mind to it.
+thing you would have done if you had taken the time to put your mind to it. Below is
+what the various models in the product line look like:
+
+.. image:: product_line.jpg
 
 So you bought a Drobo_ and you want to use it under linux.  Great!  Plug it in and Go!  
 Really! It can be used just as a normal disk.  Plug it in like any USB thumb drive.  
@@ -19,9 +22,9 @@ and build an ext3 file system and set your mount point.  see the Setup_ section 
 details on manually setting things up from the command line without any special software.
 For those with other tastes, there is also a GUI that can take care of it:
 
-[ `Screen Shots`_  ] [ Download_ ][`Links and Help`_][ `Index`_]
-.. image:: droboview_prototype4.png
+[ `Screen Shots`_  ][ Download_ ][`Links and Help`_][ `Index`_]
 
+.. image:: droboview_prototype4.png
 
 You can use Drobos without any special software.  The blue capacity lights will fill up as 
 the disks fill.  When it gets too full, Drobo will ask for another drive with its drive 
@@ -39,7 +42,7 @@ So that is where drobo-utils, the linux dashboard, comes in.
 
 .. _README: 
 
-[`Index`_]
+[`Links and Help`_][ `Index`_]
 
 .. include:: README.txt
 
@@ -59,21 +62,26 @@ Drobom
 
 .. _DEVELOPERS: 
 
-[`Index`_]
+[`Links and Help`_][ `Index`_]
 
 .. include:: DEVELOPERS.txt
 
 .. _CHANGES:
 
-[`Index`_]
+[`Links and Help`_][ `Index`_]
+
 Below are highlights included in each release.
 
 .. include:: CHANGES.txt
 
 .. _`Links and Help`:
+
 -------------
 Links & Help!
 -------------
+
+.. raw:: html
+   :file: sponsor.js
 
 If more information is needed, then there are a number of resources available:
 
@@ -81,8 +89,8 @@ If more information is needed, then there are a number of resources available:
  * README_ - Documentation for humans.
  * `Manual Pages`_ - traditional unix style documentation (man pages)
  * Group_ - The Google groups is the most active discussion forum 
- * Drobo_ - Who makes them
- * Project_ - SourceForge Project
+ * Drobo_ - Who makes Drobos.
+ * HomePage_ - Software home page.
  * DEVELOPERS_ Developer documentation
  * DroboSpace_ - Vendor forum
  * Email_ - The developers list, one of us will surely answer.
@@ -94,6 +102,7 @@ If more information is needed, then there are a number of resources available:
 .. _Drobo: http://www.drobo.com  
 .. _Download: http://sourceforge.net/project/showfiles.php?group_id=222830
 .. _Project: http://sourceforge.net/projects/drobo-utils/
+.. _HomePage: http://drobo-utils.sourceforge.net
 .. _DroboSpace: http://drobospace.com
 .. _Email: drobo-utils-devel@sourceforge.net
 .. _`Email me`: Peter.A.Silva@gmail.com
