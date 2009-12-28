@@ -293,7 +293,7 @@ Re-design the whole darn thing.
    -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
 
 
-Revision date: 2009/05/19
+Revision date: 2009/12/27
 
 copyright:
 
