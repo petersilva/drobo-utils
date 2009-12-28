@@ -753,10 +753,10 @@ class Drobo:
     if ( len(cmdout) == paklen ):
       ret = struct.unpack(mypack, cmdout)
     else:
-      print 'uh, oh... scsi inquire returned %d, bytes instead of %d expected.' % ( len(cmdout), paklen)
       if ( len(cmdout) == 36 ): # we have a PRO...
         ret = struct.unpack(dpropack, cmdout)
       else:
+        print 'warning: scsi inquire returned %d, bytes instead of %d expected.' % ( len(cmdout), paklen)
         raise DroboException
     if DEBUG & DBG_RawReturn :
         print "inquiry response: ", str(ret)
