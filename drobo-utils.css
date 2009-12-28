@@ -78,6 +78,7 @@ h1, h2, h3, h4, h5, h6 {
   border: thin solid black;
   /* This makes the borders rounded on Mozilla, which pleases me */
   -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
   padding: 4px;
   background-color: black;
   color: white;
