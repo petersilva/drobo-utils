@@ -1,7 +1,6 @@
 /*
 This style sheet is a slight modification of voidspace.css.
-
-
+mods by Peter Silva...
 
 Voidspace.css authors:
 :Authors: Ian Bicking, Michael Foord
@@ -20,8 +19,8 @@ and ``html4css1.css`` revision 1.46.
 body {
   font-family: "Lucida Grande", "Lucida Sans", Verdana, sans-serif;
   /* font-family: Arial, sans-serif; */
-  background-color: #aaaaaa;
-  color: #333333;
+  background-color: #333333;
+  color: #cccccc;
 }
 
 em, i {
@@ -29,8 +28,16 @@ em, i {
   font-family: Times New Roman, Times, serif;
 }
 
+a:link {
+  color: white;
+}
+
+a:visited {
+  color: white;
+}
+
 a.target {
-  color: blue;
+  color: white;
 }
 
 a.toc-backref {
@@ -115,6 +122,7 @@ h1.title {
   color: #eeeeee; 
   border: thick solid black;
   -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
 }
 
 table.footnote {
