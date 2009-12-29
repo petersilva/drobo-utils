@@ -1102,10 +1102,12 @@ class Drobo:
 
      l=[]
      j=0
+     print ' number of records is: %d' % r[0]
      while (j < r[0] ):
        i=j*8
        s = ( r[i+2], r[i+3], r[i+4], _ledstatus( r[i+5] ), r[i+6].strip(" \0"),
 		r[i+7].strip(" \0") )
+       print 'slot %d report: %s' % (j, s)
        l.append( s ) 
        j=j+1
 
