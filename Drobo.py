@@ -1102,12 +1102,17 @@ class Drobo:
 
      l=[]
      j=0
-     print ' number of records is: %d' % r[0]
-     while (j < r[0] ):
+
+     # The normal thing to do, which was here, is to use r[0] which is supposed
+     # to indicate the number of records returned.  Unfortunately, a bug in
+     # Drobo S, has it return 8 for r[0], instead of 5.  So use a surrogate found elsewhere.
+     #
+     # this is safe because slot_count is initialized in init.
+     #
+     while (j < self.slot_count ):
        i=j*8
        s = ( r[i+2], r[i+3], r[i+4], _ledstatus( r[i+5] ), r[i+6].strip(" \0"),
 		r[i+7].strip(" \0") )
-       print 'slot %d report: %s' % (j, s)
        l.append( s ) 
        j=j+1
 
