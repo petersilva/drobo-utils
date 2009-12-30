@@ -242,6 +242,32 @@ Have a look here:
 
 http://groups.google.com/group/drobo-talk/web/building-droboshare-apps-on-debianish-os?hl=en
 
+TRIM/DISCARD
+------------
+
+Drobo is the only consumer-level storage unit that does `Thin Provisioning`_ (allocating a device larger than the physical space available, allowing space upgrades without
+OS changes.)  Drobo does this by understanding the file system blocks, which is
+why it only supports a very limited set of file systems and cannot support full 
+disk encryption.
+
+There is considerable industry activity about adding `ATA TRIM`_ and corresponding 
+`SCSI UNMAP`_ commands.  These commands, for their respective command sets, add 
+the ability for the operating systems' file system code to indicate blocks that
+are not in use to storage units.  Drobo would work with any file system that 
+uses these commands, with far less firmware.  On linux, that file systems that 
+are starting to support TRIM/DISCARD are:  ext4, btrfs, and xfs.  It may also 
+help with the inherent limitations around full disk encryption. 
+
+These commands are still maturing in support.  Long term, they seem like 
+The right thing to do.
+
+(2009/12/30)
+
+
+.. _`ATA TRIM`: http://en.wikipedia.org/wiki/TRIM
+.. _`Thin Provisioning`: http://en.wikipedia.org/wiki/Thin_provisioning
+.. _`SCSI UNMAP`: http://www.t10.org/ftp/t10/document.08/08-149r4.pdf
+.. _`Andy Grover on TRIM`: http://blogs.oracle.com/linuxnstuff/2009/04/drobo_and_linux.html
 
 Administrivia
 -------------

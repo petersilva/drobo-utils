@@ -15,6 +15,7 @@ doc:
 	#rst2html --stylesheet-path=drobo-utils.css README.txt >README.html
 	#rst2html --stylesheet-path=drobo-utils.css DEVELOPERS.txt >DEVELOPERS.html
 	#rst2html --stylesheet-path=drobo-utils.css CHANGES.txt >CHANGES.html
+	#rst2html --stylesheet-path=drobo-utils.css DroboShare.txt >DroboShare.html
 	rst2html --stylesheet-path=drobo-utils.css index.txt >index.html
 
 # Uncomment this to turn on verbose mode.

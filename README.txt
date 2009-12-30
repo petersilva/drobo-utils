@@ -17,7 +17,8 @@ Compatibility Matrix
 --------------------
 
 If you can get your drobo device to be associated with a /dev/sdX [#GenSCSI]_ 
-file, then you will be able to read & write data to it.  
+file, then you will be able to partition, build file systems and
+read & write data to it using ordinary system tools (see Setup_.)
 
 Drobo-utils accesses drobos via the same files.  The software 
 scans those files, and asking each device if it is a Drobo.
@@ -25,29 +26,30 @@ Unfortunately, the way Drobos respond varies, so not all of them respond
 in a way that the software understands.  Even for the same
 device, different physical interconnects may work with different functionality.
 There are two levels of access to Drobos: data (being able to read and 
-write data to id, and full meaning that the drobo responds to the full
+write data, and full meaning that the drobo responds to the full
 command and control language.
 
 With that in mind, the compatibility matrix of each device vs. the
 physical channel is below:
 
-+-------------+-------------------------------------------+
-| Model       |           Interface                       |
-+-------------+------+------+---------+-----------+-------+
-|             | USB  |  FW  | TCP/IP  | iSCSI     | eSATA |
-+-------------+------+------+---------+-----------+-------+
-| Drobo (Gen1)| full | n/a  |   n/a   |  n/a      |  n/a  |
-+-------------+------+------+---------+-----------+-------+
-| Drobo (Gen2)| full | full?|   n/a   |  n/a      |  n/a  |
-+-------------+------+------+---------+-----------+-------+
-| Drobo Share |  n/a | n/a  | data*1  |  n/a      |  n/a  |
-+-------------+------+------+---------+-----------+-------+
-| Drobo Pro   | full |    ? |  n/a    | full*2    |  n/a  |
-+-------------+------+------+---------+-----------+-------+
-| Drobo Elite |  ?   | n/a  |  n/a    |   ?       |  n/a  |
-+-------------+------+------+---------+-----------+-------+
-| Drobo S     | full |  ?   |  n/a    |   n/a     | data  |
-+-------------+------+------+---------+-----------+-------+
++-------------+-------------------------------------------+---------+
+| Model       |           Interface                       | Maximum |
+|             |                                           | LUN Size|
++-------------+------+------+---------+-----------+-------+---------+
+|             | USB  |  FW  | TCP/IP  | iSCSI     | eSATA |  ext3   |
++-------------+------+------+---------+-----------+-------+---------+
+| Drobo (Gen1)| full | n/a  |   n/a   |  n/a      |  n/a  |   2     |
++-------------+------+------+---------+-----------+-------+---------+
+| Drobo (Gen2)| full | full?|   n/a   |  n/a      |  n/a  |   2     |
++-------------+------+------+---------+-----------+-------+---------+
+| Drobo Share |  n/a | n/a  | data*1  |  n/a      |  n/a  |   2     |
++-------------+------+------+---------+-----------+-------+---------+
+| Drobo Pro   | full |    ? |  n/a    | full*2    |  n/a  |   8?    |
++-------------+------+------+---------+-----------+-------+---------+
+| Drobo Elite |  ?   | n/a  |  n/a    |   ?       |  n/a  |   8?    |
++-------------+------+------+---------+-----------+-------+---------+
+| Drobo S     | full |  ?   |  n/a    |   n/a     | data  |   8?    |
++-------------+------+------+---------+-----------+-------+---------+
 
 .. parsed-literal::
 
@@ -55,7 +57,7 @@ physical channel is below:
   data - works: device functions for data i/o, but Drobo-utils cannot access it for configuration.
   n/a - not applicable (device does not have this interface.)
   \*1 - Droboshare is not usable with drobo-utils on a linux server. If you 
-       install Droboshare Augmented Root File System (DARFS) then one can 
+       install Droboshare Augmented Root File System (DARFS_) then one can 
        run a drobo-utils in line mode on the droboshare itself.
   \*2 - Will not detect, out of the box, an iSCSI drobo.  One must configure 
        the iSCSI subsystem to obtain a /dev/sdX file.  see `iSCSI Setup`_ for 
@@ -612,9 +614,106 @@ of LUNS.  If asked to format, all LUNS for the device will be formatted.
    The SCSI commands are tunnelled within other protocols used to transport data between
    computer and device (Firewire, USB, eSATA, and, yes... ISCSI)
 
+Getting Help from DRI
+=====================
+
+DRI intends Drobospace.com for owners to talk with one another, except no non-owner 
+can see the discussions, and early on, there was a lot of input from DRI staff, so 
+it looked a lot like a support forum, but it really isn't.   A lot of owners 
+objected to these forums being private, so a google group was started for people 
+to talk with one another, and the discussions to remain public:
+ 
+http://groups.google.com/group/drobo-talk/topics?hl=en
+ 
+There is still a great role for Drobo space, in that Tier 3 support analysts 
+(essentially developers.) sometimes look over there. For tier 3 support, one 
+cannot expect guaranteed response time, but one may be able to provide some 
+input into future products or firmware features.  It turns out that the 
+Drobospace forums aren't really for support.  but don't take my word for it,
+here is above was DRI's take (verbatim from a post on 
+drobospace by MarkF 2008/08/29) on things:
+
+To contact Data Robotics Inc. for support your options are:
+
+1. phone support - technical issues: 1-866-426-4280, Mon-Fri from 8am-5pm PST, excluding Holidays. 
+
+2. phone support - presales questions: 1-866-99ROBOT 
+
+3. email support - technical issues: support@drobo.com
+
+4. email support - presales questions: sales@drobo.com
+
+5. web-based support request: http://www.drobo.com/Support/Request_Support.html
+
+All technical support calls, emails, and web requests are assigned a case number 
+and tracked. DRI has 3 tiers of customer support. Tier 1 and 2 handle the majority 
+of cases. They are responsible for tracking phone, email, an web cases and 
+resolving them. Some cases are escalated to Tier 3 whose personnel reside 
+in our corporate headquarters and have access to engineering staff.
+
+Support on Drobospace.com:
+
+Drobospace.com is a user community and relies on the volunteer efforts of its members to help each other. Because it is run by volunteers response to problems varies. Tier 3 support personel monitor the Drobospace forums -- tiers 1 and 2 are focused directly on customers, and they are not required to read drobospace.com. By design Tier 3 personnel do not immediately respond to each posting in order to allow the community to function. Depending on the nature of the problem, tier 3 may post in the forum or contact the member directly through a private message to facilitate problem resolution.
+
+Because Drobospace is owned and run by a third party, Capable Networks LLC, there is no linkage with DRI's database systems. Posts here are not assigned case numbers and tracked - that only happens with cases opened directly with DRI.
+
+-------------------------------------------------------------------------
+
+
+
 
 FAQ
 ---
+
+What LUNSIZE should I use?
+==========================
+
+2 Terabytes is the biggest you should use for now.  There are lots
+of experiments on the google groups, summarized here: `LUNSIZE fits all`_
+Also consult the compatibility matrix indicates best guesses at the
+current state of affairs.  DRI announced new firmware 1.1.4 for Drobo PRO
+which is supposed to remove the 2 TiB restriction, but that isn't confirmed
+yet.
+
+What Happens When I Used A Bigger LUNSIZE?
+==========================================
+
+That's actually a bit nasty.  Nothing happens at first, everything seems
+to work fine.  After a while, it fails to reclaim space when files are deleted.
+The blue capacity lights don't show much relation to how full the file system 
+is, as reported by the operating system.  Drobo may become insatiable, always
+asking for more and more disk space, even though the amount of data used
+on the file system doesn't warrant it.  In extreme cases, data may become 
+in-accessible.
+
+
+HOW DO I CHECK THAT A LUNSIZE WORKS?
+====================================
+
+DRI naturally releases new versions of firmware and may fix these issues
+at some point.  If you are willing to test it out on your new Drobo, the
+procedure to do so is simple::
+
+   1.  Create a file system as per normal.  
+   2.  Fill the physical space up.  (blue lights should light up.)
+   3.  Remove alot of the data. 
+
+If the problem is not there, then blue lights will function properly and go
+out to correspond to the deleted data after a while.  If the blue lights
+do not go out after step 3, then do not trust your data to this file system.
+Re-create with a smaller LUN, and try again.  2 Terabytes is the only case
+of documented success so far.
+
+Can I user ReiserFS, XFS, BTRFS, xxfs ? 
+=======================================
+
+Short answer: no.
+
+For to perform storage management, it has to know what space is free, so it 
+needs to understand the file system you are using.  The list of file systems 
+it official understands is: FAT32, NTFS, HFS+, ext3.  That's it, so if you want 
+to use reiserfs, or xfs, or GFS, or whatever... you are doing research. The 
+vendors says those other file systems types will not work. 
 
 My USB always comes up as a different Disk!
 ===========================================
@@ -696,77 +795,6 @@ On Linux, a good choice would be EncFS http://www.arg0.net/encfs, which encrypts
 file names and data over an ext file system, or some other method which uses 
 FUSE  http://fuse.sourceforge.net.  is reported to work well.
  
-
-
-Droboshare Support
-------------------
-
-Droboshare is not directly supported by drobo utils running on a linux host.
-However, the droboshare itself is a linux host, and it is possible to run
-drobo-utils un-modified on the droboshare itself.  A python interpreter is needed
-to run drobo-utils.  A python interpreter has, itself, a number of dependencies.  
-So you number of packages need to be installed on the droboshare.
-This is where DARFS comes in.
-
-DARFS
-=====
-The Droboshare Augmented Root File System (darfs) is a 60 MB or so download 
-you can get from drobo-utils.sf.net.  There isn't any source code, because,
-well, nothing from any of the packages has been modified.  there are
-instructions on how to build DARFS in DEVELOPERS_
-
-DARFS is a standard droboshare root file system, with some packages added: 
-openssl, openssh, berkeleydb, bzip2, a fairly complete Python 2.6.2.  drobo-
-utils is a python app. and it works in line and API mode, natively, on
-the droboshare.  for example, I've used it to replace the firmware. no
-problem at all. 
-
-People un-afraid of the command line can upgrade drobo firmware, query 
-status, and take diagnositc dumps, from the command line on the droboshare 
-itself, just as they would on any linux host computer.  But a full GUI 
-would be too much for the little processor and more importantly the limited 
-memory in the droboshare, so that is not provided.
-
-DARFS Installation
-==================
-Download it from drobo-utils.sf.net:
-steps:
-
-   1. copy the tar file onto somewhere on your share.
-   2. log in via DropBear ssh as a root user on the droboshare.
-   3. cd /mnt/DroboShares/YourDrobo (root of drobo file system, for example)
-   4. tar -xzf darfs.tgz (root of drobo file system, for example)
-   5. the root directory of the tar is 'slash'.. it will be under YourDrobo
-   6. export PATH="/mnt/DroboShares/YourDrobo/slash/usr/bin:${PATH}"  (which is where python and drobom are.)
-   7. drobom status
-
-you're done!
-
-Enable SFTP Support
-===================
-
-all you need to do is:
-
-ln -s /usr/libexec /mnt/Droboshares/YourDrobo/slash/usr/libexec
-
-Try an sftp from another machine (as root...) and it ought to work.
-
-(explanation: when one tries to sftp to a droboshare, it gives an error 
-about trying to exec '/usr/libexec/sftp-server'.  Openssh builds the 
-right binary, but Dropbear doesn't know where to look for it.  the
-libexec directory isn't there on the droboshare, so there is no harm
-in creating it and linking into DARFS.)
-
-
-Droboshare Firmware
-===================
-
-With DARFS, and the third party software you can get from drobospace and 
-drobo.com, the droboshare is very open and hackable.   However, there
-remains one remaining limitation: There is no open source way to upgrade 
-or modify droboshare firmware.  If you want to re-flash to a factory 
-original state, you need the vendor dashboard.
-
 
 Credits
 -------

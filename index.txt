@@ -65,6 +65,8 @@ Drobom
 
 .. include:: DEVELOPERS.txt
 
+.. include:: DroboShare.txt
+
 .. _CHANGES:
 
 [`Links and Help`_][ `Index`_]
