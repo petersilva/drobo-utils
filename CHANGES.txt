@@ -16,7 +16,7 @@ TODO:
             -- preserve option settings across reboot? (one report.)
             -- periodically synch. the drobo clock to the server.
   
-0.6.2: 
+0.6.2:  2009/12/26
   * GUI Option setting, thresholds, etc...
   * changed command line syntax to more consistently set <item>
   * documented option setting in CLI

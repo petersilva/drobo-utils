@@ -25,11 +25,7 @@ Getting a Source Tree
 the following checks out the master branch of the source code tree and
 puts it in the drobo-utils subdirectory of the current tree.
 
-git clone git://drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils
-(read-only)
-
 git clone ssh://username@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils drobo-utils
-(to be able to patch)
 
 Before doing Any commits, ensure that the author fields are 
 appropriately set.  One can obtain patches applied to the branch 
@@ -247,51 +243,8 @@ Have a look here:
 http://groups.google.com/group/drobo-talk/web/building-droboshare-apps-on-debianish-os?hl=en
 
 
-
-BUGS: 
------
-
-  when running two fw uploads, the second one will not run easily.
-  need to wait for transaction to timeout...  perhaps randomize id?
-  did randomization, did not change anything...
-
-STANDARD menu entries for droboview...
-  partition types do not appear to be correctly displayed...
-   some confusion between NTFS vs. EXT3  no obvious ill effect.
-
-  partition type should pre-select in Format dialog...
-
-  memory consumption on the GUI. still chews up 4 MB per hour...
-
-gnats:
-  man page does not document output.  
-  -- what is the meaning of the output? provide a sample...
-
-review print statements:
-  should they write to stderr?
-
-
-STANDARD menu entries for droboview...
-
-Better STATUS progress reporting:
-   -- the block count is there, but heuristics for determining timing suck.
-   -- some sort of indicator of how long 'relay out' will be in progress.
-   -- when it is busy, it should say so... like when I emptied an ntfs it took hours for the led indicators to drop from 70% to 0.  It should say something about what is going on.
-
-LIVELIER GUI:
-   -- have status queries proceed asynchronously from the GUI.
-      right now, if the drobo is slow, the GUI makes it slower, and gets very slow too.
-      should run as a daemon, async. from the GUI.
-
-Re-design the whole darn thing.
-   -- there should be some sort of service integrated with dbus-hal
-   -- not sure that a GUI is needed at all. but if it is, it should be a DBUS client.
-   -- how does authentication work in DBUS?
-
-
-   of interest:
-   -- python bindings for parted... http://dcantrel.fedorapeople.org/pyparted/
-
+Administrivia
+-------------
 
 Revision date: 2009/12/27
 
@@ -301,16 +254,5 @@ Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
 Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 named COPYING in the root of the source directory tree.
 
-Administrivia
--------------
-
  version 9999, somewhen
 
-
-
-
-copyright:
-
-Drobo Utils Copyright (C) 2008  Peter Silva (Peter.A.Silva@gmail.com)
-Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
-named COPYING in the root of the source directory tree.

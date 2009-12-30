@@ -12,44 +12,105 @@ the rest of the command line interface is provided by other sub-commands of
 drobom, and offer the same functionality as the view graphical interface.  
 
 
+
+Compatibility Matrix
+--------------------
+
+If you can get your drobo device to be associated with a /dev/sdX [#GenSCSI]_ 
+file, then you will be able to read & write data to it.  
+
+Drobo-utils accesses drobos via the same files.  The software 
+scans those files, and asking each device if it is a Drobo.
+Unfortunately, the way Drobos respond varies, so not all of them respond
+in a way that the software understands.  Even for the same
+device, different physical interconnects may work with different functionality.
+There are two levels of access to Drobos: data (being able to read and 
+write data to id, and full meaning that the drobo responds to the full
+command and control language.
+
+With that in mind, the compatibility matrix of each device vs. the
+physical channel is below:
+
++-------------+-------------------------------------------+
+| Model       |           Interface                       |
++-------------+------+------+---------+-----------+-------+
+|             | USB  |  FW  | TCP/IP  | iSCSI     | eSATA |
++-------------+------+------+---------+-----------+-------+
+| Drobo (Gen1)| full | n/a  |   n/a   |  n/a      |  n/a  |
++-------------+------+------+---------+-----------+-------+
+| Drobo (Gen2)| full | full?|   n/a   |  n/a      |  n/a  |
++-------------+------+------+---------+-----------+-------+
+| Drobo Share |  n/a | n/a  | data*1  |  n/a      |  n/a  |
++-------------+------+------+---------+-----------+-------+
+| Drobo Pro   | full |    ? |  n/a    | full*2    |  n/a  |
++-------------+------+------+---------+-----------+-------+
+| Drobo Elite |  ?   | n/a  |  n/a    |   ?       |  n/a  |
++-------------+------+------+---------+-----------+-------+
+| Drobo S     | full |  ?   |  n/a    |   n/a     | data  |
++-------------+------+------+---------+-----------+-------+
+
+.. parsed-literal::
+
+  full - Find/Full: drobo-utils will find the device on it's own (auto-discover)
+  data - works: device functions for data i/o, but Drobo-utils cannot access it for configuration.
+  n/a - not applicable (device does not have this interface.)
+  \*1 - Droboshare is not usable with drobo-utils on a linux server. If you 
+       install Droboshare Augmented Root File System (DARFS) then one can 
+       run a drobo-utils in line mode on the droboshare itself.
+  \*2 - Will not detect, out of the box, an iSCSI drobo.  One must configure 
+       the iSCSI subsystem to obtain a /dev/sdX file.  see `iSCSI Setup`_ for 
+       details on that initial configuration.  After that point, Drobo-utils 
+       will function properly over iSCSI.
+
+
+.. [#GenSCSI] Linux drivers make disk, cdrom, and other peripherals, look
+   like SCSI peripherals to applications.  Regardless of the physical connection, 
+   it is a normal part of the linux kernel to make the device appear as a 
+   so-called "generic SCSI" one.
+
+
 INSTALLATION: Easiest
 ---------------------
 
-On Ubuntu 9.10 [#Distro]_ or later (or Debian unstable or other debian derived distributions), 
-drobo-utils is included in the repositories, and installation from a shell prompt is simply::
+On Ubuntu 9.10 [#Distro]_ or later (or Debian unstable or other debian derived 
+distributions), drobo-utils is included in the repositories, and installation 
+from a shell prompt is simply::
 
   % sudo apt-get install drobo-utils
 
-to run at least the command line utility.  Users on servers often want only command line 
-functionality.  On the other hand, to enable the graphical user interface, one more package 
-must be installed::
+to run at least the command line utility.  Users on servers often want only 
+command line functionality.  On the other hand, to enable the graphical user 
+interface, one more package must be installed::
 
   % sudo apt-get install python-qt4
 
-That is the easiest installation method, this method ensures that any packages required
-are automatically installed on the system as part of the above installation.  On other 
-distributions, or if the version in the repositories is too old, more complicated methods
-might be needed.  For all other installation methods, one must ensure the packages that 
-drobo-utils requires are installed.  These packages are called Dependencies.
+That is the easiest installation method, this method ensures that any packages 
+required are automatically installed on the system as part of the above 
+installation.  On other distributions, or if the version in the repositories is 
+too old, more complicated methods might be needed.  For all other installation 
+methods, one must ensure the packages that drobo-utils requires are installed.  
+These packages are called Dependencies.
 
-.. [#Distro] Drobo-utils is developed for release on the stable version of Kubuntu at the time
-   it is released.  Development started on kubuntu 7.10 and continued to 9.10 at the
-   end of 2009.  Any similarly recent distribution ought to do.  The package is
-   accepted into Debian unstable, so all debian derived distributions (debian, \*ubuntu, 
-   MEPIS, PCLinux-OS, etc...) should inherit the package in due course.  
+.. [#Distro] Drobo-utils is developed for release on the stable version of 
+   Kubuntu at the time it is released.  Development started on kubuntu 7.10 
+   and continued to 9.10 at the end of 2009.  Any similarly recent distribution 
+   ought to do.  The package is accepted into Debian unstable, so all debian 
+   derived distributions (debian, \*ubuntu, MEPIS, PCLinux-OS, etc...) should 
+   inherit the package in due course.  
 
 
 Dependencies
 ============
 
-Before one can install drobo-utils itself, the other packages needed are something like those 
-below (these examples are ubuntu packages, names may vary on other distributions)::
+Before one can install drobo-utils itself, the other packages needed are something 
+like those below (these examples are ubuntu packages, names may vary on other 
+distributions)::
 
      python      -- interpreter for python language
      parted      -- partitioner, usually included with the distro.
 
-If using Redhat Enterprise Linux (RHEL, aka. CentOS, Scientific Linux etc...), which have 
-python 2.4 [#python]_, then the following are necessary::
+If using Redhat Enterprise Linux (RHEL, aka. CentOS, Scientific Linux etc...), 
+which have python 2.4 [#python]_, then the following are necessary::
 
      python-ctypes -- module for C-interface
 
@@ -68,8 +129,9 @@ Here is an example from fedora 7 (courtesy of help4death on the google group)::
     % yum install PyQt4
     % yum install python-devel
 
-NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will work without issues.  
-The package should work fine on headless servers using only the command line.
+NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will 
+work without issues.  The package should work fine on headless servers using 
+only the command line.
 
 
 Install From Package
@@ -280,17 +342,18 @@ Sample run::
 LUNSIZE Fits All?
 =================
 
-By default, Drobo creates a separate 'disk' visible to the computer for every 2 Terabytes (TiB) 
-of parity-protected capacity on the unit.   The natural usage that a drobo invites in users is
-to have a single, large device covering all the data on device.  For example, on Mac OS/X, users 
-often create 16 TB LUNS on HFS.  This allows all the storage to fit on one large pool.  The 
-downside of larger LUNS has to do with startup time, and the time to perform a file system
-check.
+By default, Drobo creates a separate 'disk' visible to the computer for every 2 
+Terabytes (TiB) of parity-protected capacity on the unit.   The natural usage 
+that a drobo invites in users is to have a single, large device covering all the 
+data on device.  For example, on Mac OS/X, users often create 16 TB LUNS on HFS.  
+This allows all the storage to fit on one large pool.  The downside of larger 
+LUNS has to do with startup time, and the time to perform a file system check.
 
-Under Linux unfortunately, with a first generation Drobo, one should limit the volume size 
-to 2 TiB[#gen12TiB]_.  It is hoped, but not confirmed, that later products support LUNS larger 
-than 2 TiB on Linux.  Drobom view therefore limits lunsize to 2 TiB for the moment.  The 
-command line interface can be used to create larger LUNS, they just might not work.
+Under Linux unfortunately, with a first generation Drobo, one should limit the 
+volume size to 2 TiB[#gen12TiB]_.  It is hoped, but not confirmed, that later 
+products support LUNS larger than 2 TiB on Linux.  Drobom view therefore limits 
+lunsize to 2 TiB for the moment.  The command line interface can be used to 
+create larger LUNS, they just might not work.
 
 ON LUNSIZES >= 2TB:
  -- On older distributions, there are a couple of gotchas related to 
@@ -316,11 +379,11 @@ ON LUNSIZES >= 2TB:
 
   -- Windows XP does not support LUNS > 2 TiB 
 
-.. [#gen12TiB] Many tests have been performed with first generation products and several 
-   different failure modes have been found when exceeding 2 TiB.  Data Robotics has addressed 
-   several failure modes, via fixes to the kernel in 2.6.24, and for firewire in 2.6.31,
-   and continues to address them in later generation products.
-
+.. [#gen12TiB] Many tests have been performed with first generation products 
+   and several different failure modes have been found when exceeding 2 TiB.  
+   Data Robotics has addressed several failure modes, via fixes to the kernel 
+   in 2.6.24, and for firewire in 2.6.31, and continues to address them in 
+   later generation products.
 
 .. _`Filesystem Choice`:
 
@@ -335,13 +398,16 @@ but the performance is much lower than what is typically reported with ext3.
 Unless physical movement of the disk to between systems is required, the 
 native (ext3) format is the best option.
 
-Drobo Pro
-=========
+.. _`iSCSI Setup`:
 
-This is a procedure for configuring a Drobo Pro for access via iSCSI.
-(This information is based on a post by Lemonizer on the Google Group 2009/05/16) 
+iSCSI Setup
+===========
 
-First, connect the Pro via USB, and manually configure the ip of the dbpro:: 
+This is a procedure for configuring a Drobo Pro for access via iSCSI.  This 
+information is based on a post by Lemonizer on the Google Group 2009/05/16, with
+updates based on improvements and tests by others in the fall of 2009::
+
+  1. Connect the Pro via USB, and manually configure the ip of the dbpro
 
   # drobom info settings
   # drobom set IPAddress 192.168.2.80
@@ -450,8 +516,8 @@ them.  Backups are the only way to address error 18 (the number of inches in
 front of the keyboard the source of the issue lies.) and no storage unit can 
 protect against fire or flood.
 
-Compatibility
-=============
+Firmware Compatibility
+======================
 
 Drobo has been tested with every old firmware version. Any Drobo should
 be upgradable to modern firmware using the dashboard.
@@ -520,8 +586,8 @@ In other words, take the unknown vendor string and feed it as -s option to tweak
 of drobom.  Your drobo will likely then be picked up.
 
 
-Only One LUN?
-=============
+Only One LUN Shows up?
+======================
 
 LUN is an abbreviation of 'Logical UNit'. The origin of the term is SCSI[#SCSI]_ terminology.
 When RAID units became too large for support in the past, and were sub-divided 
@@ -548,43 +614,88 @@ of LUNS.  If asked to format, all LUNS for the device will be formatted.
 
 
 FAQ
-===
+---
 
-Q: How come the command to build a file system builds an ext2 file system?
+My USB always comes up as a different Disk!
+===========================================
 
-A: because an ext3 file systems is an ext2 file system with a journal.  the normal command to build an ext3 file system is mke2fs -j.  
+The order and timing of disks being connected to hot-plug busses will
+determine the device name (it might be /dev/sdb one time, and /dev/sdc another.)
+So putting /dev/sdX in the fstab to mount their disks, as is traditionally done,
+won't work.  Instead, do::
 
-Q: If you are going to use your Drobo as a single file system, can't you just mke2fs
-on the device file for the whole disk and skip partitioning altogether?
+ peter@pepino:~$ ls -l /dev/disk/by-uuid
+ total 0
+ lrwxrwxrwx 1 root root 10 2009-12-15 04:54 2C88743C8874071C -> ../../sda3
+ lrwxrwxrwx 1 root root 10 2009-12-15 04:54 32a41d0a-b193-41f3-86fa-29bbee8cd2b3 -> ../../sda8
+ lrwxrwxrwx 1 root root 10 2009-12-26 12:08 3cd5d9cc-c227-4ed8-bab2-60c2d71f6e9d -> ../../sdf1
+ lrwxrwxrwx 1 root root 10 2009-12-15 04:54 72b0ee8c-d0e8-479d-b79c-3dbda1581f55 -> ../../sda6
+ lrwxrwxrwx 1 root root 10 2009-12-15 04:54 814472db-dbee-411c-8870-7ca59f32e7c1 -> ../../sda5
+ lrwxrwxrwx 1 root root 10 2009-12-26 12:16 8ed93296-9be2-4576-9ae4-9d9c78363fb6 -> ../../sdg1
+ lrwxrwxrwx 1 root root 10 2009-12-15 04:54 a4bc252e-0eb7-489c-94e7-688efd528665 -> ../../sda7
+ lrwxrwxrwx 1 root root 10 2009-12-15 04:54 bc1ab400-df49-457d-8700-c77dde19e450 -> ../../sda2
+ lrwxrwxrwx 1 root root 10 2009-12-15 04:54 C2EE700DEE6FF7D5 -> ../../sda1
+ peter@pepino:~$
+ 
+The UUID is a name that is constant for a partition.  Each time a partition
+is mounted, a link will be created in this directory towards the correct
+/dev/sdX.  A UUID related /etc/fstab entry looks like::
 
-A: I do not know, have not properly researched that yet.
+ UUID=3cd5d9cc-c227-4ed8-bab2-60c2d71f6e9d  /drobo01   ext3 defaults 0 2 
+ 
 
-Q: Can you mix and match file systems ?
+How come the command to build a file system builds an ext2 file system?
+=======================================================================
 
-A: from DRI: Yes, you can have multiple partitions per LUN. 
+because an ext3 file systems is an ext2 file system with a journal.  
+The normal command to build an ext3 file system is mke2fs -j.  
+
+Can you have different LUNS with different file systems on them?
+================================================================
+
+DRI: Multiple partitions per LUN is supported. Having any combination of file
+supported file systems on the different LUNS and partitions is fine as well.
+
+Does Drobo work with LVM?
+=========================
+
+The Linux Volume Manager is a layer of software which is shimmed between the file system layer, and the physical disks.  It provides a 'fake' (virtual) volume on which file systems are built.  This gives flexibility to concatenate several physical volumes together to make a single file system, or allocate a single volume to different file systems over time, as needs dictate rather than all at the outset.
+
+For Drobo, LVM would be especially cool in that one could initially allocate only 
+the physical space actually available within the LUN, and thus applications which
+key on avoiding filling file systems would function correctly, instead of always 
+asking to insert more storage, and not managing the storage available.  When more
+physical space (new drives!) becomes available, one could allocate more space to 
+the virtual volume, and then grow the file system.   So Drobo would still take 
+care of the drudgery of RAID set maintenance, relay operations, etc... but the 
+user would have more control on how space was allocated at the OS level.
+
+For that to work, Drobo firmware would have to understand LVM to some extent.  
+Initial experiments showed that the firmware didn't appreciate LVM.   Being 
+able to add a Drobo unit as an pv to an LVM unit would be very cool.
 
 
+Does Drobo Support Full Disk Encryption?
+========================================
 
-   
-KNOWN BUGS
-==========
-
-drobom view isn't suited to run continuously for long periods, 
-as it has a memory leak...  total foot print starts out at 32M
-with a 15 MB resident set size, of which 10 MB are shared, so only 
-about 4M of real memory consumed.   but the RSS grows at about 
-2MB/hour.
-
-  29m  11m S    1  2.9   9:44.50 drobom view
-
-best to restart it daily, or use it when necessary, but not leave it
-on for days.
-
-After you resize luns, drobom view gets confused, you need to exit and
-restart.
-
-We have a report that dumping diagnostics does not work over firewire.
-Work-around:  connect via USB.
+Drobo works by knowing how the file system is laid out and pretending to have 
+more space than is physically present.   Drobo does some sleight of hand to 
+manage disk space and move things around optimally as hard disks fail or are 
+added.
+ 
+Full disk encryption implemented by the operating system makes the Drobo unable 
+to understand the file system, so it doesn't know which blocks are in use, and 
+the unit will always believe the system is completely full.  Drobo will not 
+behave well.  Among the methods that will not work are any that operate on a 
+raw disk partition, such as truecrypt, or any of the linux cryptoloop based solutions.
+ 
+Instead of whole disk encryption, a method that uses an underlying file system 
+that is well known to the Drobo (the list is short: FAT32, NTFS, HFS, EXT2) is 
+needed. On windows, encrypting directories with standard NTFS will work fine.  
+On Linux, a good choice would be EncFS http://www.arg0.net/encfs, which encrypts 
+file names and data over an ext file system, or some other method which uses 
+FUSE  http://fuse.sourceforge.net.  is reported to work well.
+ 
 
 
 Droboshare Support
