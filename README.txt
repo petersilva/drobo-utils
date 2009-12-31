@@ -687,7 +687,7 @@ on the file system doesn't warrant it.  In extreme cases, data may become
 in-accessible.
 
 
-HOW DO I CHECK THAT A LUNSIZE WORKS?
+How Do I Check That a LUNSIZE Works?
 ====================================
 
 DRI naturally releases new versions of firmware and may fix these issues
@@ -709,14 +709,15 @@ Can I user ReiserFS, XFS, BTRFS, xxfs ?
 
 Short answer: no.
 
-For to perform storage management, it has to know what space is free, so it 
+For Drobo to perform storage management, it has to know what space is free, so it 
 needs to understand the file system you are using.  The list of file systems 
 it official understands is: FAT32, NTFS, HFS+, ext3.  That's it, so if you want 
 to use reiserfs, or xfs, or GFS, or whatever... you are doing research. The 
 vendors says those other file systems types will not work. 
 
-My USB always comes up as a different Disk!
-===========================================
+
+My USB Drobo always comes up as a different Disk!
+=================================================
 
 The order and timing of disks being connected to hot-plug busses will
 determine the device name (it might be /dev/sdb one time, and /dev/sdc another.)
@@ -795,6 +796,17 @@ On Linux, a good choice would be EncFS http://www.arg0.net/encfs, which encrypts
 file names and data over an ext file system, or some other method which uses 
 FUSE  http://fuse.sourceforge.net.  is reported to work well.
  
+I have read everything. Help?
+=============================
+
+Best first stop is the google Group_.
+
+
+What is Drobo-utils' License?
+=============================
+
+General Public License  - Gnu - GPL .  
+
 
 Credits
 -------

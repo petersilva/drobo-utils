@@ -2,22 +2,22 @@
 .. raw:: html
    :file: sponsor.js
 
-=========================
-Drobo Dashboard for Linux
-=========================
+======================
+Using A Drobo on Linux
+======================
 
 A Drobo_ is a cool little storage unit.  Just add disks, and it takes care
-of figuring out how to maximally protect from data loss.  One does not, as with other storage 
-units, have to install matching disks.  Nor are arcane decisions about how the data is 
-laid out asked.  It pretends to be just a pile of storage, and does the smart 
-thing.  The product line is below:
+of figuring out how to maximally protect from data loss.  One does not, as 
+with other storage units, have to install matching disks.  Nor are arcane 
+decisions about how the data is laid out asked.  It pretends to be just 
+a pile of storage, and does the smart thing.  The product line is below:
 
 .. image:: product_line.jpg
 
 So you bought a Drobo_ and want to use it under linux.  Great!  Plug it in and Go!  
 Really! It can be used just as a normal disk.  Plug it in like any USB thumb drive.  
 For old Linux hands, just use a partitioner, such as parted, and build an ext3 
-file system and set the mount point.  see the Setup_ section for details on 
+file system and set the mount point.  See the Setup_ section for details on 
 manually setting things up from the command line without any special software.
 For those with other tastes, there is also a GUI that can take care of it:
 
@@ -25,17 +25,19 @@ For those with other tastes, there is also a GUI that can take care of it:
 
 .. image:: droboview_prototype4.png
 
-You can use Drobos without any special software.  The blue capacity lights will fill up as 
-the disks fill.  When it gets too full, Drobo will ask for another drive with its drive 
-lights. Just feed it drives when it asks, and that is all. So what is the 
-dashboard good for?
+You can use Drobos without any special software.  The blue capacity lights will 
+fill up as the disks fill.  When it gets too full, Drobo will ask for another 
+drive with its drive lights. Just feed it drives when it asks, and that is all. 
+So what is the dashboard good for?
 
- * If the drobo is hard to see Drobo, the software can replace the lights on the front panel.
+ * If the drobo is hard to see Drobo, the software can replace the lights on 
+   the front panel.
  * Verifying if new firmware available, and update installing it.
  * To see information about the hard drives in the Drobo without taking them out.
  * To change the drobo's settings from their defaults (like a 2 TiB LUN size)
  * For DroboPro, there are many settings (ip address?) one might
    need in order to configure it properly for use.
+ * If you have a problem, the vendor might ask you to produce a diagnostics file.
 
 So that is where drobo-utils, the linux dashboard, comes in.
 
@@ -58,18 +60,19 @@ Drobom
 
 .. _drobom: drobom.html
 
+[`Links and Help`_][ `Index`_]
 
 .. _DEVELOPERS: 
 
-[`Links and Help`_][ `Index`_]
-
 .. include:: DEVELOPERS.txt
+
+[`Links and Help`_][ `Index`_]
 
 .. include:: DroboShare.txt
 
-.. _CHANGES:
-
 [`Links and Help`_][ `Index`_]
+
+.. _CHANGES:
 
 Below are highlights included in each release.
 
@@ -116,7 +119,7 @@ If more information is needed, then there are a number of resources available:
 About This Page
 ---------------
 
-last revised: December 26th, 2009
+last revised: December 30th, 2009
 
 copyright:
 
