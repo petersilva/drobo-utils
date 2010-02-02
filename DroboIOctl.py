@@ -95,7 +95,7 @@ class DroboIOctl:
      """
      sfmt="l"
      k=create_string_buffer(struct.calcsize(sfmt)) 
-     if ioctl(self.sg_fd, sg_io_hdr.SG_GET_VERSION_NUM, k) < 0 :
+     if ioctl(self.sg_fd, sg_io_hdr.SG_GET_VERSION_NUM, k, True) < 0 :
         print "%s is not an sg device, or old sg driver\n" % char_dev_file
      num=struct.unpack(sfmt,k) 
      return num[0]
@@ -119,7 +119,7 @@ class DroboIOctl:
 
      fmt=">bbbbl"
      idlun = create_string_buffer(struct.calcsize(fmt))
-     i= ioctl( self.sg_fd, SCSI_IOCTL_GET_IDLUN, idlun)
+     i= ioctl( self.sg_fd, SCSI_IOCTL_GET_IDLUN, idlun, True)
      if i < 0:
         print "Drobo get_mode_page SG_IO ioctl error"
         return None
@@ -180,7 +180,7 @@ class DroboIOctl:
     if self.debug & Drobo.DBG_HWDialog:
       print "4 before ioctl, sense_buffer_len=", io_hdr.mx_sb_len
 
-    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr)
+    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr, True)
 
     if self.debug & Drobo.DBG_HWDialog:
       print "5 after ioctl, result=%d status: %d driver_status: %d host_status: %d sb_len_wr: %d resid: %d" % \
@@ -242,7 +242,7 @@ class DroboIOctl:
 
     #iohp = cast(pointer(io_hdr), c_void_ptr).value
 
-    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr)
+    i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr, True)
  
     if self.debug & Drobo.DBG_HWDialog:
       print "put_sub_page, 5 after ioctl, result=", i
