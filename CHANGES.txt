@@ -1,5 +1,8 @@
 
 TODO:
+
+These are all Open Tasks... HELP WANTED!
+
   * add python version testing to test suite (2.4, 2.5, 2.6)
   * add LUN test procedure to DEVELOPERS.txt
   * looking at firmware based LUN creation/deletion & format.
@@ -17,7 +20,7 @@ TODO:
             -- periodically synch. the drobo clock to the server.
   
 0.6.2.1: 2009/12/30
-  * Drobo S crash fix. (1 liner.)
+   * fix for Drobo S slotinfo firmware bug (reports 8 instead of 5.)
 
 0.6.2:  2009/12/26
   * GUI Option setting, thresholds, etc...

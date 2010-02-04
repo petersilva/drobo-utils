@@ -3,7 +3,7 @@
 Drobo-Utils
 -----------
 
-Drobo-utils is a set of linux tools to query and manage Data Robotics
+Drobo-utils is a set of linux tools to query and manage `Data Robotics`_
 Drobo storage systems.  Fire up drobom view, and it should look 
 familiar to those who have seen the dashboard on other operating systems. 
 Drobom view is built on a little python programmer interface which can be installed 
@@ -11,7 +11,7 @@ on the system and used by other applications as well.  For experienced Linux han
 the rest of the command line interface is provided by other sub-commands of 
 drobom, and offer the same functionality as the view graphical interface.  
 
-
+.. _`Data Robotics`: http://www.drobo.com
 
 Compatibility Matrix
 --------------------
@@ -34,21 +34,28 @@ physical channel is below:
 
 +-------------+-------------------------------------------+---------+
 | Model       |           Interface                       | Maximum |
-|             |                                           | LUN Size|
+|             |      ( Performance MB/s )                 | LUN Size|
 +-------------+------+------+---------+-----------+-------+---------+
 |             | USB  |  FW  | TCP/IP  | iSCSI     | eSATA |  ext3   |
+|             |      |      |         |           |       |         |
 +-------------+------+------+---------+-----------+-------+---------+
 | Drobo (Gen1)| full | n/a  |   n/a   |  n/a      |  n/a  |   2     |
+|             | (15) | (0)  |   (0)   |  (0)      | (0)   |         |
 +-------------+------+------+---------+-----------+-------+---------+
 | Drobo (Gen2)| full | full?|   n/a   |  n/a      |  n/a  |   2     |
+|             | (15) | (?)  |   (0)   |  (0)      | (0)   |         |
 +-------------+------+------+---------+-----------+-------+---------+
 | Drobo Share |  n/a | n/a  | data*1  |  n/a      |  n/a  |   2     |
+|             | (0)  | (0)  |  (15)   |  (0)      | (0)   |         |
 +-------------+------+------+---------+-----------+-------+---------+
-| Drobo Pro   | full |    ? |  n/a    | full*2    |  n/a  |   8?    |
+| Drobo Pro   | full |    ? |  n/a    | full*2    |  n/a  |   8-?   |
+|             | (15) | (?)  |   (0)   |  (80)     | (0)   |         |
 +-------------+------+------+---------+-----------+-------+---------+
 | Drobo Elite |  ?   | n/a  |  n/a    |   ?       |  n/a  |   8?    |
+|             | (?)  | (0)  |   (0)   |  (?)      | (0)   |         |
 +-------------+------+------+---------+-----------+-------+---------+
-| Drobo S     | full |  ?   |  n/a    |   n/a     | data  |   8?    |
+| Drobo S     | full |  ?   |  n/a    |   n/a     | data  |   8     |
+|             | (15) | (?)  |   (0)   |  (?)      | (0)   |         |
 +-------------+------+------+---------+-----------+-------+---------+
 
 .. parsed-literal::
@@ -69,6 +76,33 @@ physical channel is below:
    like SCSI peripherals to applications.  Regardless of the physical connection, 
    it is a normal part of the linux kernel to make the device appear as a 
    so-called "generic SCSI" one.
+
+
+COFFEE IS HOT
+-------------
+
+People sued a national fast food chain because their `coffee was hot`_, but did not 
+have a warning on the cup stating that.  For most people, the risk of scalding 
+should be fairly obvious. 
+
+.. _`coffee was hot`: http://en.wikipedia.org/wiki/Liebeck_v._McDonald's_Restaurants
+
+Drobo has made it so much easier to obtain much more secure storage, that some with 
+little or no professional storage management experience are getting Drobos.
+Some have the expectation that Drobo´s, because they allow for disk failures, 
+replace the need for backups.  Sad stories have been told about people putting 
+data only on the drobo, and no-where else, and then something happens and they 
+lose the data.
+
+
+.. PLEASE, PLEASE, PLEASE::  Do not store all your data on a Drobo (or any 
+   other single device, from any vendor) with no backups or alternate copies.   
+   Eventually, Something very bad will happen.
+  
+You need to look at your data and determine the backup/data security strategy.
+If you have never done this, or do not know what it means, please consult the
+Deployment_ section in this page for examples.
+
 
 
 INSTALLATION: Easiest
@@ -150,6 +184,10 @@ where the most current packages are available.  after downloading a .deb, it is 
 done!
 
 Redhat/Fedora users.  alien may be used to convert the package. I don't know if it works.  Someone to take on RPM packaging would be very welcome!  This is a pure python package, so the chances are good that it does work without issue.
+
+There is a `Fedora Package`_
+
+.. _Fedora Package: http://olea.org/paquetes-rpm/repoview/drobo-utils.html
 
 Install From TAR file
 =====================
@@ -383,7 +421,7 @@ ON LUNSIZES >= 2TB:
 
 .. [#gen12TiB] Many tests have been performed with first generation products 
    and several different failure modes have been found when exceeding 2 TiB.  
-   Data Robotics has addressed several failure modes, via fixes to the kernel 
+   `Data Robotics`_ has addressed several failure modes, via fixes to the kernel 
    in 2.6.24, and for firewire in 2.6.31, and continues to address them in 
    later generation products.
 
@@ -498,7 +536,7 @@ SAFETY
 ======
 
 Those worried about safety of using this software should know:  it was 
-developed with assistance from the vendor (Data Robotics Inc.), and 
+developed with assistance from the vendor (`Data Robotics`_ Inc.), and 
 in every case, based on vendor documentation, and with at least encouragement,
 if not outright support.  For each release, a QA.txt file is built, demonstrating the functionality tests run.  There are multiple checksum verifications built 
 into the firmware upgrade process, so it is next to impossible to brick a drobo 
@@ -555,6 +593,128 @@ for Drobo v1's (only models available to me used for QA)
    1.3.5 - works without issues.
 
 
+.. _Deployment:
+
+Deployment
+----------
+
+No storage unit ever constructed, at any price point, can live upto the expectation 
+of never losing data.  There is no magic wand to wave to solve the data security 
+problem.  People still need a strategy around backups and their maintenance.  
+Drobo makes it easier to implement a strategy, but does not replace it.
+Data Robotics has a `best practices`_ page that says it well, but the phrasing
+is a bit enterprisy, and while it provides general concepts, it is not 
+prescriptive enough for people to easily apply.
+
+.. _`best practics`:  http://www.drobo.com/support/best_practices.php
+
+This section gives some examples & use cases to help people 
+develop the appropriate strategy for them.  Try to keep it simple & concrete.
+
+General Concepts
+================
+
+*Don't rely on a single device, ever!*  Before deploying a storage unit,
+one should perform the thought experiment of what will happen if all data on
+it is lost.  There are always levels of risk.  For personal use, one might 
+accept the risk that if the house burns down, only have infrequent offsite 
+backups are available and months or years of data may be lost.  If someone 
+is running their business out of their home, this risk will likely not be 
+acceptable. 
+
+The simplest method of backing up your data is to put it in a humungous 
+single place, and backup the whole thing.  That is a valid strategy, but
+consider the following realistic case:
+
+A company does incremental backups[#incrbkup] once a day, and full backup
+once a week.  Once a month, a second full backup is kept as monthly, while the
+weeklies are recycled.  Monthly backups are kept for a year, and each
+year, one backup is kept for five years. So if you write data once and
+keep it unchanged for five years, you will have 3 weekly backups, 11 monthlies,
+and 4 yearly backups of that data, or 17 copies.  This strategy is not
+unusual or particularly excessive, many corporate policies end up with 50 
+or more copies of the data.
+
+With that in mind, if you avoid backing up what you don´t need to, then you
+are not saving just one byte, but all the copies too.  With a little thought, 
+one can usually reduce the total storage needs by classifying data appropriately.
+
+.. [#incrbkup] An incremental backup is where only what has changed since the last full backup is saved.   a full backup is a complete copy of all data.  
+
+Different Drobo models have very different performance.  Deploying a Drobo
+using a USB interface as primary storage is likely to disappoint.
+See the compatibility matrix for details.
+
+
+*Classify Your Data* 
+
+There are different levels of value for data.  Things that are downloaded 
+from the internet, or source code that is pushed to a repository on the internet, 
+have natural backups in most cases.  The loss of data being queued for printing, 
+might not be a terrible loss.   The loss of videos recorded off the air from 
+television, might not be terrible either.
+
+Any kind of data which is either not worth backing up, or for which a backups
+already exist, does not need to be backed up locally.  The other end of the 
+spectrum is proprietary data, for which copies on the internet are not be 
+appropriate, and which is irreplaceable if lost.  In a photographic business,
+the photos, Tax records, accounts, etc...  In a personal realm, these would 
+include family photos, etc... lets call this sort of information *precious data*
+
+That irreplaceable data is what you need to safeguard.   So the classification
+can be done in a number of ways, but the simplest is just to only put precious 
+data in the home directory.  So far that´s normal.  The unusual thing comes next: Do not put anything else there.  Internet downloads, easily replicable data, etc...
+should go somewhere else.  In general, keep the home directories of users as small
+and precious as possible.
+
+As another example, in my personal use case, Linux is readily downloadable, so 
+there are no system backups at all.  Configurations are relatively straightforward,
+only credentials, and special configurations are backed up, by having copies
+of the information in an normal /home directory of a user.  The restoral time 
+for a single system is not an issue for my personal use, and by the time a 
+restore is necessary, there will probably a new OS version to try out,
+so the value of system backups is quite limited.
+
+The only thing backed up, is the personal (/home) directories of a few users.
+
+
+Primary Storage
+===============
+
+If a Drobo is used for primary storage for precious data, a second one should be 
+obtained as a backup device.  It´s as simple as that.  Keeping all data on 
+one device that cannot be backed up is asking for trouble.  
+
+Zealots will say that the second unit should be off-site.  
+The Gen 1 / Gen 2 Drobo´s are also have limited performance, and are perhaps not
+well suited to a role as primary storage.
+
+
+Scratch Storage
+===============
+
+If the data there is all space that either exists elsewhere (mirrors of internet
+sites), can be regenerated  (object files of compilation, recordings from on-air 
+broadcasts in a media server), none of this data is particularly precious, and
+all of it can be recovered over time in the event of a data loss on one unit.
+
+Again, one argument against such usage is performance.  First and second generation
+units are a bit on the slow side for use in say.  On the other hand, media
+serving is a streaming application with typically low instantaneous bandwidth
+requirements, so even first generation Drobos should be fine for that.
+
+
+Backup Repository
+=================
+A rational means of configuring the Drobo is as a backup repository.
+The drobo is destination of the backups.  Primary copies are on the 
+desktops & laptops being backed up.  Viewed in that way, backup data
+is easily recovered in the event of a data loss: just backup the system
+again.  Of course the history of backups is lost, but the important
+thing is usually being able to recover current data.
+
+
+
 Troubleshooting
 ---------------
 
@@ -562,7 +722,7 @@ No Drobos Discovered
 ====================
 
 To find Drobo on a system, drobo-utils queries all the attached devices for indications
-it is made by Data Robotics.  These strings change from product to product.
+it is made by `Data Robotics`_.  These strings change from product to product.
 If the (new model) Drobo is not detected, then run the command line interface
 with the hardware detection debugging output turned out.  like so::
 
@@ -584,14 +744,15 @@ at the time this example was run.  so then try::
 
  # drobom -s Drobo status
 
-In other words, take the unknown vendor string and feed it as -s option to tweak detection
-of drobom.  Your drobo will likely then be picked up.
+In other words, take the unknown vendor string and feed it as -s option to tweak 
+detection of drobom.  Your drobo will likely then be picked up.
 
 
 Only One LUN Shows up?
 ======================
 
-LUN is an abbreviation of 'Logical UNit'. The origin of the term is SCSI[#SCSI]_ terminology.
+LUN is an abbreviation of 'Logical UNit'. The origin of the term is 
+SCSI[#SCSI]_ terminology.
 When RAID units became too large for support in the past, and were sub-divided 
 to present smaller units the operating system.  The default LUNSIZE on Drobos 
 is 2 TiB (adjustable using the tools.) If more disk space (after allowing for 
@@ -633,7 +794,7 @@ Drobospace forums aren't really for support.  but don't take my word for it,
 here is above was DRI's take (verbatim from a post on 
 drobospace by MarkF 2008/08/29) on things:
 
-To contact Data Robotics Inc. for support your options are:
+To contact `Data Robotics`_ Inc. for support your options are:
 
 1. phone support - technical issues: 1-866-426-4280, Mon-Fri from 8am-5pm PST, excluding Holidays. 
 
@@ -716,6 +877,20 @@ to use reiserfs, or xfs, or GFS, or whatever... you are doing research. The
 vendors says those other file systems types will not work. 
 
 
+If my Drobo breaks, Can I Get My Data back?
+===========================================
+
+No. The way the data is placed on the disks is completely proprietary.
+You cannot take the drives and connect them individually to a server, and read
+the data off that way, because it isn't a linux md or lvm format that can easily
+be reconstructed.  You cannot give the disk pack to a data recovery company, 
+because they do not know the data format either, and you will have to pay them
+to reverse engineer DRI's format, which will get expensive quickly.
+
+You need either a backup, or another Drobo.  Even among Drobos there
+are limits to compatibility see the Drobo.com web site for details.
+
+
 My USB Drobo always comes up as a different Disk!
 =================================================
 
@@ -759,6 +934,10 @@ supported file systems on the different LUNS and partitions is fine as well.
 Does Drobo work with LVM?
 =========================
 
+`Some people do it`_. I would not risk it.
+
+.. _`Some people do it`: http://www.norio.be/blog/2008/11/setting-drobo-linux
+
 The Linux Volume Manager is a layer of software which is shimmed between the file system layer, and the physical disks.  It provides a 'fake' (virtual) volume on which file systems are built.  This gives flexibility to concatenate several physical volumes together to make a single file system, or allocate a single volume to different file systems over time, as needs dictate rather than all at the outset.
 
 For Drobo, LVM would be especially cool in that one could initially allocate only 
@@ -796,6 +975,7 @@ On Linux, a good choice would be EncFS http://www.arg0.net/encfs, which encrypts
 file names and data over an ext file system, or some other method which uses 
 FUSE  http://fuse.sourceforge.net.  is reported to work well.
  
+
 I have read everything. Help?
 =============================
 

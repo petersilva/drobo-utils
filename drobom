@@ -444,6 +444,7 @@ for u in l:
        from DroboGUI import DroboGUI
      except:
        print "QT support missing, no GUI possible"
+       print "perhaps following will help: apt-get install python-qt4 "
 
      # fire up a GUI for the given LUN, stays foreground...
      app = QtGui.QApplication(sys.argv)
