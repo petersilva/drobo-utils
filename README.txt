@@ -32,31 +32,30 @@ command and control language.
 With that in mind, the compatibility matrix of each device vs. the
 physical channel is below:
 
-+-------------+-------------------------------------------+---------+
-| Model       |           Interface                       | Maximum |
-|             |      ( Performance MB/s )                 | LUN Size|
-+-------------+------+------+---------+-----------+-------+---------+
-|             | USB  |  FW  | TCP/IP  | iSCSI     | eSATA |  ext3   |
-|             |      |      |         |           |       |         |
-+-------------+------+------+---------+-----------+-------+---------+
-| Drobo (Gen1)| full | n/a  |   n/a   |  n/a      |  n/a  |   2     |
-|             | (15) | (0)  |   (0)   |  (0)      | (0)   |         |
-+-------------+------+------+---------+-----------+-------+---------+
-| Drobo (Gen2)| full | full?|   n/a   |  n/a      |  n/a  |   2     |
-|             | (15) | (?)  |   (0)   |  (0)      | (0)   |         |
-+-------------+------+------+---------+-----------+-------+---------+
-| Drobo Share |  n/a | n/a  | data*1  |  n/a      |  n/a  |   2     |
-|             | (0)  | (0)  |  (15)   |  (0)      | (0)   |         |
-+-------------+------+------+---------+-----------+-------+---------+
-| Drobo Pro   | full |    ? |  n/a    | full*2    |  n/a  |   8-?   |
-|             | (15) | (?)  |   (0)   |  (80)     | (0)   |         |
-+-------------+------+------+---------+-----------+-------+---------+
-| Drobo Elite |  ?   | n/a  |  n/a    |   ?       |  n/a  |   8?    |
-|             | (?)  | (0)  |   (0)   |  (?)      | (0)   |         |
-+-------------+------+------+---------+-----------+-------+---------+
-| Drobo S     | full |  ?   |  n/a    |   n/a     | data  |   8     |
-|             | (15) | (?)  |   (0)   |  (?)      | (0)   |         |
-+-------------+------+------+---------+-----------+-------+---------+
++--------+-------------------------------------------+---------+
+| Model  |      Interface                            | Maximum |
+|        |      ( Performance MB/s )                 | LUN Size|
++--------+------+------+---------+-----------+-------+---------+
+| interf | USB  |  FW  | TCP/IP  | iSCSI     | eSATA |  ext3   |
++--------+------+------+---------+-----------+-------+---------+
+| Drobo  | full | n/a  |   n/a   |  n/a      |  n/a  |   2     |
+| (Gen1) | (15) | (0)  |   (0)   |  (0)      |  (0)  |         |
++--------+------+------+---------+-----------+-------+---------+
+| Drobo  | full | full?|   n/a   |  n/a      |  n/a  |   2     |
+| (Gen2) | (15) | (?)  |   (0)   |  (0)      |  (0)  |         |
++--------+------+------+---------+-----------+-------+---------+
+| Drobo  | n/a  | n/a  | data*1  |  n/a      |  n/a  |   2     |
+| Share  | (0)  | (0)  | (15)    |  (0)      |  (0)  |         |
++--------+------+------+---------+-----------+-------+---------+
+| Drobo  | full | ?    |  n/a    | full*2    |  n/a  |   8-?   |
+| Pro    | (15) | (?)  |  (0)    | (80)      |  (0)  |         |
++--------+------+------+---------+-----------+-------+---------+
+| Drobo  | ?    | n/a  |  n/a    |  ?        |  n/a  |   8?    |
+| Elite  | (?)  | (0)  |  (0)    |  (?)      |  (0)  |         |
++--------+------+------+---------+-----------+-------+---------+
+| Drobo  | full | ?    |  n/a    |   n/a     | data  |   8     |
+|   S    | (15) | (?)  |  (0)    |   (?)     | (0)   |         |
++--------+------+------+---------+-----------+-------+---------+
 
 .. parsed-literal::
 
@@ -606,7 +605,7 @@ Data Robotics has a `best practices`_ page that says it well, but the phrasing
 is a bit enterprisy, and while it provides general concepts, it is not 
 prescriptive enough for people to easily apply.
 
-.. _`best practics`:  http://www.drobo.com/support/best_practices.php
+.. _`best practices`:  http://www.drobo.com/support/best_practices.php
 
 This section gives some examples & use cases to help people 
 develop the appropriate strategy for them.  Try to keep it simple & concrete.

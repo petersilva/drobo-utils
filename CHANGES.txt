@@ -19,6 +19,9 @@ These are all Open Tasks... HELP WANTED!
             -- preserve option settings across reboot? (one report.)
             -- periodically synch. the drobo clock to the server.
   
+0.6.2.2: 2009/02/06
+   * fix for Redhat/python 2.4 wanting to partition everything!
+
 0.6.2.1: 2009/12/30
    * fix for Drobo S slotinfo firmware bug (reports 8 instead of 5.)
 
