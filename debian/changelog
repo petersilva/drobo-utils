@@ -1,6 +1,9 @@
 drobo-utils (9999) stable; urgency=low
-  * lord knows
- -- Peter Silva <Peter.A.Silva@gmail.com>  Mon, 12 Oct 2009 21:22:31 -0500
+ -- Peter Silva <Peter.A.Silva@gmail.com>  Mon, 7 Feb 2010 21:22:31 -0500
+
+drobo-utils (0.6.2.2) stable; urgency=low
+   * fix for Redhat/python 2.4 wanting to partition everything!
+ -- Peter Silva <Peter.A.Silva@gmail.com>  Mon, 7 Feb 2010 21:22:31 -0500
 
 drobo-utils (0.6.1) stable; urgency=low
 
