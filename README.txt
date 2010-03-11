@@ -149,9 +149,12 @@ which have python 2.4 [#python]_, then the following are necessary::
 
      python-ctypes -- module for C-interface
 
-.. [#python] I'm not sure that python-2.4 will work, for other reasons.  the utility is built on 
-   python-2.5 and python-2.6 and it should work on them.  python-2.4 is not tested.  python-3 will
-   definitely not work.
+.. [#python] drobo-utils was tested in line mode using Python-2.4 for release 0.6.2.2.  
+Prior to that there is a fairly scary bug, where it format wants to format all attached 
+drives (only using 2.4)  It was fixed for 0.6.2.2.  No one has tested GUI function, 
+and it may be a challenge to obtain an appropriate Pyqt4 package.  The utility is 
+built on python-2.5 and python-2.6 and it is tested on both of them.  
+python-3 will definitely not work.
 
 On RPM-based distros (such as Redhat & SuSe), it would more likely be 'yum' instead of 
 'aptitude' and some of the package names will change.  A typical difference is that 
