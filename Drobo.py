@@ -291,8 +291,11 @@ class Drobo:
         # for some reason under ubuntu intrepid, start getting responses of all bits set.
         # need some ways to spot a real drobo.  
         cfg = self.GetSubPageConfig()
-
         #Side effect: Config, sets self.slot_count...
+
+
+        self.inquiry=self.inquire()
+
 
         if DEBUG & DBG_Detection:
             print "cfg: ", cfg
@@ -706,7 +709,7 @@ class Drobo:
        print 'Reading Firmware from = %s' % name
 
     if ( name[-1] == 'z' ): # data is zipped...
-       inqw=self.inquire()
+       inqw=self.inquiry
        hwlevel=inqw[10] 
        z=zipfile.ZipFile(name,'r')
        for f in z.namelist():
@@ -783,7 +786,7 @@ class Drobo:
     if DEBUG & DBG_Simulation:
        return ('fwarch', 'fwv', 'hwlevel', 'value')
 
-    inqw=self.inquire()
+    inqw=self.inquiry
     hwlevel=inqw[10] 
     fwv= str(self.fw[0]) + '.' + str(self.fw[1]) + '.' + str(self.fw[2])
 
@@ -1318,7 +1321,7 @@ class Drobo:
                 "NetMask":'255.255.255.0', "DualDiskRedundancy":True, \
                 "UseManualVolumeManagement":False }
 
-     if self.fw[7] >= '1.1.0': 
+     if self.inquiry[10] > '1.00' or self.fw[7] >= '1.1.0': 
          # insert try/except for compatibility with firmware <= 1.1.0  
          o = self.__getsubpage(0x30, 'BBBIBB' )
          d = { "YellowThreshold": o[0], "RedThreshold": o[1] }

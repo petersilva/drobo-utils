@@ -145,7 +145,7 @@ def printfirmware(d):
   
 def printscsi(d):
   print "SCSI emulation information:"
-  s=d.inquire()
+  s=d.inquiry
   if Drobo.DEBUG & Drobo.DBG_Chatty:
       print "Vendor: %-8s  Model: %15s Revision: %s"  % ( s[8], s[9], s[10] )
   else:
