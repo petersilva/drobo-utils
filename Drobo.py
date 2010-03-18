@@ -210,15 +210,29 @@ def _unitfeatures(norig):
          of course, do not know what they are...
     """
     n=norig
-    feature_map = [ ( 0x001, 'NO_AUTO_REBOOT' ), ( 0x0002, 'NO_FAT32_FORMAT' ),
-       ( 0x0004, 'USED_CAPACITY_FROM_HOST' ), ( 0x0008, 'DISKPACKSTATUS' ),
-       ( 0x0010, 'ENCRYPT_NOHEADER' ), ( 0x0020, 'CMD_STATUS_QUERIABLE' ),
-       ( 0x0040, 'VARIABLE_LUN_SIZE_1_16' ), ( 0x0080, 'PARTITION_LUN_GPT_MBR' ),
-       ( 0x0100, 'FAT32_FORMAT_VOLNAME' ), ( 0x0200, 'SUPPORTS_DROBOSHARE' ),
-       ( 0x0400, 'SUPPORTS_NEW_LUNINFO2' ), ( 0x0800, 'feature x0800' ),
-       ( 0x1000, 'LUN_MANAGEMENT' ), ( 0x2000, 'feature x2000 ' ), 
-       ( 0x4000, 'SUPPORTS_OPTIONS2' ), ( 0x8000, 'SUPPORTS_SHUTDOWN' ), 
-       ( 0x80000000, 'SUPPORTS_SINGLE_LUN_FORMAT' ), ( 0x40000000, 'SUPPORTS_VOLUME_RENAME' ) ]
+    feature_map = [
+       ( 0x0001, 'NO_AUTO_REBOOT' ),
+       ( 0x0002, 'NO_FAT32_FORMAT' ),
+       ( 0x0004, 'USED_CAPACITY_FROM_HOST' ),
+       ( 0x0008, 'DISKPACKSTATUS' ),
+       ( 0x0010, 'ENCRYPT_NOHEADER' ),
+       ( 0x0020, 'CMD_STATUS_QUERIABLE' ),
+       ( 0x0040, 'VARIABLE_LUN_SIZE_1_16' ),
+       ( 0x0080, 'PARTITION_LUN_GPT_MBR' ),
+       ( 0x0100, 'FAT32_FORMAT_VOLNAME' ),
+       ( 0x0200, 'SUPPORTS_DROBOSHARE' ),
+       ( 0x0400, 'SUPPORTS_NEW_LUNINFO2' ),
+       ( 0x0800, 'feature x0800' ),
+       ( 0x1000, 'LUN_MANAGEMENT' ),
+       ( 0x2000, 'feature x2000' ),
+       ( 0x4000, 'SUPPORTS_OPTIONS2' ),
+       ( 0x8000, 'SUPPORTS_SHUTDOWN' ),
+       ( 0x10000, 'feature x10000' ),
+       ( 0x20000, 'SUPPORTS_ISCSI' ),
+       ( 0x40000, 'SUPPORTS_DUALNIC' ),
+       ( 0x80000, 'feature x80000' ),
+       ( 0x40000000, 'SUPPORTS_VOLUME_RENAME' ),
+       ( 0x80000000, 'SUPPORTS_SINGLE_LUN_FORMAT' )]
     f = []
     for feature in feature_map:
         #print "checking for %s %04x in %04x: " % ( feature[1], feature[0], n )
@@ -1320,22 +1334,36 @@ class Drobo:
                 "UseStaticIPAddress":True, "IPAddress":'192.168.10.4', \
                 "NetMask":'255.255.255.0', "DualDiskRedundancy":True, \
                 "UseManualVolumeManagement":False }
-
-     if self.inquiry[10] > '1.00' or self.fw[7] >= '1.1.0': 
-         # insert try/except for compatibility with firmware <= 1.1.0  
+     if 'SUPPORTS_OPTIONS2' in self.features or self.fw[7] >= '1.1.0':
+         # insert try/except for compatibility with firmware <= 1.1.0
          o = self.__getsubpage(0x30, 'BBBIBB' )
          d = { "YellowThreshold": o[0], "RedThreshold": o[1] }
          if ( 'SUPPORTS_OPTIONS2' in self.features ):
-             ( flags, d['SpinDownDelayMinutes'], rawip, rawnm, reserved ) = \
-               self.__getsubpage(0x31, 'QHLLB' )
-             d["DualDiskRedundancy"] = ( flags & 0x0001 ) > 0 
-             d["SpinDownDelay"] = ( flags & 0x0002 ) > 0 
-             d["UseManualVolumeManagement"] = ( flags & 0x0004 ) > 0 
-             d["UseStaticIPAddress"] = ( flags & 0x0008 ) > 0 
-             ip   = socket.ntohl(rawip)
-             mask = socket.ntohl(rawnm)
-             d["IPAddress"]=socket.inet_ntoa(struct.pack('I',ip))
-             d["NetMask"]=socket.inet_ntoa(struct.pack('I',mask))
+             ( flags, d['SpinDownDelayMinutes'], \
+               rawipb, rawnmb, rawgwb, mtub, \
+               rawipa, rawnma, rawgwa, mtua ) = \
+               self.__getsubpage(0x31, 'QHLLLHLLLH' )
+             d['Flags'] = flags
+             d['DualDiskRedundancy'] = ( flags & 0x0001 ) > 0
+             d['SpinDownDelay'] = ( flags & 0x0002 ) > 0
+             d['UseManualVolumeManagement'] = ( flags & 0x0004 ) > 0
+             if ( 'SUPPORTS_ISCSI' in self.features ):
+                 d['UseStaticIPAddress'] = ( flags & 0x0008 ) > 0
+                 ipb   = socket.ntohl(rawipb)
+                 d['IPAddress_B']=socket.inet_ntoa(struct.pack('I',ipb))
+                 maskb = socket.ntohl(rawnmb)
+                 d['NetMask_B']=socket.inet_ntoa(struct.pack('I',maskb))
+                 gwb   = socket.ntohl(rawgwb)
+                 d['Gateway_B']=socket.inet_ntoa(struct.pack('I',gwb))
+                 d['MTU_B']=mtub
+             if ( 'SUPPORTS_DUALNIC' in self.features ):
+                 ipa   = socket.ntohl(rawipa)
+                 d['IPAddress_A']=socket.inet_ntoa(struct.pack('I',ipa))
+                 maska = socket.ntohl(rawnma)
+                 d['NetMask_A']=socket.inet_ntoa(struct.pack('I',maska))
+                 gwa   = socket.ntohl(rawgwa)
+                 d['Gateway_A']=socket.inet_ntoa(struct.pack('I',gwa))
+                 d['MTU_A']=mtua
          return d
      else:
          return None
