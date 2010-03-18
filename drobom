@@ -185,10 +185,14 @@ def printstatus(d):
   
 def printoptions(d):
   options=d.GetOptions()
+  if Options==None :
+    print "options not supported on this hardware"
+    return
+
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query options result: ' 
-    for i in options.keys():
-       print '\t',i,options[i]
+    if options : 
+       for i in options.keys():
+          print '\t',i,options[i]
   else:
     print options
   
