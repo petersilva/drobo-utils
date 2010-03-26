@@ -557,7 +557,7 @@ class Drobo:
     self.fd.put_sub_page( modepageblock, buffer, DEBUG )
 
     if ( 'SUPPORTS_OPTIONS2' in self.features ):
-      ip = struct.unpack('I', socket.inet_aton(options['IPAddress']))[0]
+      ip = struct.unpack('I', socket.inet_aton(options['IPAddress_B']))[0]
       nm = struct.unpack('I',socket.inet_aton(options['NetMask']))[0]
       rawip = socket.htonl(ip)
       rawnm = socket.htonl(nm)
@@ -1312,7 +1312,7 @@ class Drobo:
                - this drobo does not support Options ( fw < 1.11 )
            ( YellowThresh, RedThresh, AutoDelSnapshot, LowYel, LowRed )
                - drobo supports first version of options ( fw >= 1.11)
-  	   ( above + FeatureOnOffStates, SpinDownDelay, IPAddress, Subnetmask ) 
+  	   ( above + FeatureOnOffStates, SpinDownDelay, IPAddress_B, Subnetmask ) 
                - DroboPro only ? my v1's don't support it.
 	
         STATUS: untested, seems to agree with dmp.h for Options
@@ -1331,7 +1331,7 @@ class Drobo:
      if DEBUG & DBG_Simulation:
         return {"YellowThreshold":85, "RedThreshold":95, \
                 "SpinDownDelayMinutes":5, "SpinDownDelay": True, \
-                "UseStaticIPAddress":True, "IPAddress":'192.168.10.4', \
+                "UseStaticIPAddress":True, "IPAddress_B":'192.168.10.4', \
                 "NetMask":'255.255.255.0', "DualDiskRedundancy":True, \
                 "UseManualVolumeManagement":False }
      if 'SUPPORTS_OPTIONS2' in self.features or self.fw[7] >= '1.1.0':
