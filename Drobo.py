@@ -558,7 +558,7 @@ class Drobo:
 
     if ( 'SUPPORTS_OPTIONS2' in self.features ):
       ip = struct.unpack('I', socket.inet_aton(options['IPAddress_B']))[0]
-      nm = struct.unpack('I',socket.inet_aton(options['NetMask']))[0]
+      nm = struct.unpack('I',socket.inet_aton(options['NetMask_B']))[0]
       rawip = socket.htonl(ip)
       rawnm = socket.htonl(nm)
       flags=0
@@ -1332,7 +1332,7 @@ class Drobo:
         return {"YellowThreshold":85, "RedThreshold":95, \
                 "SpinDownDelayMinutes":5, "SpinDownDelay": True, \
                 "UseStaticIPAddress":True, "IPAddress_B":'192.168.10.4', \
-                "NetMask":'255.255.255.0', "DualDiskRedundancy":True, \
+                "NetMask_B":'255.255.255.0', "DualDiskRedundancy":True, \
                 "UseManualVolumeManagement":False }
      if 'SUPPORTS_OPTIONS2' in self.features or self.fw[7] >= '1.1.0':
          # insert try/except for compatibility with firmware <= 1.1.0
