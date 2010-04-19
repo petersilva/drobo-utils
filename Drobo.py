@@ -557,8 +557,8 @@ class Drobo:
     self.fd.put_sub_page( modepageblock, buffer, DEBUG )
 
     if ( 'SUPPORTS_OPTIONS2' in self.features ):
-      ip = struct.unpack('I', socket.inet_aton(options['IPAddress_B']))[0]
-      nm = struct.unpack('I',socket.inet_aton(options['NetMask_B']))[0]
+      ip = struct.unpack('I', socket.inet_aton(options['IPAddress']))[0]
+      nm = struct.unpack('I',socket.inet_aton(options['NetMask']))[0]
       rawip = socket.htonl(ip)
       rawnm = socket.htonl(nm)
       flags=0
@@ -1312,7 +1312,7 @@ class Drobo:
                - this drobo does not support Options ( fw < 1.11 )
            ( YellowThresh, RedThresh, AutoDelSnapshot, LowYel, LowRed )
                - drobo supports first version of options ( fw >= 1.11)
-  	   ( above + FeatureOnOffStates, SpinDownDelay, IPAddress_B, Subnetmask ) 
+  	   ( above + FeatureOnOffStates, SpinDownDelay, IPAddress, Subnetmask ) 
                - DroboPro only ? my v1's don't support it.
 	
         STATUS: untested, seems to agree with dmp.h for Options
@@ -1331,8 +1331,8 @@ class Drobo:
      if DEBUG & DBG_Simulation:
         return {"YellowThreshold":85, "RedThreshold":95, \
                 "SpinDownDelayMinutes":5, "SpinDownDelay": True, \
-                "UseStaticIPAddress":True, "IPAddress_B":'192.168.10.4', \
-                "NetMask_B":'255.255.255.0', "DualDiskRedundancy":True, \
+                "UseStaticIPAddress":True, "IPAddress":'192.168.10.4', \
+                "NetMask":'255.255.255.0', "DualDiskRedundancy":True, \
                 "UseManualVolumeManagement":False }
      if 'SUPPORTS_OPTIONS2' in self.features or self.fw[7] >= '1.1.0':
          # insert try/except for compatibility with firmware <= 1.1.0
@@ -1350,20 +1350,25 @@ class Drobo:
              if ( 'SUPPORTS_ISCSI' in self.features ):
                  d['UseStaticIPAddress'] = ( flags & 0x0008 ) > 0
                  ipb   = socket.ntohl(rawipb)
-                 d['IPAddress_B']=socket.inet_ntoa(struct.pack('I',ipb))
                  maskb = socket.ntohl(rawnmb)
-                 d['NetMask_B']=socket.inet_ntoa(struct.pack('I',maskb))
                  gwb   = socket.ntohl(rawgwb)
-                 d['Gateway_B']=socket.inet_ntoa(struct.pack('I',gwb))
-                 d['MTU_B']=mtub
-             if ( 'SUPPORTS_DUALNIC' in self.features ):
-                 ipa   = socket.ntohl(rawipa)
-                 d['IPAddress_A']=socket.inet_ntoa(struct.pack('I',ipa))
-                 maska = socket.ntohl(rawnma)
-                 d['NetMask_A']=socket.inet_ntoa(struct.pack('I',maska))
-                 gwa   = socket.ntohl(rawgwa)
-                 d['Gateway_A']=socket.inet_ntoa(struct.pack('I',gwa))
-                 d['MTU_A']=mtua
+                 if ( 'SUPPORTS_DUALNIC' in self.features ):
+                     ipa   = socket.ntohl(rawipa)
+                     maska = socket.ntohl(rawnma)
+                     gwa   = socket.ntohl(rawgwa)
+                     d['IPAddress']=socket.inet_ntoa(struct.pack('I',ipa))
+                     d['NetMask']=socket.inet_ntoa(struct.pack('I',maska))
+                     d['Gateway']=socket.inet_ntoa(struct.pack('I',gwa))
+                     d['MTU']=mtua
+                     d['IPAddress2']=socket.inet_ntoa(struct.pack('I',ipb))
+                     d['NetMask2']=socket.inet_ntoa(struct.pack('I',maskb))
+                     d['Gateway2']=socket.inet_ntoa(struct.pack('I',gwb))
+                     d['MTU2']=mtub
+                 else:
+                     d['IPAddress']=socket.inet_ntoa(struct.pack('I',ipb))
+                     d['NetMask']=socket.inet_ntoa(struct.pack('I',maskb))
+                     d['Gateway']=socket.inet_ntoa(struct.pack('I',gwb))
+                     d['MTU']=mtub
          return d
      else:
          return None
