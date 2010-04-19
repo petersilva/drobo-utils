@@ -47,10 +47,10 @@ physical channel is below:
 | Drobo  | n/a  | n/a  | data*1  |  n/a      |  n/a  |   2     |
 | Share  | (0)  | (0)  | (15)    |  (0)      |  (0)  |         |
 +--------+------+------+---------+-----------+-------+---------+
-| Drobo  | full | ?    |  n/a    | full*2    |  n/a  |   8-?   |
+| Drobo  | full | ?    |  n/a    | full*2    |  n/a  |   8     |
 | Pro    | (15) | (?)  |  (0)    | (80)      |  (0)  |         |
 +--------+------+------+---------+-----------+-------+---------+
-| Drobo  | ?    | n/a  |  n/a    |  ?        |  n/a  |   8?    |
+| Drobo  | ?    | n/a  |  n/a    |  ?        |  n/a  |   8     |
 | Elite  | (?)  | (0)  |  (0)    |  (?)      |  (0)  |         |
 +--------+------+------+---------+-----------+-------+---------+
 | Drobo  | full | ?    |  n/a    |   n/a     | data  |   8     |
@@ -88,7 +88,7 @@ should be fairly obvious.
 
 Drobo has made it so much easier to obtain much more secure storage, that some with 
 little or no professional storage management experience are getting Drobos.
-Some have the expectation that Drobo´s, because they allow for disk failures, 
+Some have the expectation that Drobos, because they allow for disk failures, 
 replace the need for backups.  Sad stories have been told about people putting 
 data only on the drobo, and no-where else, and then something happens and they 
 lose the data.
