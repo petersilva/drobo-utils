@@ -229,7 +229,7 @@ def _unitfeatures(norig):
        ( 0x8000, 'SUPPORTS_SHUTDOWN' ),
        ( 0x10000, 'feature x10000' ),
        ( 0x20000, 'SUPPORTS_ISCSI' ),
-       ( 0x80000, 'feature x40000' ),
+       ( 0x40000, 'feature x40000' ),
        ( 0x80000, 'feature x80000' ),
        ( 0x40000000, 'SUPPORTS_VOLUME_RENAME' ),
        ( 0x80000000, 'SUPPORTS_SINGLE_LUN_FORMAT' )]
