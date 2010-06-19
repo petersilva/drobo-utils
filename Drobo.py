@@ -229,7 +229,7 @@ def _unitfeatures(norig):
        ( 0x8000, 'SUPPORTS_SHUTDOWN' ),
        ( 0x10000, 'feature x10000' ),
        ( 0x20000, 'SUPPORTS_ISCSI' ),
-       ( 0x40000, 'SUPPORTS_DUALNIC' ),
+       ( 0x40000, 'feature x40000' ),
        ( 0x80000, 'feature x80000' ),
        ( 0x40000000, 'SUPPORTS_VOLUME_RENAME' ),
        ( 0x80000000, 'SUPPORTS_SINGLE_LUN_FORMAT' )]
@@ -1352,7 +1352,7 @@ class Drobo:
                  ipb   = socket.ntohl(rawipb)
                  maskb = socket.ntohl(rawnmb)
                  gwb   = socket.ntohl(rawgwb)
-                 if ( 'SUPPORTS_DUALNIC' in self.features ):
+                 if ( mtua > 0 ):
                      ipa   = socket.ntohl(rawipa)
                      maska = socket.ntohl(rawnma)
                      gwa   = socket.ntohl(rawgwa)
@@ -1368,7 +1368,6 @@ class Drobo:
                      d['IPAddress']=socket.inet_ntoa(struct.pack('I',ipb))
                      d['NetMask']=socket.inet_ntoa(struct.pack('I',maskb))
                      d['Gateway']=socket.inet_ntoa(struct.pack('I',gwb))
-                     d['MTU']=mtub
          return d
      else:
          return None
