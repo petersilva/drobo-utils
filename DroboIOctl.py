@@ -263,7 +263,7 @@ class DroboIOctl:
        print " get_mode_page SG_IO ioctl error"
        return None
  
-    if (io_hdr.status != 0 ) and (io_hdr != 2) :
+    if (io_hdr.status != 0 ) and (io_hdr.status != 2) :
         print "oh no! io_hdr status is: %x\n" %  io_hdr.status
         return None
  
