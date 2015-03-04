@@ -194,7 +194,7 @@ class DroboGUI(QtGui.QMainWindow):
 	   luntooltip = luntooltip + "lun id: " + str(l[0]) + " used: " +  \
                    _toGB(l[2]) + " total: " + _toGB(l[1]) 
            if 'SUPPORTS_NEW_LUNINFO2' in self.drobo.features :
-              luntooltip = luntooltip + " scheme: " + l[3] + " type: " + str(l[4]) 
+              luntooltip = luntooltip + " scheme: " + str(l[3]) + " type: " + str(l[4]) 
            luntooltip = luntooltip + "\n"
 
         i=0
