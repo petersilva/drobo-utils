@@ -1,4 +1,5 @@
 QA Test checklist prior to release:
+-----------------------------------
 
    1.0 Review Documentation
 	-- Revision dates in index.html, README.txt, TODO.txt
