@@ -13,6 +13,8 @@ drobom, and offer the same functionality as the view graphical interface.
 
 .. _`Data Robotics`: http://www.drobo.com
 
+.. contents::
+
 Compatibility Matrix
 --------------------
 
