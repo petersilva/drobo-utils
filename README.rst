@@ -981,7 +981,26 @@ On Linux, a good choice would be EncFS http://www.arg0.net/encfs, which encrypts
 file names and data over an ext file system, or some other method which uses 
 FUSE  http://fuse.sourceforge.net.  is reported to work well.
  
-
+ Does Drobo-Utiles work with USB3/ESATA
+ ======================================
+ 
+ I no longer remember which one of these is totally pooched.  At some point Drobo.com completely
+ changed the protocol, so that it is completely differently done internally... The old one encapsulated
+ generic SCSI packets inside USB.   The new protocol is SATA based, and emulates SATA in USB.
+ The original SCSI protocol support was built with help from Drobo.com, but the for new protocol,
+ the vendor never published the format, so it would require full-on reverse engineering to get it to work.
+ 
+ Is it Still Supported ?
+ =======================
+ 
+ Not really. I no longer have any hardware to test with, so cannot validate anything. I switched to QNAP instead,
+ which was more appropriate for my needs.  The package is python2 and will never be ported to python3, it 
+ lives on in the Debian archive because some kind soul is a maintainer there.  If someone wants
+ to take over, by all means git clone and go at it.  I will provide whatever guidance I can to someone interested.
+ 
+ 
+ 
+ 
 I have read everything. Help?
 =============================
 
