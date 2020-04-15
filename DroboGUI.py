@@ -659,9 +659,10 @@ class DroboGUI(QtGui.QMainWindow):
           self.Options.SDDMinutes.setValue( self.options['SpinDownDelayMinutes'] )
           self.Options.MVMCheckBox.setChecked( \
               self.options['UseManualVolumeManagement'] )
-          self.Options.SIPCheckBox.setChecked( self.options['UseStaticIPAddress'] )
-          self.Options.AddrEdit.setText( self.options['IPAddress'] ) 
-          self.Options.NetMaskEdit.setText( self.options['NetMask'] ) 
+          if 'SUPPORTS_ISCSI' in self.drobo.features :
+              self.Options.SIPCheckBox.setChecked( self.options['UseStaticIPAddress'] )
+              self.Options.AddrEdit.setText( self.options['IPAddress'] ) 
+              self.Options.NetMaskEdit.setText( self.options['NetMask'] ) 
         else:
           self.Options.DDRCheckBox.setCheckable(False)
           self.Options.DDRCheckBox.setStyleSheet( "QWidget { color: gray }" )
