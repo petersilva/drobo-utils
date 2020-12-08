@@ -1,7 +1,8 @@
 
 **Status: Abandonware, here as memorabilia/archive. This package is written for obsolete
-libraries (qt4) in an obsolete language (python2.) It will not work on a current Linux distribution.
-you have been warned.**
+libraries (qt4) in an obsolete language (python2.) Ubuntu 20.04, for example, no longer supports python3.
+This package is likely  not to work on any current Linux distribution. If you feel like
+showing the package some love, feel free. I will help you if I can.**
 
 -----------
 Drobo-Utils
