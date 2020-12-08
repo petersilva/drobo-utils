@@ -1,4 +1,8 @@
 
+**Status: Abandonware, here as memorabilia/archive. This package is written for obsolete
+libraries (qt4) in an obsolete language (python2.) It will not work on a current Linux distribution.
+you have been warned.**
+
 -----------
 Drobo-Utils
 -----------
