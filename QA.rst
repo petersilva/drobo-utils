@@ -2,7 +2,7 @@ QA Test checklist prior to release:
 -----------------------------------
 
    1.0 Review Documentation
-	-- Revision dates in index.html, README.txt, TODO.txt
+	-- Revision dates in index.html, README.rst, TODO.rst
 	-- Set version to pre-release one.
         -- build packages with pre-release version id.
    1.1 drobom status... check for accuracy.

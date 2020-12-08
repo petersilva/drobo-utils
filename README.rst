@@ -549,7 +549,7 @@ SAFETY
 Those worried about safety of using this software should know:  it was 
 developed with assistance from the vendor (`Data Robotics`_ Inc.), and 
 in every case, based on vendor documentation, and with at least encouragement,
-if not outright support.  For each release, a QA.txt file is built, demonstrating the functionality tests run.  There are multiple checksum verifications built 
+if not outright support.  For each release, a QA.rst file is built, demonstrating the functionality tests run.  There are multiple checksum verifications built 
 into the firmware upgrade process, so it is next to impossible to brick a drobo 
 using the tools.  Drobo-utils verifies firmware checksums before attempting 
 to upload the image to the device, and the device checks the firmware against 

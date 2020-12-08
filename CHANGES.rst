@@ -5,7 +5,7 @@ TODO:
 These are all Open Tasks... HELP WANTED!
 
   * add python version testing to test suite (2.4, 2.5, 2.6)
-  * add LUN test procedure to DEVELOPERS.txt
+  * add LUN test procedure to DEVELOPERS.rst
   * looking at firmware based LUN creation/deletion & format.
   * disk pack status.
   * alerts.
@@ -123,7 +123,7 @@ These are all Open Tasks... HELP WANTED!
 0.3.2 release 2008/10/25
 ------------------------
 
-  * for v1, still don't understand index.txt file.
+  * for v1, still don't understand index.rst file.
   * after testing, some more fixes, v2 downloads now work.
   * fixes received from Brad Guillory for v2/tdz firmware downloading.
      they don't do any harm afaict, don't have a v2 to test with.

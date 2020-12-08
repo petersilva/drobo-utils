@@ -140,7 +140,7 @@ Procedure::
    git checkout <branch> # switches current dir to the branch.
 
   2 - Stamp the branch with version 
-   vi CHANGES.txt          # complete change manifest for release
+   vi CHANGES.rst          # complete change manifest for release
    vi debian/changelog     # copy manifest from txt, add signature.
    vi setup.py 		   # edit version
    vi Drobo.py             # edit VERSION
@@ -148,8 +148,8 @@ Procedure::
   3 - Build packages for testing & Install them. (see separate recipe.)
 
   4 - Run QA.
-   Record results of release tests in the branch (QA.txt) As new tests are created, 
-   modify QA.txt on trunk for to keep references for the next release.
+   Record results of release tests in the branch (QA.rst) As new tests are created, 
+   modify QA.rst on trunk for to keep references for the next release.
 
   5 - Commit & Push QA'd branch
 
@@ -157,14 +157,14 @@ Procedure::
     git push origin origin:refs/heads/<branch>
 
 
-Quality Assurance (QA.txt)
+Quality Assurance (QA.rst)
 ==========================
 
-QA.txt is a quality assurance log.  The version on the trunk of the releases 
+QA.rst is a quality assurance log.  The version on the trunk of the releases 
 indicates the QA procedure to be applied to the next version during the 
 release process.  Since a branch is created for each release, the version 
-of QA.txt acts as a quality log for that release.  so one can do a git 
-checkout, or git export to get the quality log for any release (QA.txt 
+of QA.rst acts as a quality log for that release.  so one can do a git 
+checkout, or git export to get the quality log for any release (QA.rst 
 introduce in version 0.4.0)
 
 
@@ -193,7 +193,7 @@ Assumes you have installed the Build dependencies::
  % cd ..
  % tar -czvf drobo-utils-0.3.3-1.tgz drobo-utils-0.99.9
 
-apply QA tests. as per QA.txt recording results there.
+apply QA tests. as per QA.rst recording results there.
 
 
 Updating Documentation

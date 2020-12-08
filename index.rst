@@ -45,7 +45,7 @@ So that is where drobo-utils, the linux dashboard, comes in.
 
 [`Links and Help`_][ `Index`_]
 
-.. include:: README.txt
+.. include:: README.rst
 
 .. _`Manual Pages`:
 
@@ -64,11 +64,11 @@ Drobom
 
 .. _DEVELOPERS: 
 
-.. include:: DEVELOPERS.txt
+.. include:: DEVELOPERS.rst
 
 [`Links and Help`_][ `Index`_]
 
-.. include:: DroboShare.txt
+.. include:: DroboShare.rst
 
 [`Links and Help`_][ `Index`_]
 
@@ -76,7 +76,7 @@ Drobom
 
 Below are highlights included in each release.
 
-.. include:: CHANGES.txt
+.. include:: CHANGES.rst
 
 .. _`Links and Help`:
 

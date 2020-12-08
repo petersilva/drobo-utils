@@ -12,11 +12,11 @@ clean:
 doc:
 	groff -Thtml -man drobom.8 >drobom.html
 	groff -Thtml -man droboview.8 >droboview.html
-	rst2html --stylesheet-path=drobo-utils.css README.txt >README.html
-	rst2html --stylesheet-path=drobo-utils.css DEVELOPERS.txt >DEVELOPERS.html
-	rst2html --stylesheet-path=drobo-utils.css CHANGES.txt >CHANGES.html
-	rst2html --stylesheet-path=drobo-utils.css DroboShare.txt >DroboShare.html
-	rst2html --stylesheet-path=drobo-utils.css index.txt >index.html
+	rst2html --stylesheet-path=drobo-utils.css README.rst >README.html
+	rst2html --stylesheet-path=drobo-utils.css DEVELOPERS.rst >DEVELOPERS.html
+	rst2html --stylesheet-path=drobo-utils.css CHANGES.rst >CHANGES.html
+	rst2html --stylesheet-path=drobo-utils.css DroboShare.rst >DroboShare.html
+	rst2html --stylesheet-path=drobo-utils.css index.rst >index.html
 
 # Uncomment this to turn on verbose mode.
 
