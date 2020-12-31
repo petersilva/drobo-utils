@@ -13,7 +13,7 @@ import struct
 
 def hexdump(label,data):
       i=0
-      print "%s %03x:" % (label, i),
+      print( "%s %03x:" % (label, i) )
       for bb in data:
          print "%02x" % ord(bb), 
          i=i+1
