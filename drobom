@@ -450,7 +450,6 @@ for u in l:
   elif cmd == "view":
      if True : #try: 
        print("Partial port to QT5... not working at all... help welcome.")
-       print("signal/slot semantics changed ... QT5... no idea what to do." )
        from PyQt5 import QtWidgets
        from PyQt5 import QtCore
        from DroboGUI import DroboGUI
