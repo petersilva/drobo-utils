@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 """
 copyright:
@@ -37,8 +37,8 @@ def confirmed(prompt,setting):
       then ask the user.
   '''
   if setting == 'a':
-     print prompt,
-     answer=raw_input()
+     print(prompt, end=' ')
+     answer=input()
   else:
      answer=setting
 
@@ -48,58 +48,58 @@ def confirmed(prompt,setting):
      return False
   
 def usage():
-   print "\nUsage: drobom [options] <command> [ arguments... ] \n"
-   print " drobo management interface, version: %s\n" % Drobo.VERSION
-   print "options may be one of: "
-   print " -c, --command <command>\tcommand to run."
-   print " -d, --device <device>\tpick a specific disk, rather than scan"
-   print " -h, --help \t\tprint this help text"
-   print " -n, --no \t answer all questions no (generally does not do any damage) "
-   print " -s, --string <string>\t sometimes, new models are not detected. See README "
-   print " -v, --verbose <debug_code>\t bit-field, default is 0 (off) "
-   print "\t1  - General"
-   print "\t2  - Hardware Dialog"
-   print "\t4  - Initiation"
-   print "\t8  - Raw returned records from DMIP queries"
-   print "\t16 - Detection"
-   print "\t63 - All of the above"
-   print "\t128- Simulate presence of Drobo for testing\n"
-   print " -V, --version\treport version of drobo-utils."
-   print " -y, --yes \t answer all questions yes (generally overwrites stuff) "
-   print "\ncommand is one of: "
-   print "\tblink\tidentify the drobo by making the lights blink"
-   print "\tdiag \tdump diagnostics file into /tmp directory"
-   print "\tdiagprint <file>  - print diagnostic file to stdout"
-   print "\tformat\tPrepares a script to format LUNS from a device. Arguments:"
-   print "\t\t<fstype>\tfile system type.  One of: " + str(valid_formats)
-   print "\t\tNote: This places a script in /tmp, which you must run."
-   print "\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo"
-   print "\tfwload\tload a specific firmware for the given Drobo. Arguments:"
-   print "\t\t<fwimage>\tthe firmware file to load."
-   print "\tfwupgrade\tupgrade the firmware to the latest and greatest,"
-   print "\t\t\trecommended by DRI"
-   print "\tinfo <options>\tprint information on a Drobo"
-   print "\t\t<options>\tcomma separated list of:"
+   print("\nUsage: drobom [options] <command> [ arguments... ] \n")
+   print(" drobo management interface, version: %s\n" % Drobo.VERSION)
+   print("options may be one of: ")
+   print(" -c, --command <command>\tcommand to run.")
+   print(" -d, --device <device>\tpick a specific disk, rather than scan")
+   print(" -h, --help \t\tprint this help text")
+   print(" -n, --no \t answer all questions no (generally does not do any damage) ")
+   print(" -s, --string <string>\t sometimes, new models are not detected. See README ")
+   print(" -v, --verbose <debug_code>\t bit-field, default is 0 (off) ")
+   print("\t1  - General")
+   print("\t2  - Hardware Dialog")
+   print("\t4  - Initiation")
+   print("\t8  - Raw returned records from DMIP queries")
+   print("\t16 - Detection")
+   print("\t63 - All of the above")
+   print("\t128- Simulate presence of Drobo for testing\n")
+   print(" -V, --version\treport version of drobo-utils.")
+   print(" -y, --yes \t answer all questions yes (generally overwrites stuff) ")
+   print("\ncommand is one of: ")
+   print("\tblink\tidentify the drobo by making the lights blink")
+   print("\tdiag \tdump diagnostics file into /tmp directory")
+   print("\tdiagprint <file>  - print diagnostic file to stdout")
+   print("\tformat\tPrepares a script to format LUNS from a device. Arguments:")
+   print("\t\t<fstype>\tfile system type.  One of: " + str(valid_formats))
+   print("\t\tNote: This places a script in /tmp, which you must run.")
+   print("\tfwcheck\tquery drobo.com for updates to firmware for the given Drobo")
+   print("\tfwload\tload a specific firmware for the given Drobo. Arguments:")
+   print("\t\t<fwimage>\tthe firmware file to load.")
+   print("\tfwupgrade\tupgrade the firmware to the latest and greatest,")
+   print("\t\t\trecommended by DRI")
+   print("\tinfo <options>\tprint information on a Drobo")
+   print("\t\t<options>\tcomma separated list of:")
    for line in textwrap.wrap(opt_str, 40):
-      print "\t\t\t\t" + line
-   print "\tlist \tshow device files for all Drobos found."
-   print "\tset\t Set some Drobo thingum."
-   print "\t\tDualDiskRedundancy <True|False> \tSet option feature flag"
-   print "\t\tIPAddress <Address> \tSet iSCSI IP address"
-   print "\t\tlunsize\tSet the size of LUNS on device. Arguments:"
-   print "\t\t\t<sz>\tinteger number of TiB to set the lunsize to"
-   print "\t\t\tNote: After execution, Drobo reboots, wait a few minutes"
-   print "\t\t\tbefore accessing again"
-   print "\t\tname <name> \tSet Drobo name"
-   print "\t\tNetMask <NetMask> \tSet iSCSI IP netmask"
-   print "\t\tSpinDownDelayMinutes <minutes> \tSet how long before spin down (0 to disable)"
-   print "\t\ttime\tsync Drobo's clock to UTC"
-   print "\t\tUseManualVolumeManagement <True|False> \tSet option feature flag"
-   print "\t\tUseStaticIPAddress <True|False> \tSet option feature flag"
-   print "\tshutdown\tShutdown drobo"
-   print "\t\t\t(DRI calls this 'standby'. Shutdown also umounts.)"
-   print "\tstatus\treport how the Drobo is doing"
-   print "\tview\tstart up a management dashboard GUI"
+      print("\t\t\t\t" + line)
+   print("\tlist \tshow device files for all Drobos found.")
+   print("\tset\t Set some Drobo thingum.")
+   print("\t\tDualDiskRedundancy <True|False> \tSet option feature flag")
+   print("\t\tIPAddress <Address> \tSet iSCSI IP address")
+   print("\t\tlunsize\tSet the size of LUNS on device. Arguments:")
+   print("\t\t\t<sz>\tinteger number of TiB to set the lunsize to")
+   print("\t\t\tNote: After execution, Drobo reboots, wait a few minutes")
+   print("\t\t\tbefore accessing again")
+   print("\t\tname <name> \tSet Drobo name")
+   print("\t\tNetMask <NetMask> \tSet iSCSI IP netmask")
+   print("\t\tSpinDownDelayMinutes <minutes> \tSet how long before spin down (0 to disable)")
+   print("\t\ttime\tsync Drobo's clock to UTC")
+   print("\t\tUseManualVolumeManagement <True|False> \tSet option feature flag")
+   print("\t\tUseStaticIPAddress <True|False> \tSet option feature flag")
+   print("\tshutdown\tShutdown drobo")
+   print("\t\t\t(DRI calls this 'standby'. Shutdown also umounts.)")
+   print("\tstatus\treport how the Drobo is doing")
+   print("\tview\tstart up a management dashboard GUI")
 
 '''
   print* routines all print portions of information about the drobo.
@@ -111,61 +111,61 @@ def usage():
 def printconfig(d):
   config=d.GetSubPageConfig()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'Configuration maxima: slots: %d, luns: %d, lunsize: %d TB' % \
-        ( config[0], config[1], totb(config[2]))
+    print('Configuration maxima: slots: %d, luns: %d, lunsize: %d TB' % \
+        ( config[0], config[1], totb(config[2])))
   else:
-    print config
+    print(config)
 
 def printcapacity(d):
   c=d.GetSubPageCapacity()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'Capacity (in GB):  used: %d, free: %d, total: %d'  % \
-          ( togig(c[1]), togig(c[0]), togig(c[2]))
+    print('Capacity (in GB):  used: %d, free: %d, total: %d'  % \
+          ( togig(c[1]), togig(c[0]), togig(c[2])))
   else:
-    print c
+    print(c)
 
 
 def printprotocol(d):
   protocol=d.GetSubPageProtocol()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'protocol version: %2d.%d' % ( protocol[0], protocol[1] )
+    print('protocol version: %2d.%d' % ( protocol[0], protocol[1] ))
   else:
-    print protocol
+    print(protocol)
 
 def printslots(d):
   slotinfo=d.GetSubPageSlotInfo()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'query slotinfo result:  number of slots:', d.slot_count
-    print "%4s %4s %20s %20s" % ( "slot", "GB", "Model", "Status" )
+    print('query slotinfo result:  number of slots:', d.slot_count)
+    print("%4s %4s %20s %20s" % ( "slot", "GB", "Model", "Status" ))
   for i in slotinfo:
-    print "  %2d %4d %20s %20s" % ( i[0], togig(i[1]), i[4], i[3] )
+    print("  %2d %4d %20s %20s" % ( i[0], togig(i[1]), i[4], i[3] ))
   
 def printfirmware(d):
   firmware=d.GetSubPageFirmware()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print 'Firmware:', firmware[7]
-    print 'Revision: %d.%d ( %d ) built: %s' % \
-       ( firmware[0], firmware[1], firmware[2], firmware[5] )
-    print 'Features: %s' % ','.join(firmware[8])
+    print('Firmware:', firmware[7])
+    print('Revision: %d.%d ( %d ) built: %s' % \
+       ( firmware[0], firmware[1], firmware[2], firmware[5] ))
+    print('Features: %s' % ','.join(firmware[8]))
   else:
-    print firmware
+    print(firmware)
   
 def printscsi(d):
-  print "SCSI emulation information:"
+  print("SCSI emulation information:")
   s=d.inquiry
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-      print "Vendor: %-8s  Model: %15s Revision: %s"  % ( s[8], s[9], s[10] )
+      print("Vendor: %-8s  Model: %15s Revision: %s"  % ( s[8], s[9], s[10] ))
   else:
-      print str( (s[8],s[9],s[10]) )
+      print(str( (s[8],s[9],s[10]) ))
   for c in d.char_devs:
       dio = DroboIOctl.DroboIOctl(c,0,Drobo.DEBUG)
       version = dio.version()
       ( host, channel, id, lun, vendor ) = dio.identifyLUN()
       if Drobo.DEBUG & Drobo.DBG_Chatty:
-         print "%s: bus=scsi%d channel=%d id=%d lun=%d (vendor=%s, version=%d)" % \
-           ( c, host, channel, id, lun, vendor, version )
+         print("%s: bus=scsi%d channel=%d id=%d lun=%d (vendor=%s, version=%d)" % \
+           ( c, host, channel, id, lun, vendor, version ))
       else:
-         print  str( (c, host, channel, id, lun, vendor, version) )
+         print(str( (c, host, channel, id, lun, vendor, version) ))
 
 
 def printstatus(d):
@@ -179,7 +179,7 @@ def printstatus(d):
      if c[2] > 0 :
          pfull = 100 * ((c[1]+1.0)/c[2])
      else:
-         print "firmware too old to report capacity properly... or the drobo is empty..."
+         print("firmware too old to report capacity properly... or the drobo is empty...")
          pfull = -1
 
      m=':'.join(d.DiscoverMounts())
@@ -187,54 +187,54 @@ def printstatus(d):
        m="-"
      if n[2] == "":
        n[2] = "-"
-     print "%s %s %s %02d%% full - %s" % ( ':'.join(d.char_devs), m, n[2], \
-          pfull, d.GetSubPageStatus() )
+     print("%s %s %s %02d%% full - %s" % ( ':'.join(d.char_devs), m, n[2], \
+          pfull, d.GetSubPageStatus() ))
   
 def printoptions(d):
   options=d.GetOptions()
   if options==None :
-    print "options not supported on this hardware"
+    print("options not supported on this hardware")
     return
 
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    for i in options.keys():
-          print '\t',i,options[i]
+    for i in list(options.keys()):
+          print('\t',i,options[i])
   else:
-    print options
+    print(options)
   
 def printluns(d):
   luninfo=d.GetSubPageLUNs()
   if Drobo.DEBUG & Drobo.DBG_Chatty:
-    print    'lun     size (GB) used    PTFmt  FStype:'
+    print('lun     size (GB) used    PTFmt  FStype:')
     for i in luninfo:
-       print ' %2d %8d  %8d  %7s %s ' % ( i[0], togig(i[1]), togig(i[2]), i[3], i[4] )
+       print(' %2d %8d  %8d  %7s %s ' % ( i[0], togig(i[1]), togig(i[2]), i[3], i[4] ))
   else:
     for i in luninfo:
-       print i
+       print(i)
  
 
 
 def info(d,choices):
   if debug & Drobo.DBG_Chatty:
     s = d.GetSubPageSettings()
-    print '---------------------------------------------------------'
-    print 'Drobo Name: %-10s Devices: %s' %( s[2], ':'.join(d.char_devs))
-    print '      Time:', time.ctime(s[0])
-    print '---------------------------------------------------------'
+    print('---------------------------------------------------------')
+    print('Drobo Name: %-10s Devices: %s' %( s[2], ':'.join(d.char_devs)))
+    print('      Time:', time.ctime(s[0]))
+    print('---------------------------------------------------------')
 
   for c in choices:
      if c in valid_print:
         eval( "print" + c + "(d)"  )
      else:
-        print 'no such option: %s' % c
-        print 'valid options: ', opt_str
+        print('no such option: %s' % c)
+        print('valid options: ', opt_str)
 
   if debug & Drobo.DBG_Chatty:
-    print '---------------------------------------------------------'
+    print('---------------------------------------------------------')
 
 
 def update(pct):
-  print "write is %2d%% done." % ( pct )
+  print("write is %2d%% done." % ( pct ))
 
 def setlunsize(d,newlunsize,confirmation):
   ''' trigger a change of lunsize on the drobo.  Destructive operation.
@@ -243,20 +243,20 @@ def setlunsize(d,newlunsize,confirmation):
   lunsize=int(newlunsize)
 
   if lunsize not in (1, 2, 4, 8, 16):
-     print 'lun size needs to be 1, 2, 4, 8, or 16 TiB; %d is invalid' % lunsize
+     print('lun size needs to be 1, 2, 4, 8, or 16 TiB; %d is invalid' % lunsize)
      sys.exit()
 
   if lunsize > 2:
-     print 'WARNING: lun size > 2 TiB known not work in many cases under Linux' 
+     print('WARNING: lun size > 2 TiB known not work in many cases under Linux') 
 
-  print 'You asked to set the lunsize to %d ' % lunsize
+  print('You asked to set the lunsize to %d ' % lunsize)
   if confirmed("WARNING: Ready to destroy all you data. Continue? (y/n)", \
-        confirmation ):
-  	d.SetLunSize(lunsize)
-        print '''Done... Drobo is likely now rebooting.  
-                 In a few minutes, it will come back with the new LUN size.'''
+      confirmation ):
+      d.SetLunSize(lunsize)
+      print('''Done... Drobo is likely now rebooting.  
+                 In a few minutes, it will come back with the new LUN size.''')
   else:
-	print 'Phew... You stopped just in time!'
+      print('Phew... You stopped just in time!')
 
 
 # Mainline...
@@ -273,7 +273,7 @@ debug=1
 try:
    opts, args = getopt.getopt(sys.argv[1:], "c:d:hns:v:Vy", \
        ["command=", "device=", "help", "no", "string=", "verbosity=", "version", "y" ])
-except getopt.GetoptError, err:
+except getopt.GetoptError as err:
    usage()
    sys.exit(2)
 
@@ -283,20 +283,20 @@ confirmation='a'
 vendor_string=''
 for o, a in opts:
         if o in ("-c", "--command"):
-	    cmd = a
+            cmd = a
         elif o in ("-d", "--device"):
-	    device=a
+            device=a
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
         elif o in ("-n", "--no") :
             confirmation='n'
         elif o in ("-s", "--string"):
-	    vendor_string=a
+            vendor_string=a
         elif o in ("-v", "--verbosity", "--verbose") :
             debug = int(a)
         elif o in ("-V", "--version" ):
-            print Drobo.VERSION
+            print(Drobo.VERSION)
             sys.exit()
         elif o in ("-y", "--yes") :
             confirmation='y'
@@ -310,19 +310,19 @@ if cmd==None :
   cmd=args[0]
 
 if (os.geteuid() != 0) and (debug & Drobo.DBG_Simulation == 0):
-   print "Please try again as root."
+   print("Please try again as root.")
    sys.exit()
 
 l = Drobo.DiscoverLUNs(debug,vendor_string)
 if not l:
-   print "No Drobos discovered"
+   print("No Drobos discovered")
    sys.exit()
 
 # find the requested Drobo...
 match=False
 if device != None:
    for i in l:
-      if type(i) == types.ListType:
+      if type(i) == list:
          for j in i:
             if device in j:
                l=[i]
@@ -332,15 +332,15 @@ if device != None:
          match=True
 
 if device != None and not match:
-   print "given device: %s, is not a Drobo" % device
+   print("given device: %s, is not a Drobo" % device)
    sys.exit()
  
 if cmd == 'list':
-   print ' '.join(map(lambda x: ':'.join(x) , l ))
+   print(' '.join([':'.join(x) for x in l]))
    sys.exit()
 
 if debug & Drobo.DBG_Detection:
-   print "found ", l
+   print("found ", l)
 
 for u in l:
   d=Drobo.Drobo(u,debug)
@@ -351,42 +351,42 @@ for u in l:
 
   elif cmd == "diag":
      f=d.dumpDiagnostics()
-     print "diagnostics in ", f
+     print("diagnostics in ", f)
 
   elif cmd == "diagprint":
      if len(args) < 2:
-	print "error: diagnostics file required as argument" 
+        print("error: diagnostics file required as argument") 
      else:
-        print d.decodeDiagnostics( args[1] )
+        print(d.decodeDiagnostics( args[1] ))
 
   elif cmd == "format":
 
      if (len(args) < 2) or (args[1] not in valid_formats):
-	print "error: file system format required as argument"
-        print "       Choices are: " + str(valid_formats)
+        print("error: file system format required as argument")
+        print("       Choices are: " + str(valid_formats))
      else:
         printstatus(d)
-        print 'preparing a format script for a %s file system as you requested' % args[1]
+        print('preparing a format script for a %s file system as you requested' % args[1])
         d.format_script(args[1])
-        print 'OK, I built the script but nothing is erased yet...'
-        print 'You can have a look at it with: cat /tmp/fmtscript'
-        print 'If you are really sure, go ahead and do: sh /tmp/fmtscript'
+        print('OK, I built the script but nothing is erased yet...')
+        print('You can have a look at it with: cat /tmp/fmtscript')
+        print('If you are really sure, go ahead and do: sh /tmp/fmtscript')
         if confirmed("WARNING: Ready to destroy all your data. Continue? (y/n)", \
            confirmation ):
-           print 'ok... firing it off...'
+           print('ok... firing it off...')
            fmtproc = subprocess.Popen("/tmp/fmtscript", bufsize=0, shell=True )
            fmtproc.wait()
         else:
-           print 'Phew... You stopped just in time!'
+           print('Phew... You stopped just in time!')
 
 
   elif cmd == 'fwcheck':
      tuple=d.PickLatestFirmware()
-     print tuple[3]
+     print(tuple[3])
 
   elif cmd == 'fwload':
      if len(args) < 2:
-	print "error: firmware file required as argument" 
+        print("error: firmware file required as argument") 
      else:
         if d.PickFirmware(args[1]):
           d.writeFirmware(update)
@@ -405,7 +405,7 @@ for u in l:
 
   elif cmd == "set": 
      if len(args) < 2:
-	 print "error: set what?" 
+         print("error: set what?") 
          usage()
      else:
          what = args[1]
@@ -419,7 +419,7 @@ for u in l:
             d.Sync()
          else:
             options=d.GetOptions()
-            if args[1] in options.keys():
+            if args[1] in list(options.keys()):
                # TODO: are all options integers? no..
                if args[2] == 'True':
                    value=True
@@ -433,7 +433,7 @@ for u in l:
                options[args[1]]=value
                d.SetOptions( options ) 
             else:
-               print 'option not present: ', args[1]
+               print('option not present: ', args[1])
 
 
   elif cmd == "shutdown":
@@ -445,7 +445,7 @@ for u in l:
 
   elif cmd == "time":
      settings=d.GetSubPageSettings()
-     print "Drobo says it is:", time.ctime(settings[0])
+     print("Drobo says it is:", time.ctime(settings[0]))
 
   elif cmd == "view":
      try: 
@@ -453,8 +453,8 @@ for u in l:
        from PyQt4 import QtCore
        from DroboGUI import DroboGUI
      except:
-       print "QT support missing, no GUI possible"
-       print "perhaps following will help: apt-get install python-qt4 "
+       print("QT support missing, no GUI possible")
+       print("perhaps following will help: apt-get install python-qt4 ")
 
      # fire up a GUI for the given LUN, stays foreground...
      app = QtGui.QApplication(sys.argv)
@@ -464,4 +464,4 @@ for u in l:
 
   else:
      usage()
-     print "Unknown Command: ", cmd
+     print("Unknown Command: ", cmd)

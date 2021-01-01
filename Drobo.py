@@ -21,14 +21,13 @@ named COPYING in the root of the source directory tree.
 
 """
 
-import fcntl, struct, socket, array, commands, time
-import exceptions
+import fcntl, struct, socket, array, subprocess, time
 import os, sys, re
 import types
 
 #only for fw download...
 import os.path
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import zipfile,zlib
 
 #only for simulation mode...
@@ -61,14 +60,14 @@ DBG_Simulation = 0x80
 import DroboIOctl
 
 
-class DroboException(exceptions.Exception):
+class DroboException(Exception):
   """  If there is a problem accessing the Drobo, this exception is raised.
   """
   def __init__(self, msg="Unknown"):
       self.msg = msg
 
   def __str__(self):
-     print "Problem accessing a Drobo: " + self.msg
+     print("Problem accessing a Drobo: " + self.msg)
 
 def _ledstatus(n):
     """ return colors decoded, given numeric slot status 
@@ -77,7 +76,7 @@ def _ledstatus(n):
         STATUS: working with ERRATA:
         Developer Notes:
         The spec says: status is high order 3 bits, and starting from 0, goes:
-		green, yellow, Red, ( Green Yellow )
+                green, yellow, Red, ( Green Yellow )
 
         dmp.h says:
         forget the high order 3 bits, it's the whole byte.
@@ -86,17 +85,17 @@ def _ledstatus(n):
 
         my drobo says: 
                 high order bits always 0. status seems to use whole byte.
-		green is 3,  
-		flashing red-green is 4...  which dmp.h says is yellow green
+                green is 3,  
+                flashing red-green is 4...  which dmp.h says is yellow green
                 flashing red-black is 6...  agrees with dmp.h
-		0x80 is indeed an empty slot, as per dmp.h
+                0x80 is indeed an empty slot, as per dmp.h
                 unknown-- yellow-green...
         matches neither... hmm...        
     """
     colourstats=[ 'black', 'red', 'yellow', 'green', ['red', 'green'], 
       [ 'red', 'yellow' ], ['red', 'black'] ] 
     if DEBUG & DBG_General:
-         print 'colourstats, argument n is: ', n
+         print('colourstats, argument n is: ', n)
     if ( n == 0x80 ):  # empty
        return 'gray'
     return colourstats[n & 0x0f ]
@@ -176,7 +175,7 @@ def _partformat(n):
        f.append( 'FAT32' )
 
     if (len(f) != 1):
-      print 'hoho! multiple partition types! Brave are we not?' 
+      print('hoho! multiple partition types! Brave are we not?') 
 
     return f
 
@@ -201,11 +200,11 @@ def _unitfeatures(norig):
     
         STATUS: working.
         this comes straight from dmp.h.. what they mean isn't documented.
-        stuff that looks wrong:	
-		-- USED_CAPACITY... should be USE_CAPACITY ... no 'D'
-		-- all the 'SUPPORTS' texts are redundant. every bit is about
+        stuff that looks wrong:        
+                -- USED_CAPACITY... should be USE_CAPACITY ... no 'D'
+                -- all the 'SUPPORTS' texts are redundant. every bit is about
                    what is supported.  It should be just LUNINFO2
-         etc...			
+         etc...                        
          feature x0800 and 0x2000 show up on my Drobo v1 running 1.3.0...
          of course, do not know what they are...
     """
@@ -277,11 +276,11 @@ class Drobo:
      DEBUG=debugflags
 
      if DEBUG & DBG_Instantiation :
-        print '__init__ '
+        print('__init__ ')
 
      self.fd=None
 
-     if type(chardevs) is types.ListType:
+     if type(chardevs) is list:
         self.char_dev_file = chardevs[0]
         self.char_devs = chardevs
      else:
@@ -312,31 +311,31 @@ class Drobo:
 
 
         if DEBUG & DBG_Detection:
-            print "cfg: ", cfg
+            print("cfg: ", cfg)
 
         if ( len(cfg) != 3 ): # We ask this page to return three fields...
             if DEBUG & DBG_Detection:
-              print "%s length of cfg is: %d, should be 3" % (self.char_dev_file, len(cfg))
-	    raise DroboException 
+              print("%s length of cfg is: %d, should be 3" % (self.char_dev_file, len(cfg)))
+            raise DroboException 
 
         if ( self.slot_count < 4 ): 
             if DEBUG & DBG_Detection:
-              print "%s cfg[0] = %s, should >= 4. All Drobos have at least 4 slots" % (self.char_dev_file, cfg[0])
-	    raise DroboException # Assert: All Drobo have 4 slots.
+              print("%s cfg[0] = %s, should >= 4. All Drobos have at least 4 slots" % (self.char_dev_file, cfg[0]))
+            raise DroboException # Assert: All Drobo have 4 slots.
  
         set=self.GetSubPageSettings()
         if DEBUG & DBG_Detection:
-            print "settings: ", set
+            print("settings: ", set)
 
         self.GetSubPageFirmware()
         if ( len(self.fw) < 8 ) and (len(self.fw[7]) < 5):
             if DEBUG & DBG_Detection:
-              print "%s length of fw query: is %d, should be < 8." % (self.char_dev_file, len(self.fw))
-              print "%s len(fw[7]) query: is %d, should be < 5." % (self.char_dev_file, len(self.fw[7]))
+              print("%s length of fw query: is %d, should be < 8." % (self.char_dev_file, len(self.fw)))
+              print("%s len(fw[7]) query: is %d, should be < 5." % (self.char_dev_file, len(self.fw[7])))
             raise DroboException
 
         if ( self.fw[6].lower() != 'armmarvell' ):
-	     print "interesting, %s fw[6] is: %s" % (self.char_dev_file,self.fw[6])
+             print("interesting, %s fw[6] is: %s" % (self.char_dev_file,self.fw[6]))
         #if ( self.fw[6].lower() != 'armmarvell' ):
         #    if DEBUG & DBG_Detection:
         #      print "%s fw[6] is not armmarvell." % self.char_dev_file
@@ -346,7 +345,7 @@ class Drobo:
   def __del__(self):
 
      if DEBUG & DBG_Instantiation :
-        print '__del__ '
+        print('__del__ ')
 
      if self.fd != None :
            self.fd.closefd()
@@ -372,7 +371,7 @@ class Drobo:
      need to detect each lun...
 
      algorithm:
-	do discoverLUNs()
+        do discoverLUNs()
         figure out which LUNs belong to the current Drobo... How?
           -- do not want to partition LUNS on another Drobo!
              That would be bad!
@@ -420,10 +419,10 @@ class Drobo:
             fd.write( "parted -s %s print; sleep 5\n" % cd )
             fd.write( 'mkdosfs -v -v -F 32 -S 4096 -n Drobo01 %s1\n' % cd )
         else:
-            print 'unsupported  partition type %s, sorry...' % fstype
+            print('unsupported  partition type %s, sorry...' % fstype)
 
      fd.close()
-     os.chmod(format_script,0700)
+     os.chmod(format_script,0o700)
 
      return format_script 
 
@@ -444,7 +443,7 @@ class Drobo:
        following two bytes have the length of the record (max: 65535)
     """
     if DEBUG & DBG_HWDialog:
-       print 'getsubpage'
+       print('getsubpage')
 
     if DEBUG & DBG_Simulation:
        return ()
@@ -452,7 +451,7 @@ class Drobo:
     mypack = '>BBH' + pack
     paklen=struct.calcsize(mypack)
     if DEBUG & DBG_RawReturn :
-        print 'DMIP sub_page query:0x%02x pattern: %s ' % (sub_page,mypack)
+        print('DMIP sub_page query:0x%02x pattern: %s ' % (sub_page,mypack))
 
     modepageblock=struct.pack( ">BBBBBBBHB", 
          0x5a, 0, 0x3a, sub_page, 0, 0, 0, paklen, 0 )
@@ -461,16 +460,16 @@ class Drobo:
     cmdout = self.fd.get_sub_page(paklen, modepageblock,0, DEBUG)
 
     if len(cmdout) != paklen:
-      print 'expected %d, got %d bytes' %( len(cmdout), paklen )
+      print('expected %d, got %d bytes' %( len(cmdout), paklen ))
       raise DroboException("cmdout is unexpected length")
 
 #    print 'Pack: ' + mypack
 
     result = struct.unpack(mypack, cmdout)
     if DEBUG & DBG_HWDialog :
-        print '4 byte returned sense buffer header: 0x%x, 0x%x, 0x%x' % result[:3]
+        print('4 byte returned sense buffer header: 0x%x, 0x%x, 0x%x' % result[:3])
     if DEBUG & DBG_RawReturn :
-        print 'DMIP response sub_page:0x%02x returned: %s ' % (sub_page,str(result[3:]))
+        print('DMIP response sub_page:0x%02x returned: %s ' % (sub_page,str(result[3:])))
     return result[3:]
 
   def __transactionNext(self):
@@ -491,7 +490,7 @@ class Drobo:
     """
 
     if DEBUG & DBG_HWDialog:
-        print 'issuecommand...'
+        print('issuecommand...')
 
     if DEBUG & DBG_Simulation:
         self.__transactionNext()
@@ -504,8 +503,8 @@ class Drobo:
        cmdout = self.fd.get_sub_page(1, modepageblock,1,DEBUG)
 
     except:
-       print 'IF you see, "bad address", it is because you need to be the super user...'
-       print " try sudo or su ...       "
+       print('IF you see, "bad address", it is because you need to be the super user...')
+       print(" try sudo or su ...       ")
        sys.exit()
 
     self.__transactionNext()
@@ -516,7 +515,7 @@ class Drobo:
 
   def Sync(self,NewName=None):
     """  Set the Drobo's current time to the host's time,
-	 and the name to selected value.
+         and the name to selected value.
 
      STATUS: works, maybe...
         DRI claims Drobos are all in California time.  afaict, it ignores TZ completely.
@@ -530,7 +529,7 @@ class Drobo:
     payload="LH32s"
     payloadlen=struct.calcsize(payload)
     if NewName==None:
-    	NewName=self.GetSubPageSettings()[2]
+            NewName=self.GetSubPageSettings()[2]
 
     buffer=struct.pack( ">BBH" + payload , 0x7a, 0x05, payloadlen, now, 0 , NewName )
     sblen=len(buffer)
@@ -594,11 +593,11 @@ class Drobo:
        status:  works with no issues!
     """
     if (DEBUG & DBG_Chatty):
-       print 'set lunsize to %d TiB' % tb
+       print('set lunsize to %d TiB' % tb)
 
     if not self.umount():
        if (DEBUG & DBG_Chatty):
-          print 'cannot free up Drobo to set lunsize'
+          print('cannot free up Drobo to set lunsize')
        return
 
     buffer=struct.pack( ">l", tb )
@@ -639,12 +638,12 @@ class Drobo:
     """ returns diagnostics as a string...
         diagcodes are either 4 or 7 for the two different Records available.
 
-	STATUS: works fine.
+        STATUS: works fine.
 
         decryption done in drobom (look at diagprint)
     """
     if DEBUG & DBG_Chatty:
-      print "Dumping Diagnostics..."
+      print("Dumping Diagnostics...")
 
     # tried 32000 ... it only returned 5K, so try something small.
     buflen=4096
@@ -655,7 +654,7 @@ class Drobo:
     todev=0
 
     if DEBUG & DBG_General:
-        print "Page 0..."
+        print("Page 0...")
 
     cmdout = self.fd.get_sub_page( buflen, modepageblock, todev, DEBUG )
     diags=cmdout
@@ -666,10 +665,10 @@ class Drobo:
 
         cmdout = self.fd.get_sub_page( buflen, modepageblock, todev, DEBUG )
         i=i+1
-	diags=diags+cmdout
+        diags=diags+cmdout
 
         if DEBUG & DBG_General:
-            print "diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags)
+            print("diags ", i, ", cmdlen=", len(cmdout), " diagslen=", len(diags))
        
     return diags
 
@@ -697,7 +696,7 @@ class Drobo:
       return ''
 
     key = ord(data[0]) ^ 0x2d
-    datam = ''.join(map( lambda x: chr(ord(x)^key), data ))
+    datam = ''.join([chr(ord(x)^key) for x in data])
     return datam
 
 
@@ -720,7 +719,7 @@ class Drobo:
 
     """
     if (DEBUG & DBG_Chatty):
-       print 'Reading Firmware from = %s' % name
+       print('Reading Firmware from = %s' % name)
 
     if ( name[-1] == 'z' ): # data is zipped...
        inqw=self.inquiry
@@ -728,9 +727,9 @@ class Drobo:
        z=zipfile.ZipFile(name,'r')
        for f in z.namelist():
            if (DEBUG & DBG_General):
-              print f , ' ? '
-              print 'firmware for hw rev ', f[-5] , ' this drobo is rev ', hwlevel[0]
-	   if f[-5] == hwlevel[0]:
+              print(f , ' ? ')
+              print('firmware for hw rev ', f[-5] , ' this drobo is rev ', hwlevel[0])
+           if f[-5] == hwlevel[0]:
               self.fwdata = z.read(f) 
     else: # old file...
        f = open(name,'r')
@@ -773,10 +772,10 @@ class Drobo:
       if ( len(cmdout) == 36 ): # we have a PRO...
         ret = struct.unpack(dpropack, cmdout)
       else:
-        print 'warning: scsi inquire returned %d, bytes instead of %d expected.' % ( len(cmdout), paklen)
+        print('warning: scsi inquire returned %d, bytes instead of %d expected.' % ( len(cmdout), paklen))
         raise DroboException
     if DEBUG & DBG_RawReturn :
-        print "inquiry response: ", str(ret)
+        print("inquiry response: ", str(ret))
     return ret
     
   def PickLatestFirmware(self):
@@ -814,8 +813,8 @@ class Drobo:
     fwarch = self.fw[6].lower()
 
     if (DEBUG & DBG_Chatty):
-      print 'looking for firmware for:', fwarch, fwv, 'hw version:', hwlevel
-    listing_file=urllib2.urlopen( Drobo.fwsite + "index.txt")
+      print('looking for firmware for:', fwarch, fwv, 'hw version:', hwlevel)
+    listing_file=urllib.request.urlopen( Drobo.fwsite + "index.txt")
     list_of_firmware_string=listing_file.read().strip("\t\r")
     list_of_firmware=list_of_firmware_string.split("|") 
     i=1
@@ -844,11 +843,11 @@ class Drobo:
           if k[4] == fwv:
               if len(k) > 4: 
                 if (DEBUG & DBG_Chatty):
-                   print 'This Drobo should be running: ', value
+                   print('This Drobo should be running: ', value)
                 return (fwarch, fwv, hwlevel, value)
       i=i+2
     if (DEBUG & DBG_Chatty):
-       print 'no matching firmware found, must be the latest and greatest!'
+       print('no matching firmware found, must be the latest and greatest!')
     return ( '','','','' )
 
   def downloadFirmware( self, fwname, localfw ):
@@ -859,15 +858,15 @@ class Drobo:
       STATUS: works.
     """
     if (DEBUG & DBG_Chatty):
-      print 'downloading firmware ', fwname, '...'
+      print('downloading firmware ', fwname, '...')
     self.fwdata=None
-    firmware_url=urllib2.urlopen( Drobo.fwsite + fwname )
+    firmware_url=urllib.request.urlopen( Drobo.fwsite + fwname )
     filedata = firmware_url.read()
     f = open(localfw,'w+')
     f.write(filedata)
     f.close()
     if (DEBUG & DBG_Chatty ) :
-        print 'local copy written'
+        print('local copy written')
 
     if ( fwname[-1] == 'z' ): # data is zipped...
        self.PickFirmware(localfw)
@@ -875,7 +874,7 @@ class Drobo:
        self.fwdata=filedata
 
     if (DEBUG & DBG_Chatty ) :
-       print 'downloading done '
+       print('downloading done ')
     return self.fwdata
 
   def validateFirmware(self):
@@ -898,48 +897,48 @@ class Drobo:
 
     """
     if (DEBUG & DBG_Chatty):
-      print 'validateFirmware start...'
+      print('validateFirmware start...')
     self.fwhdr = struct.unpack('>ll4sl16slllll256sl', self.fwdata[0:312])
 
     if  len(self.fwdata) != ( self.fwhdr[0] + self.fwhdr[8] ) :
-	print 'header corrupt... Length does not validate.'
-	return 0
-
-    if (DEBUG & DBG_Chatty):
-      print 'header+body lengths validated.  Good.'
-    #print self.fwhdr
-
-    if  self.fwhdr[2] != 'TDIH' :
-        print 'bad Magic, not a valid firmware'
+        print('header corrupt... Length does not validate.')
         return 0
 
     if (DEBUG & DBG_Chatty):
-      print 'Magic number validated. Good.'
-      print '%d + %d = %d length validated. Good.' % ( self.fwhdr[0], self.fwhdr[8], len(self.fwdata) )
+      print('header+body lengths validated.  Good.')
+    #print self.fwhdr
+
+    if  self.fwhdr[2] != 'TDIH' :
+        print('bad Magic, not a valid firmware')
+        return 0
+
+    if (DEBUG & DBG_Chatty):
+      print('Magic number validated. Good.')
+      print('%d + %d = %d length validated. Good.' % ( self.fwhdr[0], self.fwhdr[8], len(self.fwdata) ))
 
     # http://bugs.python.org/issue1202
     # doesn't work on 64 bit, only on 32bit... weird...
     blank = struct.pack('i',0)
-    hdrcrc = zlib.crc32( self.fwdata[0:308] + blank + self.fwdata[312:self.fwhdr[0]] ) & 0xffffffffL
-    r = self.fwhdr[11] & 0xffffffffL
+    hdrcrc = zlib.crc32( self.fwdata[0:308] + blank + self.fwdata[312:self.fwhdr[0]] ) & 0xffffffff
+    r = self.fwhdr[11] & 0xffffffff
 
     if (DEBUG & DBG_Chatty):
-      print 'CRC from header: %d, calculated using python zlib crc32: %d ' % ( r, hdrcrc)
+      print('CRC from header: %d, calculated using python zlib crc32: %d ' % ( r, hdrcrc))
     if r != hdrcrc :
-        print 'file corrupt, header checksum wrong'
+        print('file corrupt, header checksum wrong')
         return 0
-    bodycrc = zlib.crc32( self.fwdata[self.fwhdr[0]:] ) & 0xffffffffL
-    q = self.fwhdr[9] & 0xffffffffL
+    bodycrc = zlib.crc32( self.fwdata[self.fwhdr[0]:] ) & 0xffffffff
+    q = self.fwhdr[9] & 0xffffffff
  
     if (DEBUG & DBG_Chatty):
-      print 'CRC for body from header: %d, calculated: %d ' % ( q, bodycrc)
+      print('CRC for body from header: %d, calculated: %d ' % ( q, bodycrc))
     if q != bodycrc :
-        print 'file corrupt, payload checksum wrong'
+        print('file corrupt, payload checksum wrong')
         return 0
     
     if (DEBUG & DBG_Chatty):
-      print '32 bit Cyclic Redundancy Check correct. Good.'
-      print 'validateFirmware successful...'
+      print('32 bit Cyclic Redundancy Check correct. Good.')
+      print('validateFirmware successful...')
 
     return 1 
     
@@ -970,26 +969,26 @@ class Drobo:
     fwname = fwpath.split('/')
     localfw = Drobo.localfwrepository + '/' + fwarch + '_' + hwlevel + '_' + fwname[-1] 
     if (DEBUG & DBG_Chatty):
-       print 'looking for: %s' % localfw
+       print('looking for: %s' % localfw)
     if not os.path.exists(localfw):
        if (DEBUG & DBG_Chatty):
-          print 'not present, fetching from drobo.com'
+          print('not present, fetching from drobo.com')
        self.fwdata = self.downloadFirmware(fwpath,localfw)
        good = self.validateFirmware()
        if not good:
-          print 'downloaded firmware did not validate.' 
+          print('downloaded firmware did not validate.') 
           return 0
     else:
        if (DEBUG & DBG_Chatty):
-          print 'local copy already present:', localfw
+          print('local copy already present:', localfw)
        good = self.PickFirmware(localfw)
 
     if good:
       if (DEBUG & DBG_Chatty):
-         print 'correct fw available'
+         print('correct fw available')
       return 1
  
-    print 'no valid firmware found'
+    print('no valid firmware found')
     return 0
    
 
@@ -997,7 +996,7 @@ class Drobo:
     """
         given good firmware data, upload it to the Drobo...
 
-	1_README_*.txt from the resource kit is followed here.
+        1_README_*.txt from the resource kit is followed here.
 
         function -- a callback that accepts a single argument, an integer in the range 0-100.
            indicates % done.  the function is called after each write in the loop.
@@ -1015,7 +1014,7 @@ class Drobo:
     written = self.fd.put_sub_page( modepageblock, buffer, DEBUG )
 
     if DEBUG & DBG_General:
-      print "Page 0..."
+      print("Page 0...")
 
     buflen=32768
     written=buflen
@@ -1024,13 +1023,13 @@ class Drobo:
     moretocome=0x01
 
     if (DEBUG & DBG_General ) :
-      print 'writeFirmware: i=%d, start=%d, last=%d fw length= %d\n' % \
-         ( i, self.fwhdr[0], totallength, len(buffer) )
+      print('writeFirmware: i=%d, start=%d, last=%d fw length= %d\n' % \
+         ( i, self.fwhdr[0], totallength, len(buffer) ))
 
     while (written == buflen) and ( i < len(self.fwdata)) :
 
         if ( i + buflen ) > totallength :  # writing the last record.
-        	buflen= totallength - i
+                buflen= totallength - i
                 moretocome=0
 
         modepageblock=struct.pack( ">BBBBBBBHB", 
@@ -1044,10 +1043,10 @@ class Drobo:
         function(i*100/totallength)
 
         if (DEBUG & DBG_General ) :
-            print 'wrote ',written, ' bytes.  Cumulative: ',  i, ' of', totallength
+            print('wrote ',written, ' bytes.  Cumulative: ',  i, ' of', totallength)
 
     if (DEBUG & DBG_General ) :
-       print 'writeFirmware Done.  i=%d, len=%d' % ( i, totallength )
+       print('writeFirmware Done.  i=%d, len=%d' % ( i, totallength ))
 
     self.__transactionNext()
     
@@ -1059,7 +1058,7 @@ class Drobo:
     status = struct.unpack( '>B', cmdout )
 
     if DEBUG & DBG_General : 
-      print 'Drobo thinks write status is: ', status[0]
+      print('Drobo thinks write status is: ', status[0])
 
         
 
@@ -1074,7 +1073,7 @@ class Drobo:
 
      if DEBUG & DBG_Simulation:
         self.slot_count = 8
-	return (8, 16, 2199023250944)
+        return (8, 16, 2199023250944)
 
      result=self.__getsubpage( 0x01, 'BBBQ'  )
      self.slot_count = result[0]
@@ -1086,7 +1085,7 @@ class Drobo:
      if DEBUG & DBG_Simulation:
         capacity = 495452160000
         used = random.randint(0,capacity)
-	return (capacity-used, used, capacity, 125184245760)
+        return (capacity-used, used, capacity, 125184245760)
 
      return self.__getsubpage(0x02, 'QQQQ' )
 
@@ -1129,7 +1128,7 @@ class Drobo:
      while (j < self.slot_count ):
        i=j*8
        s = ( r[i+2], r[i+3], r[i+4], _ledstatus( r[i+5] ), r[i+6].strip(" \0"),
-		r[i+7].strip(" \0") )
+                r[i+7].strip(" \0") )
        l.append( s ) 
        j=j+1
 
@@ -1140,7 +1139,7 @@ class Drobo:
      """
          For each LUN, returns detailed information tuple:
             [ ( LUNID, LUN total Capacity, LUN Used Capacity, PartitionScheme*, Format* ),
-		... ]
+                ... ]
 
          *only returned if firmware: SUPPORTS_NEW_LUNINFO2 (essentially >=1.1.0)
 
@@ -1151,7 +1150,7 @@ class Drobo:
 
       parameter luninfo2[k+4] is supposed to be partcount...
       but 'PartCount' is odd. Seems to always be 128 (0x80)
- 	once partitions are set on my v1.  perhaps indicates maximum?
+         once partitions are set on my v1.  perhaps indicates maximum?
 
       if you mix partition types within a single Drobo, Drobo tends to give up
       and claim "no partitions" rather than reporting the union of the types.
@@ -1177,7 +1176,7 @@ class Drobo:
 
            # sanity check, in case I ever get out of sync again...
            if l2[k] != 17 :
-              print 'Warning: probably have not grokked the LUNINFO2 record correctly'
+              print('Warning: probably have not grokked the LUNINFO2 record correctly')
 
            li.append( (l2[k+1], l2[k+2], l[j+4], _partscheme(l2[k+3]), _partformat(l2[k+5]) ) )
         else:
@@ -1193,14 +1192,14 @@ class Drobo:
 
         STATUS: works with... 
         ERRATA:
-		-- dpd.h and other sources say offset is two bytes.
+                -- dpd.h and other sources say offset is two bytes.
                 -- DMP Spec says it is only one byte.
-		-- other sources say it is always set to 'California Time'... 8.
-		-- California time is UTC - 8... +8 would be China.
-		-- structures returned are supposed to be in network byte order (MSB)
+                -- other sources say it is always set to 'California Time'... 8.
+                -- California time is UTC - 8... +8 would be China.
+                -- structures returned are supposed to be in network byte order (MSB)
                    when two byte value read in network byte order, result is 2048.
                    they stuff it in LSB order, so the 8 ended up in the higher order byte.
-		-- so I just claim it says 8 and shut up.
+                -- so I just claim it says 8 and shut up.
 
      """
      if DEBUG & DBG_Simulation:
@@ -1232,22 +1231,22 @@ class Drobo:
         STATUS:  working with ERRATA:
 
         returns ( majorVer, MinorVer, Build, UpgMajorVer, UpgMinorVer, 
-		BuildDate, Arch, )
+                BuildDate, Arch, )
         above is what the spec says...
 
-	dpd.h says byte 128 has a feature
-	    agrees on the first four, but says the date is a 32 char string, and
+        dpd.h says byte 128 has a feature
+            agrees on the first four, but says the date is a 32 char string, and
             is followed by Arch[16], and Extra[256],  
 
             Drobo has a version string after arch, guessed at 16 chars.
             I shortened Extra for that.
-	    byte 0x80 is supposed to be feature flags, found it a 0x73...
+            byte 0x80 is supposed to be feature flags, found it a 0x73...
      """
      if DEBUG & DBG_Simulation:
         self.features=['NO_AUTO_REBOOT', 'NO_FAT32_FORMAT', \
                'USED_CAPACITY_FROM_HOST', 'DISKPACKSTATUS', \
                'ENCRYPT_NOHEADER', 'CMD_STATUS_QUERIABLE', \
-	       'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', \
+               'VARIABLE_LUN_SIZE_1_16', 'PARTITION_LUN_GPT_MBR', \
                'FAT32_FORMAT_VOLNAME', 'SUPPORTS_OPTIONS2', \
                'SUPPORTS_DROBOSHARE', 'SUPPORTS_NEW_LUNINFO2']
         self.fw=(1, 201, 12942, 12, 6, 'May 13 2008,15:29:32', \
@@ -1312,9 +1311,9 @@ class Drobo:
                - this drobo does not support Options ( fw < 1.11 )
            ( YellowThresh, RedThresh, AutoDelSnapshot, LowYel, LowRed )
                - drobo supports first version of options ( fw >= 1.11)
-  	   ( above + FeatureOnOffStates, SpinDownDelay, IPAddress, Subnetmask ) 
+             ( above + FeatureOnOffStates, SpinDownDelay, IPAddress, Subnetmask ) 
                - DroboPro only ? my v1's don't support it.
-	
+        
         STATUS: untested, seems to agree with dmp.h for Options
             Options2 (only on Drobo Pro) completely un-tested.
 
@@ -1385,7 +1384,7 @@ class Drobo:
     if len(toumount) > 0:
        for i in toumount:
            if DEBUG & DBG_Chatty:
-              print "unmounting: ", i
+              print("unmounting: ", i)
            umresult=os.system("umount " + i )
            if umresult != 0:
                 return False
@@ -1412,7 +1411,7 @@ class Drobo:
 
 def DiscoverLUNs(debugflags=0,vendorstring="Drobo"):
     """ find all Drobo LUNs accessible to this user on this system. 
-	returns a list of list of character device files 
+        returns a list of list of character device files 
               samples: [ [ "/dev/sdf", "/dev/sdg" ], [ "/dev/sdh" ] ] 
         vendorstring adds a string to be compared to for SCSI ID LUN call.
         This value changes as new products are introduced.
@@ -1427,12 +1426,12 @@ def DiscoverLUNs(debugflags=0,vendorstring="Drobo"):
 
     for potential in DroboIOctl.drobolunlist(DEBUG,vendorstring):
        if ( DEBUG & DBG_Detection ):
-             print "trying: ", potential
+             print("trying: ", potential)
 
        try: 
               d = Drobo( potential, DEBUG )
               devices.append(potential)
        except:
- 	      pass
+               pass
               
     return devices

@@ -13,14 +13,14 @@ import struct
 
 def hexdump(label,data):
       i=0
-      print( "%s %03x:" % (label, i) )
+      print(( "%s %03x:" % (label, i) ))
       for bb in data:
-         print "%02x" % ord(bb), 
+         print("%02x" % ord(bb), end=' ') 
          i=i+1
          if (i % 16) == 0:
-             print
-             print "%s %03x:" % (label,i),
-      print
+             print()
+             print("%s %03x:" % (label,i), end=' ')
+      print()
 
 
 class sg_io_hdr(Structure):
@@ -103,7 +103,7 @@ class DroboIOctl:
      sfmt="l"
      k=create_string_buffer(struct.calcsize(sfmt)) 
      if ioctl(self.sg_fd, sg_io_hdr.SG_GET_VERSION_NUM, k, True) < 0 :
-        print "%s is not an sg device, or old sg driver\n" % char_dev_file
+        print("%s is not an sg device, or old sg driver\n" % char_dev_file)
      num=struct.unpack(sfmt,k) 
      return num[0]
 
@@ -128,7 +128,7 @@ class DroboIOctl:
      idlun = create_string_buffer(struct.calcsize(fmt))
      i= ioctl( self.sg_fd, SCSI_IOCTL_GET_IDLUN, idlun, True)
      if i < 0:
-        print "Drobo get_mode_page SG_IO ioctl error"
+        print("Drobo get_mode_page SG_IO ioctl error")
         return None
  
      (channel, lun, id, host, host_unique_id ) = struct.unpack(fmt, idlun) 
@@ -185,14 +185,14 @@ class DroboIOctl:
     io_hdr.dxferp = cast(page_buffer,c_char_p)
 
     if self.debug & Drobo.DBG_HWDialog:
-      print "4 before ioctl, sense_buffer_len=", io_hdr.mx_sb_len
+      print("4 before ioctl, sense_buffer_len=", io_hdr.mx_sb_len)
 
     i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr, True)
 
     if self.debug & Drobo.DBG_HWDialog:
-      print "5 after ioctl, result=%d status: %d driver_status: %d host_status: %d sb_len_wr: %d resid: %d" % \
+      print("5 after ioctl, result=%d status: %d driver_status: %d host_status: %d sb_len_wr: %d resid: %d" % \
          ( i, io_hdr.status, io_hdr.driver_status, \
-            io_hdr.host_status, io_hdr.sb_len_wr, io_hdr.resid )
+            io_hdr.host_status, io_hdr.sb_len_wr, io_hdr.resid ))
 
     if i < 0:
         raise IOError("Drobo get_mode_page SG_IO ioctl error")
@@ -207,7 +207,7 @@ class DroboIOctl:
 
     if self.debug & Drobo.DBG_HWDialog:
        hexdump("page_buffer", page_buffer)
-       print "the length is: ", retsz
+       print("the length is: ", retsz)
     return page_buffer[0:retsz]
 
 
@@ -216,7 +216,7 @@ class DroboIOctl:
 
      ioctl to write using a sub-page to the Drobo.
      required arguments:
-	modepageblock - 
+         modepageblock - 
         buffer
         DEBUG
 
@@ -252,19 +252,19 @@ class DroboIOctl:
     i=ioctl(self.sg_fd, sg_io_hdr.SG_IO, io_hdr, True)
  
     if self.debug & Drobo.DBG_HWDialog:
-      print "put_sub_page, 5 after ioctl, result=", i
-      print "status: ", io_hdr.status
-      print "driver_status: ", io_hdr.driver_status
-      print "host_status: ", io_hdr.host_status
-      print "sb_len_wr: ", io_hdr.sb_len_wr
-      print "resid: ",  io_hdr.resid
+      print("put_sub_page, 5 after ioctl, result=", i)
+      print("status: ", io_hdr.status)
+      print("driver_status: ", io_hdr.driver_status)
+      print("host_status: ", io_hdr.host_status)
+      print("sb_len_wr: ", io_hdr.sb_len_wr)
+      print("resid: ",  io_hdr.resid)
 
     if (i< 0) :
-       print " get_mode_page SG_IO ioctl error"
+       print(" get_mode_page SG_IO ioctl error")
        return None
  
     if (io_hdr.status != 0 ) and (io_hdr.status != 2) :
-        print "oh no! io_hdr status is: %x\n" %  io_hdr.status
+        print("oh no! io_hdr status is: %x\n" %  io_hdr.status)
         return None
  
     if io_hdr.resid > 0:
@@ -300,44 +300,44 @@ def drobolunlist(debugflags=0,vendor="Drobo"):
           dev_file = devdir + '/' + potential
           try:
             if debugflags & Drobo.DBG_Detection:
-              print "examining: ", dev_file
+              print("examining: ", dev_file)
             pdio = DroboIOctl( dev_file )
           except:
             if debugflags & Drobo.DBG_Detection:
-              print "rejected: failed to construct LUN pdio"
+              print("rejected: failed to construct LUN pdio")
             continue
 
           try:
             id = pdio.identifyLUN()
           except:
             if debugflags & Drobo.DBG_Detection:
-                   print "rejected: failed to identify LUN"
+                   print("rejected: failed to identify LUN")
             pdio.closefd()
             continue
 
           if debugflags & Drobo.DBG_Detection:
-             print "id: ", id
+             print("id: ", id)
 
           thisdev="%02d%02d%02d" % (id[0], id[1], id[2])
           if ( id[4].lower().startswith("trusted") or \
                id[4].lower().startswith("drobo") or \
                id[4].lower().startswith(vendor.lower()) ):  # you have a Drobo!
              if debugflags & Drobo.DBG_Detection:
-                print "found a Drobo"
+                print("found a Drobo")
              if thisdev == previousdev :  # multi-lun drobo...
                 if debugflags & Drobo.DBG_Detection:
-                    print "appending to lundevs..."
+                    print("appending to lundevs...")
                 lundevs.append( dev_file )
              else:
-	        if lundevs != []:
+                if lundevs != []:
                      devices.append(lundevs)
                 if debugflags & Drobo.DBG_Detection:
-                       print "appending new lundevs to devices:", devices
+                       print("appending new lundevs to devices:", devices)
                 lundevs=[dev_file]        
 
           else:
               if debugflags & Drobo.DBG_Detection:
-                   print "rejected: vendor is %s (not from DRI)" % id[4]
+                   print("rejected: vendor is %s (not from DRI)" % id[4])
 
           previousdev=thisdev
           pdio.closefd()
@@ -346,7 +346,7 @@ def drobolunlist(debugflags=0,vendor="Drobo"):
        devices.append(lundevs)
 
     if debugflags & Drobo.DBG_Detection:
-        print "returning list: ", devices
+        print("returning list: ", devices)
     return devices
 
 # unit testing...
@@ -357,20 +357,20 @@ if __name__ == "__main__":
 
   valid_mcb=struct.pack(">BBBBBBBBBB", 0x5a, 0, 0x3a, 1, 0, 0, 0, 0, 0x14, 0 )
   dmp = DroboIOctl(valid_device)
-  print "version", dmp.version()
-  print "identifyLUN", dmp.identifyLUN()
-  print "doing a sub_page"
+  print("version", dmp.version())
+  print("identifyLUN", dmp.identifyLUN())
+  print("doing a sub_page")
   hoho=dmp.get_sub_page(20,valid_mcb,0,4)
   # the 4 byte header on the returned sense buffer:  (122, 1, 20)
   # cfg:  (4, 16, 1099511557632)                                 
 
   #hexdump("hoho", hoho)
   fmt=">BBHBBBQBHH"
-  print struct.calcsize(fmt)
-  print struct.unpack(fmt,hoho)
+  print(struct.calcsize(fmt))
+  print(struct.unpack(fmt,hoho))
   dmp.closefd()
 
-  print 'hunt...'
-  print drobolunlist() 
+  print('hunt...')
+  print(drobolunlist()) 
   
   
