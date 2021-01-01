@@ -78,7 +78,8 @@ class DroboAbout(QtWidgets.QWidget):
         al.addWidget(self.main)
         self.quit = QtWidgets.QPushButton('Dismiss',self)
         al.addWidget(self.quit)
-        self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
+        #self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
+        self.quit.clicked.connect( self.hide )
  
 class ShowText(QtWidgets.QWidget):
 
@@ -120,7 +121,9 @@ class ShowText(QtWidgets.QWidget):
       al.addWidget(self.main)
       self.quit = QtWidgets.QPushButton('Dismiss',self)
       al.addWidget(self.quit)
-      self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
+      #self.connect(self.quit, QtCore.SIGNAL('clicked()'), self.hide)
+      self.quit.clicked.connect( self.hide )
+      
 
       #self.findbt = QtWidgets.QPushButton('Find',self)
       #al.addWidget(self.findbt)
@@ -183,7 +186,7 @@ class DroboGUI(QtWidgets.QMainWindow):
         self.Device.id.setText(  self.drobo.GetCharDev() + ' ' + settings[2] + ' firmware: ' + fwv[7] )
 
         self.Device.id.setToolTip(
-           "Firmware build: " + str(fwv[0]) + '.' + str(fwv[1]) + '.' + str(fwv[2]) + "\n Features: " + string.join(fwv[8],"\n") )
+           "Firmware build: " + str(fwv[0]) + '.' + str(fwv[1]) + '.' + str(fwv[2]) + "\n Features: " + '\n'.join(fwv[8]) )
         
         self.s=self.drobo.GetSubPageSlotInfo()
 
@@ -213,7 +216,7 @@ class DroboGUI(QtWidgets.QMainWindow):
         c=self.drobo.GetSubPageCapacity()
         if c[2] > 0:
            self.Device.fullbar.setValue( c[1]*100/c[2] )
-           self.Device.fullbar.setToolTip(  string.join(self.drobo.DiscoverMounts(),',') +
+           self.Device.fullbar.setToolTip(  ','.join(self.drobo.DiscoverMounts()) +
             "\nused: " + _toGB(c[1]) + ' free: ' + _toGB(c[0]) + ' Total: ' + _toGB(c[2]) + ' GB, update# ' + str(self.updates) )
         #print self.statusmsg
         #self.__StatusBar_space()
@@ -225,14 +228,15 @@ class DroboGUI(QtWidgets.QMainWindow):
                # reset to normal state...
                print('it took: %d updates to run' % (self.updates - self.Format.startupdate ))
                self.Format.inProgress=0
-               normal = self.Tools.Updatebutton.palette().color( QtWidgets.QPalette.Button )
-               self.Format.Formatbutton.palette().setColor( QtWidgets.QPalette.Button, QtCore.Qt.blue )
+               normal = self.Tools.Updatebutton.palette().color( QtGui.QPalette.Button )
+               self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, QtCore.Qt.blue )
                self.Format.ext3.setChecked(0)
                self.Format.ntfs.setChecked(0)
                self.Format.msdos.setChecked(0)
                self.Format.Formatbutton.setText('Format Done!')
-               self.Format.connect(self.Format.Formatbutton, \
-                     QtCore.SIGNAL('clicked()'), self.FormatLUN)
+               #self.Format.connect(self.Format.Formatbutton, \
+               #      QtCore.SIGNAL('clicked()'), self.FormatLUN)
+               self.Format.Formatbutton.clicked.connect( self.FormatLUN )
         #pdb.set_trace()
 
     def __updateStatus(self):
@@ -280,16 +284,21 @@ class DroboGUI(QtWidgets.QMainWindow):
 
         self.Device.fullbar = QtWidgets.QProgressBar(self.Device)
         devtablayout.addWidget(self.Device.fullbar,i+1,0,1,-1)
-        self.connect(self.Device.fullbar, QtCore.SIGNAL('focusInEvent()'), 
-                self.__StatusBar_space)
+
+        print( "FIXME: dunno how to deal with focusin events in qt 5" )
+        #self.connect(self.Device.fullbar, QtCore.SIGNAL('focusInEvent()'), 
+        #        self.__StatusBar_space)
+        #self.Device.fullbar.focusInEvent.connect( self.__StatusBar_space )
 
         self.tab.addTab(self.Device, "Device")
 
     def ReallyFormatLUN(self):
 
        print('Really formatting...')
-       self.Format.disconnect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
-                self.ReallyFormatLUN)
+       #self.Format.disconnect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+       #         self.ReallyFormatLUN)
+       self.Format.Formatbutton.clicked.disconnect( elf.ReallyFormatLUN )
+
        if self.Format.fstype == 'none': # changing LUN size
             self.Format.Formatbutton.setText('Done. WAIT 5 min. restart dashboard!')
             self.drobo.SetLunSize(self.Format.lunszlcd.value())
@@ -301,7 +310,7 @@ class DroboGUI(QtWidgets.QMainWindow):
             #self.fmt_process = subprocess.Popen( format_script, bufsize=0, stdout=subprocess.PIPE )
             self.fmt_process = subprocess.Popen( format_script )
             p = self.Format.Formatbutton.palette()
-            p.setColor( QtWidgets.QPalette.Button, QtCore.Qt.red )
+            p.setColor( QtGui.QPalette.Button, QtCore.Qt.red )
 
 
     def FormatLUN(self):
@@ -317,19 +326,21 @@ class DroboGUI(QtWidgets.QMainWindow):
             if ( self.Format.lunszlcd.value() == self.Format.lunsize ):
                  return
 
-            self.Format.Formatbutton.palette().setColor( QtWidgets.QPalette.Button, QtCore.Qt.yellow )
+            self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, QtCore.Qt.yellow )
             self.Format.Formatbutton.setText( \
                   "Last Chance, Resize to %d TiB" % self.Format.lunszlcd.value() )
 
        if fstype != 'none':
-          self.Format.Formatbutton.palette().setColor( QtWidgets.QPalette.Button, QtCore.Qt.yellow )
+          self.Format.Formatbutton.palette().setColor( QtGui.QPalette.Button, QtCore.Qt.yellow )
           self.Format.Formatbutton.setText( "Last Chance, Format %s ?" % fstype)
 
        self.Format.fstype=fstype
-       self.Format.disconnect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
-                self.FormatLUN)
-       self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
-                self.ReallyFormatLUN)
+       #self.Format.disconnect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+       #         self.FormatLUN)
+       self.Format.Formatbutton.clicked.disconnect( self.FormatLUN )
+       #self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+       #         self.ReallyFormatLUN)
+       self.Format.Formatbutton.clicked.connect( self.ReallyFormatLUN )
 
     def __adjustlunsize(self,sz):
 
@@ -409,8 +420,9 @@ class DroboGUI(QtWidgets.QMainWindow):
         else:
            self.Format.horizontalSlider.setValue(0) 
 
-        self.Format.connect(self.Format.horizontalSlider, QtCore.SIGNAL('valueChanged(int)'),
-                self.__adjustlunsize)
+        #self.Format.connect(self.Format.horizontalSlider, QtCore.SIGNAL('valueChanged(int)'),
+        #        self.__adjustlunsize)
+        self.Format.horizontalSlider.valueChanged.connect(self.__adjustlunsize)
 
         self.Format.ext3 = QtWidgets.QRadioButton("Ext3 (journalled ext2)", self.Format)
         mkfs = subprocess.getoutput("which mke2fs")
@@ -446,16 +458,20 @@ class DroboGUI(QtWidgets.QMainWindow):
 
         self.tab.addTab(self.Format, "Format")
 
-        self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
-                self.FormatLUN)
+        #self.Format.connect(self.Format.Formatbutton, QtCore.SIGNAL('clicked()'),
+        #        self.FormatLUN)
+        self.Format.Formatbutton.clicked.connect( self.FormatLUN )
 
         # progress flag...
         self.Format.inProgress = 0
 
 
     def upgrade(self):
-        self.disconnect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.upgrade)
-        self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
+        #self.disconnect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.upgrade)
+        #self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
+
+        self.Tools.Updatebutton.clicked.disconnect( self.upgrade )
+        self.Tools.Updatebutton.clicked.connect( self.checkup )
 
         if self.drobo.updateFirmwareRepository():
              self.drobo.writeFirmware( self.Tools.progress.setValue )
@@ -467,9 +483,11 @@ class DroboGUI(QtWidgets.QMainWindow):
         print("checkup: this Drobo is a %s hw rev: %s, and needs: %s" % ( fwarch, hwlevel, fwversion ))
         if fwpath != '' :
             self.Tools.Updatebutton.setText( "Upgrade" )
-            self.disconnect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
-            self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), 
-                self.upgrade)
+            #self.disconnect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
+            #self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), 
+            #    self.upgrade)
+            self.Tools.Updatebutton.clicked.disconnect( self.checkup )
+            self.Tools.Updatebutton.clicked.connect( self.upgrade )
             self.Tools.comment.setText( "Press 'Upgrade' upgrade to %s" % ( fwversion ))
         else:
             self.Tools.comment.setText( "No update available!" )
@@ -526,8 +544,9 @@ class DroboGUI(QtWidgets.QMainWindow):
         self.Tools.Standbybutton.setCheckable(False)
         tlay.addWidget(self.Tools.Standbybutton,0,0,1,1)
 
-        self.connect(self.Tools.Standbybutton, QtCore.SIGNAL('clicked()'), 
-                self.drobo.Standby)
+        #self.connect(self.Tools.Standbybutton, QtCore.SIGNAL('clicked()'), 
+        #        self.drobo.Standby)
+        self.Tools.Standbybutton.clicked.connect(self.drobo.Standby)
 
         w=self.Tools.Standbybutton.width()
 
@@ -536,20 +555,23 @@ class DroboGUI(QtWidgets.QMainWindow):
         self.Tools.Blinkybutton.setCheckable(False)
         tlay.addWidget(self.Tools.Blinkybutton,0,1,1,1)
 
-        self.connect(self.Tools.Blinkybutton, QtCore.SIGNAL('clicked()'), 
-                self.drobo.Blink)
+        #self.connect(self.Tools.Blinkybutton, QtCore.SIGNAL('clicked()'), 
+        #        self.drobo.Blink)
+        self.Tools.Blinkybutton.clicked.connect( self.drobo.Blink )
 
         self.Tools.Renamebutton = QtWidgets.QPushButton('Rename', self.Tools)
         self.Tools.Renamebutton.setToolTip( "Change the Drobo's name (does not affect mount points.)" )
         self.Tools.Renamebutton.setCheckable(False)
         tlay.addWidget(self.Tools.Renamebutton,1,0,1,1)
-        self.connect(self.Tools.Renamebutton, QtCore.SIGNAL('clicked()'), self.__renameDialog)
+        #self.connect(self.Tools.Renamebutton, QtCore.SIGNAL('clicked()'), self.__renameDialog)
+        self.Tools.Renamebutton.clicked.connect( self.__renameDialog )
         
         self.Tools.Updatebutton = QtWidgets.QPushButton('Update', self.Tools)
         self.Tools.Updatebutton.setToolTip( "See if new firmware is available." )
         tlay.addWidget(self.Tools.Updatebutton,1,1,1,1)
 
-        self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
+        #self.connect(self.Tools.Updatebutton, QtCore.SIGNAL('clicked()'), self.checkup)
+        self.Tools.Updatebutton.clicked.connect( self.checkup)
 
         Registerbutton = QtWidgets.QPushButton('Register', self.Tools)
         Registerbutton.setToolTip( "Report for warranty service." )
@@ -561,19 +583,23 @@ class DroboGUI(QtWidgets.QMainWindow):
         Diagbutton.setToolTip( "Have Drobo write a diagnostics file to /tmp" )
         Diagbutton.setCheckable(False)
         tlay.addWidget(Diagbutton,2,1,1,1)
-        self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), self.__diags)
+        #self.connect(Diagbutton, QtCore.SIGNAL('clicked()'), self.__diags)
+        Diagbutton.clicked.connect( self.__diags)
 
         DiagShowbutton = QtWidgets.QPushButton('Show Diag', self.Tools)
         DiagShowbutton.setToolTip( "Show a decoded diagnostics file" )
         DiagShowbutton.setCheckable(False)
         tlay.addWidget(DiagShowbutton,3,0,1,1)
-        self.connect(DiagShowbutton, QtCore.SIGNAL('clicked()'), self.__printDiagFile)
+        #self.connect(DiagShowbutton, QtCore.SIGNAL('clicked()'), self.__printDiagFile)
+        DiagShowbutton.clicked.connect( self.__printDiagFile)
+
 
         FwLdbutton = QtWidgets.QPushButton('Load Firmware', self.Tools)
         FwLdbutton.setToolTip( "Pick your own firmware (use Update normally)" )
         FwLdbutton.setCheckable(False)
         tlay.addWidget(FwLdbutton,3,1,1,1)
-        self.connect(FwLdbutton, QtCore.SIGNAL('clicked()'), self.__loadFirmware)
+        #self.connect(FwLdbutton, QtCore.SIGNAL('clicked()'), self.__loadFirmware)
+        FwLdbutton.clicked.connect( self.__loadFirmware) 
 
         self.Tools.progress = QtWidgets.QProgressBar(self.Tools)
         #self.Tools.progress.setMinimumWidth(2*w)
@@ -584,7 +610,7 @@ class DroboGUI(QtWidgets.QMainWindow):
         self.Tools.comment = QtWidgets.QLabel("Press 'Update' to look for updates", self.Tools)
         tlay.addWidget(self.Tools.comment,5,0,1,2)
 
-        normal = self.Tools.Updatebutton.palette().color( QtWidgets.QPalette.Button )
+        normal = self.Tools.Updatebutton.palette().color( QtGui.QPalette.Button )
 
         self.tab.addTab(self.Tools, "Tools")
 
@@ -706,8 +732,9 @@ class DroboGUI(QtWidgets.QMainWindow):
         self.Options.Setbutton = QtWidgets.QPushButton('Set', self.Options)
         self.Options.Setbutton.setToolTip("Set the options on the Drobo")
         olay.addWidget(self.Options.Setbutton,i,j,1,-1)
-        self.Options.connect(self.Options.Setbutton, \
-           QtCore.SIGNAL('clicked()'), self.__SetOptions)
+        #self.Options.connect(self.Options.Setbutton, \
+        #   QtCore.SIGNAL('clicked()'), self.__SetOptions)
+        self.Options.Setbutton.clicked.connect( self.__SetOptions )
 
         self.tab.addTab(self.Options, "Options")
 
@@ -734,7 +761,9 @@ class DroboGUI(QtWidgets.QMainWindow):
         exit = QtWidgets.QAction(QtGui.QIcon('icons/exit.png'), 'Exit', self)
         exit.setShortcut('Ctrl+Q')
         exit.setStatusTip('Exit application')
-        self.connect(exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
+        # FIXME!
+        #self.connect(exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
+        exit.triggered.connect( self.close )
 
         menubar = self.menuBar()
         file = menubar.addMenu('&File')
@@ -745,27 +774,32 @@ class DroboGUI(QtWidgets.QMainWindow):
         manual = QtWidgets.QAction(QtGui.QIcon('icons/exit.png'), 'Read Me', self)
         self.manualdialog = ShowText("README.html")
         help.addAction(manual)
-        self.connect(manual, QtCore.SIGNAL('triggered()'), self.manualdialog.show)
+        #self.connect(manual, QtCore.SIGNAL('triggered()'), self.manualdialog.show)
+        manual.triggered.connect ( self.manualdialog.show)
 
         devmanual = QtWidgets.QAction(QtGui.QIcon('icons/exit.png'), 'For Developers', self)
         self.devmanualdialog = ShowText("DEVELOPERS.html")
         help.addAction(devmanual)
-        self.connect(devmanual, QtCore.SIGNAL('triggered()'), self.devmanualdialog.show)
+        #self.connect(devmanual, QtCore.SIGNAL('triggered()'), self.devmanualdialog.show)
+        devmanual.triggered.connect( self.devmanualdialog.show )
 
         dmmanpage = QtWidgets.QAction(QtGui.QIcon('icons/exit.png'), 'Drobom man-page', self)
         self.dmmanpagedialog = ShowText("drobom.html")
         help.addAction(dmmanpage)
-        self.connect(dmmanpage, QtCore.SIGNAL('triggered()'), self.dmmanpagedialog.show)
+        #self.connect(dmmanpage, QtCore.SIGNAL('triggered()'), self.dmmanpagedialog.show)
+        dmmanpage.triggered.connect( self.dmmanpagedialog.show )
 
         chgmanual = QtWidgets.QAction(QtGui.QIcon('icons/exit.png'), 'Change log', self)
         self.chgmanualdialog = ShowText("CHANGES.html")
         help.addAction(chgmanual)
-        self.connect(chgmanual, QtCore.SIGNAL('triggered()'), self.chgmanualdialog.show)
+        #self.connect(chgmanual, QtCore.SIGNAL('triggered()'), self.chgmanualdialog.show)
+        chgmanual.triggered.connect( self.chgmanualdialog.show )
 
         about = QtWidgets.QAction(QtGui.QIcon('icons/exit.png'), 'About Drobom view', self)
         self.aboutdialog = DroboAbout()
         help.addAction(about)
-        self.connect(about, QtCore.SIGNAL('triggered()'), self.aboutdialog.show)
+        #self.connect(about, QtCore.SIGNAL('triggered()'), self.aboutdialog.show)
+        about.triggered.connect( self.aboutdialog.show )
 
         self.tab = QtWidgets.QTabWidget(self)
         self.setCentralWidget(self.tab)
@@ -779,8 +813,9 @@ class DroboGUI(QtWidgets.QMainWindow):
 
         self.__updatewithQueryStatus()
         self.updateTimer = QtCore.QTimer(self)
-        self.connect(self.updateTimer, QtCore.SIGNAL("timeout()"),
-                self.__updateStatus )
+        #self.connect(self.updateTimer, QtCore.SIGNAL("timeout()"),
+        #        self.__updateStatus )
+        self.updateTimer.timeout.connect( self.__updateStatus )
         self.updateTimer.setInterval(1000)
         self.updateTimer.start()
 
