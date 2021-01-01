@@ -4,14 +4,13 @@ Priority: extra
 Maintainer: Peter Silva <Peter.A.Silva@gmail.com>
 Uploaders: Chris AtLee <chris@atlee.ca>
 Build-Depends: debhelper (>= 5), python, groff, python-docutils
-Build-Depends-Indep: python-support (>= 0.6)
 Standards-Version: 3.8.0
 Homepage: http://drobo-utils.sourceforge.net
 XS-Python-Version: all
 
 Package: drobo-utils
 Architecture: all
-Suggests: python-qt4
+Suggests: python3-qtpy, python3-pyqt5
 Depends: ${misc:Depends}, ${python:Depends}, python-ctypes, parted
 XB-Python-Version: ${python:Versions}
 Description: manage data robotics storage units (drobos)

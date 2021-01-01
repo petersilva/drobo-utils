@@ -10,13 +10,13 @@ build: build-stamp
 
 build-stamp:
 	dh_testdir
-	python setup.py build
+	python3 setup.py build
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	python setup.py clean --all
+	python3 setup.py clean --all
 	[ ! -d build ] || rm -rf build
 	find . -name "*\.pyc" -delete
 	dh_clean *-stamp
@@ -27,10 +27,10 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	make doc
-	python setup.py install_lib -d $(CURDIR)/debian/$(PKGNAME)/usr/share/python-support/$(PKGNAME)
+	python3 setup.py install_lib -d $(CURDIR)/debian/$(PKGNAME)/usr/share/python-support/$(PKGNAME)
 	find $(CURDIR)/debian/$(PKGNAME) -name "*\.pyc" -delete
-	python setup.py install_data -d $(CURDIR)/debian/$(PKGNAME)/usr/share/$(PKGNAME)
-	python setup.py install_scripts -d $(CURDIR)/debian/$(PKGNAME)/usr/sbin
+	python3 setup.py install_data -d $(CURDIR)/debian/$(PKGNAME)/usr/share/$(PKGNAME)
+	python3 setup.py install_scripts -d $(CURDIR)/debian/$(PKGNAME)/usr/sbin
 	for s in $(CURDIR)/debian/$(PKGNAME)/usr/sbin/*; do \
 	    sed -i '1s,#!.*python.*,#!/usr/bin/python,' $$s; \
 	done

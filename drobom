@@ -448,14 +448,14 @@ for u in l:
      print("Drobo says it is:", time.ctime(settings[0]))
 
   elif cmd == "view":
-     if True : #try: 
+     try: 
        print("Partial port to QT5... not working at all... help welcome.")
        from PyQt5 import QtWidgets
        from PyQt5 import QtCore
        from DroboGUI import DroboGUI
-     #except:
-     #  print("QT support missing, no GUI possible")
-     #  print("perhaps following will help: apt-get install python3-qtpy")
+     except:
+       print("QT support missing, no GUI possible")
+       print("perhaps following will help: apt-get install python3-qtpy")
 
      # fire up a GUI for the given LUN, stays foreground...
      app = QtWidgets.QApplication(sys.argv)

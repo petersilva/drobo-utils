@@ -1,7 +1,10 @@
 
-**Status: Abandonware, here as memorabilia/archive. This package is written for obsolete
+**Status: Abandonware, here as memorabilia/archive. This package was written for obsolete
 libraries (qt4) in an obsolete language (python2.) Ubuntu 20.04, for example, no longer supports python2.
-This package is likely  not to work on any current Linux distribution. If you feel like
+There is an experimental branch, ported to python3 and qt5, available here:
+
+It runs, but have not tested functionality... no guarantees at all.
+Other than that branch, package is likely  not to work on any current Linux distribution. If you feel like
 showing the package some love, feel free. I will help you if I can.**
 
 -----------

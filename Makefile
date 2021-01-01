@@ -1,10 +1,10 @@
 #!/usr/bin/make -f
 
 build: doc
-	python setup.py build
+	python3 setup.py build
 
 clean:
-	-python setup.py clean
+	-python3 setup.py clean
 	-find . -name "*\.pyc" -delete
 	-rm *.html
 	-rm -rf build*
@@ -23,9 +23,9 @@ doc:
 PKGNAME := drobo-utils
 
 install: build
-	python setup.py install_lib -d /usr/lib/python/site-packages; 
-	python setup.py install_data -d /usr/share/$(PKGNAME)
-	python setup.py install_scripts -d /usr/sbin
+	python3 setup.py install_lib -d /usr/lib/python/site-packages; 
+	python3 setup.py install_data -d /usr/share/$(PKGNAME)
+	python3 setup.py install_scripts -d /usr/sbin
 
 release:
 	./make_tarball.sh
