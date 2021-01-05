@@ -1,7 +1,9 @@
 drobo-utils (9999) stable; urgency=low
- -- Peter Silva <Peter.A.Silva@gmail.com>  Mon, 7 Feb 2010 21:22:31 -0500
 
- * ported to python3 & qt5... but not working...
+ * ported to: python3, qt5, dh-python.
+ * diagnostics and fw functions now broken, documented as bugs.
+ 
+ -- Peter Silva <Peter.A.Silva@gmail.com>  Mon, 7 Feb 2010 21:22:31 -0500
 
 drobo-utils (0.6.2.2) stable; urgency=low
    * fix for Redhat/python 2.4 wanting to partition everything!
