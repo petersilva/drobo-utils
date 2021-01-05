@@ -96,19 +96,15 @@ class ShowText(QtWidgets.QWidget):
       #self.lscursor.setPosition(0)
 
       if isfile:
-        dirs=[ "/usr/local/share/doc/drobo-utils-doc", "/usr/share/doc/drobo-utils-doc/", "." ]
+        dirs=[ "/usr/local/share/drobo-utils-doc", "/usr/share/drobo-utils-doc/", "." ]
         readme=""
         i=0
         while (i < 3 ) and (readme == "") :
-          if True: #try: 
           readmefn = dirs[i] + "/" + manual
-
-          if os.path.isfile(readmefn) and os.access(file, os.R_OK) : 
-            readmefile = open( dirs[i] + "/" + manual )
+          if os.path.isfile(readmefn) and os.access(readmefn, os.R_OK) : 
+            readmefile = open( readmefn )
             readme = readmefile.read()
             readmefile.close()
-          else: #except:
-            pass
 
           i=i+1
 
