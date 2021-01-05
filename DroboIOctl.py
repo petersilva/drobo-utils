@@ -108,7 +108,7 @@ class DroboIOctl:
      return num[0]
 
   def closefd(self):
-     if self.sg_fd > 0:
+     if not type(self.sg_fd) is int :
         self.sg_fd.close()
      self.sg_fd=-1
      pass
@@ -146,7 +146,7 @@ class DroboIOctl:
      hoho=self.get_sub_page(hoholen,mcb,0,self.debug)
      (dunno1,vendor,product) = struct.unpack(fmt,hoho)
 
-     return ( host, channel, id, lun, vendor )
+     return ( host, channel, id, lun, vendor.decode() )
 
 
   def get_sub_page(self, sz, mcb, out, DEBUG):

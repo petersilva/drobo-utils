@@ -815,7 +815,7 @@ class Drobo:
     if (DEBUG & DBG_Chatty):
       print('looking for firmware for:', fwarch, fwv, 'hw version:', hwlevel)
     listing_file=urllib.request.urlopen( Drobo.fwsite + "index.txt")
-    list_of_firmware_string=listing_file.read().strip("\t\r")
+    list_of_firmware_string=listing_file.read().decode().strip("\t\r")
     list_of_firmware=list_of_firmware_string.split("|") 
     i=1
     p = re.compile('\[(.*)\]')
@@ -967,6 +967,7 @@ class Drobo:
          os.mkdir(Drobo.localfwrepository)
 
     fwname = fwpath.split('/')
+    hwlevel = hwlevel.decode()
     localfw = Drobo.localfwrepository + '/' + fwarch + '_' + hwlevel + '_' + fwname[-1] 
     if (DEBUG & DBG_Chatty):
        print('looking for: %s' % localfw)
@@ -1127,8 +1128,8 @@ class Drobo:
      #
      while (j < self.slot_count ):
        i=j*8
-       s = ( r[i+2], r[i+3], r[i+4], _ledstatus( r[i+5] ), r[i+6].strip(" \0"),
-                r[i+7].strip(" \0") )
+       s = ( r[i+2], r[i+3], r[i+4], _ledstatus( r[i+5] ), r[i+6].decode().strip(" \0"),
+                r[i+7].decode().strip(" \0") )
        l.append( s ) 
        j=j+1
 
@@ -1206,7 +1207,7 @@ class Drobo:
         return (1220112079, 8, 'TRUSTED DATA')
 
      ( utc, offset, name ) = self.__getsubpage(0x05, 'LH32s' )
-     name=name.strip(" \0")
+     name=name.decode().strip(" \0")
      offset=8 # offset is screwed up returned by Drobo, just set it to what they claim it should be.
      return ( utc, offset, name )
 
@@ -1256,8 +1257,8 @@ class Drobo:
      raw=self.__getsubpage(0x08, 'BBHBB32s16s16s240s' )
      result = struct.unpack('>112sL32sH90s', raw[8])
      self.features = _unitfeatures(result[1])
-     self.fw = (raw[0], raw[1], raw[2], raw[3], raw[4], raw[5].strip(" \0"), 
-         raw[6].strip(" \0"), raw[7].strip(" \0"), self.features )
+     self.fw = (raw[0], raw[1], raw[2], raw[3], raw[4], raw[5].decode().strip(" \0"), 
+         raw[6].decode().strip(" \0"), raw[7].decode().strip(" \0"), self.features )
      return self.fw
 
   def GetSubPageStatus(self):
