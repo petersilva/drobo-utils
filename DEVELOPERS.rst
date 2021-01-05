@@ -13,7 +13,7 @@ Working With Source
 -------------------
 
 Project Source code is managed using a git repository provided by 
-sourceforge.net.  Git ( http://git-scm.com/ ) provides a fully 
+https://github.com/petersilva/drobo-utils  Git ( http://git-scm.com/ ) provides a fully 
 distributed development model, so one can exchange patches arbitrarily 
 among developers.  On the sf.net repository, the 'master' branch is 
 the final integration target for future releases. 
@@ -37,8 +37,8 @@ Build Dependencies
 
 To build the package from source, there are a number of other packages needed::
  
- boule% sudo aptitude install debhelper python2.5-dev
- boule% sudo aptitude install python-docutils
+ boule% sudo aptitude install debhelper dh-python 
+ boule% sudo aptitude install python3-docutils python3-setuptools
  boule%
 
 The second line only required to build documentation.  On the other hand,
@@ -47,7 +47,7 @@ to grep in the Debian package control file (which defines what the
 dependencies are for the build system)::
 
      peter@pepino% grep Depend debian/control
-     Build-Depends: debhelper (>= 5), python2.5-dev, python-docutils
+     Build-Depends: debhelper (>= 9), python3, python-docutils, python3-setuptools, dh-python
      Depends: ${shlibs:Depends}, ${misc:Depends}, parted
      peter@pepino%
 
@@ -124,7 +124,10 @@ drobo-utils has been picked up for inclusion in debian.  The "real" packaging
 for debian packages is kept in a separate tree, and maintained by debian 
 developers.  
 
-The debian/ setup puts stuff in /usr/sbin while setup.py puts things in /usr/bin.  Python install does not install man pages either, which the dpkg takes care of.  The libs are placed differently too.  haven't reviewed for other conflicts, least confusing to use one or the other method on a system.  
+The debian/ setup puts stuff in /usr/sbin while setup.py puts things in /usr/bin.  
+Python install does not install man pages either, which the dpkg takes care of.  
+The libs are placed differently too.  haven't reviewed for other conflicts, least 
+confusing to use one or the other method on a system.  
 
 (if you do distutils install, then remove the debian package via: dpkg --purge drobo-utils)
 
@@ -245,7 +248,8 @@ http://groups.google.com/group/drobo-talk/web/building-droboshare-apps-on-debian
 TRIM/DISCARD
 ------------
 
-Drobo is the only consumer-level storage unit that does `Thin Provisioning`_ (allocating a device larger than the physical space available, allowing space upgrades without
+Drobo is the only consumer-level storage unit that does `Thin Provisioning`_ (allocating 
+a device larger than the physical space available, allowing space upgrades without
 OS changes.)  Drobo does this by understanding the file system blocks, which is
 why it only supports a very limited set of file systems and cannot support full 
 disk encryption.
@@ -253,9 +257,9 @@ disk encryption.
 There is considerable industry activity about adding `ATA TRIM`_ and corresponding 
 `SCSI UNMAP`_ commands.  These commands, for their respective command sets, add 
 the ability for the operating systems' file system code to indicate blocks that
-are not in use to storage units.  Drobo would work with any file system that 
-uses these commands, with far less firmware.  On linux, that file systems that 
-are starting to support TRIM/DISCARD are:  ext4, btrfs, and xfs.  It may also 
+are not in use to storage units. Drobo would work with any file system that 
+uses these commands, with far less firmware. On linux, that file systems that 
+are starting to support TRIM/DISCARD are:  ext4, btrfs, and xfs. It may also 
 help with the inherent limitations around full disk encryption. 
 
 These commands are still maturing in support.  Long term, they seem like 
@@ -272,11 +276,11 @@ The right thing to do.
 Administrivia
 -------------
 
-Revision date: 2009/12/27
+Revision date: 2021/01/05
 
 copyright:
 
-Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
+Drobo Utils Copyright (C) 2008,2009,2021  Peter Silva (Peter.A.Silva@gmail.com)
 Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 named COPYING in the root of the source directory tree.
 
