@@ -1,5 +1,6 @@
 *.pyc
 *.html
+.pybuild/
 build-stamp
 build/
 debian/drobo-utils.debhelper.log
@@ -8,3 +9,4 @@ debian/drobo-utils.prerm.debhelper
 debian/drobo-utils.substvars
 debian/drobo-utils/
 debian/files
+debian/.debhelper/
