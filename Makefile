@@ -9,7 +9,7 @@ clean:
 	-rm *.html
 	-rm -rf build*
 
-doc:
+man:
 	groff -Thtml -man drobom.8 >drobom.html
 	groff -Thtml -man droboview.8 >droboview.html
 	rst2html --stylesheet-path=drobo-utils.css README.rst >README.html
@@ -22,11 +22,12 @@ doc:
 
 PKGNAME := drobo-utils
 
-install: build
+#install: build
+old_build:
 	python3 setup.py install_lib -d /usr/lib/python/site-packages; 
 	python3 setup.py install_data -d /usr/share/$(PKGNAME)
 	python3 setup.py install_scripts -d /usr/sbin
 
-release:
+#release:
 	./make_tarball.sh
 	debuild -i

@@ -16,6 +16,7 @@
 # debugging stuff: end
 #-------------------------------------------------------------------
 import os,sys,math
+import os.path
 from PyQt5 import QtGui,QtWidgets
 from PyQt5 import QtCore
 import socket
@@ -95,15 +96,18 @@ class ShowText(QtWidgets.QWidget):
       #self.lscursor.setPosition(0)
 
       if isfile:
-        dirs=[ "/usr/local/share/drobo-utils-doc", "/usr/share/drobo-utils/share/drobo-utils-doc", "." ]
+        dirs=[ "/usr/local/share/doc/drobo-utils-doc", "/usr/share/doc/drobo-utils-doc/", "." ]
         readme=""
         i=0
         while (i < 3 ) and (readme == "") :
-          try: 
+          if True: #try: 
+          readmefn = dirs[i] + "/" + manual
+
+          if os.path.isfile(readmefn) and os.access(file, os.R_OK) : 
             readmefile = open( dirs[i] + "/" + manual )
             readme = readmefile.read()
             readmefile.close()
-          except:
+          else: #except:
             pass
 
           i=i+1
