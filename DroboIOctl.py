@@ -15,7 +15,9 @@ def hexdump(label,data):
       i=0
       print(( "%s %03x:" % (label, i) ))
       for bb in data:
-         print("%02x" % ord(bb), end=' ') 
+         if type(bb) is bytes:
+            bb = ord(bb)
+         print("%02x" % int(bb), end=' ') 
          i=i+1
          if (i % 16) == 0:
              print()
