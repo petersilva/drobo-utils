@@ -139,7 +139,7 @@ These packages are called Dependencies.
    inherit the package in due course.  
 
 Ubuntu 20.04
-~~~~~~~~~~~~
+============
 
 later OS versions ship with python3. There is a python3/qt5/dh-python port
 in the main repo. You need to install from git for that to work.
