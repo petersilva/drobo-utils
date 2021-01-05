@@ -104,9 +104,9 @@ If more information is needed, then there are a number of resources available:
 .. _`Screen Shots`: gallery.html
 .. _Group: http://groups.google.com/group/drobo-talk?hl=en">http://groups.google.com/group/drobo-talk?hl=en
 .. _Drobo: http://www.drobo.com  
-.. _Download: http://sourceforge.net/project/showfiles.php?group_id=222830
-.. _Project: http://sourceforge.net/projects/drobo-utils/
-.. _HomePage: http://drobo-utils.sourceforge.net
+.. _Download: no downloads maintained, please build from source.
+.. _Project: http://github.com/petersilva/drobo-utils
+.. _HomePage: http://github.com/petersilva/drobo-utils
 .. _DroboSpace: http://drobospace.com
 .. _Email: drobo-utils-devel@sourceforge.net
 .. _`Email me`: Peter.A.Silva@gmail.com

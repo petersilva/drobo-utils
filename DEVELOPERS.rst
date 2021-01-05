@@ -25,7 +25,8 @@ Getting a Source Tree
 the following checks out the master branch of the source code tree and
 puts it in the drobo-utils subdirectory of the current tree.
 
-git clone ssh://username@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils drobo-utils
+git clone https://github.com/petersilva/drobo-utils.git
+
 
 Before doing Any commits, ensure that the author fields are 
 appropriately set.  One can obtain patches applied to the branch 
@@ -61,7 +62,7 @@ author settings.  Something like the following is appropriate if you
 use a single identity for all your code contributions::
 
   boule% git config --global user.name "firstname lastname"
-  boule% git config --global user.email "developer@sourceforge.net"
+  boule% git config --global user.email "developer@yourdomain.net"
   boule% 
 
 Others may wish for the identity to be associated with each project.
@@ -73,9 +74,9 @@ Sometimes, when there are issues, the correction gets checked in, but there
 hasn't been time to do a full release process.  If you really need the fix, 
 then your only option is to get it from the developers' git repository.  
 If you are told 'it is in git', that refers to the git source code management 
-system, and the server for that is at sourceforge.net.  How to get it::
+system, and the server for that is at github.com.  How to get it::
 
- # git clone ssh://developer@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils mine
+ # git clone https://github.com/petersilva/drobo-utils mine
  # cd mine                 # go into the source directory you downloaded
  # ./drobom status         # try it out...
  # python setup.py install # install it in system places...
@@ -174,10 +175,21 @@ introduce in version 0.4.0)
 Building Debian & Ubuntu Packages
 =================================
 
-Assumes you have installed the Build dependencies::
+Assumes you have installed the Build dependencies
+Method 1::
+
+ % git clone https://github.com/petersilva/drobo-utils drobo-utils-<version>
+ % cd drobo-utils-<version>
+ % git checkout <tag for version you want>
+ % debuild -us -uc
+
+builds a .deb in the parent directory.
+
+method 2::
+
 
  # obtain a fresh tree 
- % git clone ssh://user@drobo-utils.git.sourceforge.net/gitroot/drobo-utils/<version> drobo-utils-<version>
+ % git clone https://github.com/petersilva/drobo-utils drobo-utils-<version>
  % cd drobo-utils-<version>
  % rm -rf .git  # get rid of Git cruft, yielding a raw source tree.
  % chmod 755 debian/rules  # I dunno why the permissions are wrong...
@@ -201,6 +213,9 @@ apply QA tests. as per QA.rst recording results there.
 
 Updating Documentation
 ----------------------
+
+**OBSOLETE** site moved to github.com, which renders rst into html automagically.
+this section no longer relevant.
 
 use the restructured text tools (from the python-docutils package.)
 to build things using:

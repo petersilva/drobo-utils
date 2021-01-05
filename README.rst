@@ -112,7 +112,7 @@ Deployment_ section in this page for examples.
 INSTALLATION: Easiest
 ---------------------
 
-On Ubuntu 9.10 [#Distro]_ or later (or Debian unstable or other debian derived 
+On Ubuntu 9.10 [#Distro]_ until Ubuntu 20.04 (or Debian unstable or other debian derived 
 distributions), drobo-utils is included in the repositories, and installation 
 from a shell prompt is simply::
 
@@ -138,6 +138,12 @@ These packages are called Dependencies.
    derived distributions (debian, \*ubuntu, MEPIS, PCLinux-OS, etc...) should 
    inherit the package in due course.  
 
+Ubuntu 20.04
+~~~~~~~~~~~~
+
+later OS versions ship with python3. There is a python3/qt5/dh-python port
+in the main repo. You need to install from git for that to work.
+I have no idea if/when that will get into repos.
 
 Dependencies
 ============
@@ -155,10 +161,9 @@ which have python 2.4 [#python]_, then the following are necessary::
      python-ctypes -- module for C-interface
 
 .. [#python] drobo-utils was tested in line mode using Python-2.4 for release 0.6.2.2.  Prior to that there is a fairly scary bug, where it format wants to format all attached 
-  drives (only using 2.4)  It was fixed for 0.6.2.2.  No one has tested GUI function, 
-  and it may be a challenge to obtain an appropriate Pyqt4 package.  The utility is 
-  built on python-2.5 and python-2.6 and it is tested on both of them.  
-  python-3 will definitely not work.
+  drives (only using 2.4)  It was fixed for 0.6.2.2.  
+
+The ctypes module is included with python3, so not necessary in that case.
 
 On RPM-based distros (such as Redhat & SuSe), it would more likely be 'yum' instead of 
 'aptitude' and some of the package names will change.  A typical difference is that 
@@ -181,7 +186,7 @@ Install From Package
 
 Once dependencies are satisfied,  one can install the latest stable package manually.
 
-Point a browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
+**packages no longer built...**
 
 where the most current packages are available.  after downloading a .deb, it is simply a matter of::
 
@@ -202,7 +207,7 @@ Assuming the dependencies are installed/satisfied, the package will actually run
 without being installed in any systemish places.  Source code can be directly downloaded
 run it explicitly from the directory.  
 
-Point a browser at: http://sourceforge.net/project/showfiles.php?group_id=222830 
+Point a browser at: <deprecated>
 
 download the .tgz preferred, then unpack it::
 
@@ -221,7 +226,7 @@ follow along with the latest development version.  installation of git_, is nece
 then use it can be used to get a copy of the source tree::
 
   # apt-get install git
-  # git clone git://drobo-utils.git.sourceforge.net/gitroot/drobo-utils/drobo-utils
+  # git clone git://github.com/petersilva/drobo-utils
   # cd droo-utils
   # ./drobom status
   # git pull
@@ -229,6 +234,12 @@ then use it can be used to get a copy of the source tree::
 This gives a read-only copy of the source code that can be updated with the latest 
 changes with 'git pull'.  One can also select any stable version of drobo-utils by use of
 'git branch -r', and 'git checkout'.  For details, consult git documentation.
+
+If you want a package, can build and install it::
+
+  # apt install debhelper dh-python
+  # debuild -us -uc
+  # dpkg -i ../drobo-utils-something.deb
 
 So, one way or another, drobo-utils is installed. The next step is to try it out.
 
@@ -995,9 +1006,12 @@ Is it Still Supported ?
 =======================
  
 Not really. I no longer have any hardware to test with, so cannot validate anything. I switched to QNAP instead,
-which was more appropriate for my needs.  The package is python2 and will never be ported to python3, it 
-lives on in the Debian archive because some kind soul is a maintainer there.  If someone wants
-to take over, by all means git clone and go at it.  I will provide whatever guidance I can to someone interested.
+which was more appropriate for my needs.  It lives on in the Debian archive because some kind soul is a 
+maintainer there.  If someone wants to take over, by all means git clone and go at it.  
+I will provide whatever guidance I can to someone interested.
+I ported it to modern distros (python3/qt5/dh-python) so it fits in nicely with 20.04, but that broke
+things, so while it looks ok, there is some key broken stuff (diagnostics and firmware.)
+
  
  
  
