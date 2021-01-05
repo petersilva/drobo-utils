@@ -112,7 +112,7 @@ Deployment_ section in this page for examples.
 INSTALLATION: Easiest
 ---------------------
 
-On Ubuntu 9.10 [#Distro]_ until Ubuntu 20.04 (or Debian unstable or other debian derived 
+On Ubuntu 9.10 [#Distro]_ until Ubuntu 18.04 (or Debian unstable or other debian derived 
 distributions), drobo-utils is included in the repositories, and installation 
 from a shell prompt is simply::
 
@@ -179,6 +179,8 @@ Here is an example from fedora 7 (courtesy of help4death on the google group)::
 NOTE: if X or QT is missing, it will only disable the GUI.  Line mode will 
 work without issues.  The package should work fine on headless servers using 
 only the command line.
+
+If using python3 (from git) dependencies shift to python3-pyqt5.
 
 
 Install From Package
@@ -268,7 +270,7 @@ Try Out the GUI
 ===============
 
 Once the command line functionality is verified, and assuming 
-python-qt4 is installed::
+python-qt4 (umm... for python3, that would be python3-pyqt5 instead)  is installed::
 
  # drobom view
 
