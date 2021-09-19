@@ -26,4 +26,3 @@ override_dh_installinit:
 
 %:
 	dh $@ --with python3 --buildsystem=pybuild
-

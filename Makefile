@@ -10,8 +10,10 @@ clean:
 	-rm -rf build*
 
 man:
-	groff -Thtml -man drobom.8 >drobom.html
-	groff -Thtml -man droboview.8 >droboview.html
+	rst2man drobom.8.rst >drobom.8
+	rst2man droboview.8.rst >droboview.8
+	rst2html drobom.8.rst >drobom.html
+	rst2html droboview.8.rst >droboview.html
 	rst2html --stylesheet-path=drobo-utils.css README.rst >README.html
 	rst2html --stylesheet-path=drobo-utils.css DEVELOPERS.rst >DEVELOPERS.html
 	rst2html --stylesheet-path=drobo-utils.css CHANGES.rst >CHANGES.html
