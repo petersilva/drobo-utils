@@ -141,9 +141,10 @@ These packages are called Dependencies.
 Ubuntu 20.04
 ============
 
-later OS versions ship with python3. There is a python3/qt5/dh-python port
-in the main repo. You need to install from git for that to work.
-I have no idea if/when that will get into repos.
+later OS versions ship with python3. The dependencies for the current
+package are whatever seems current for a given OS. Nothing newish required.
+code just minimally ported to be functional on modern platform.
+
 
 Dependencies
 ============
