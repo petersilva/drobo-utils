@@ -1458,10 +1458,10 @@ def DiscoverLUNs(debugflags=0, vendorstring="Drobo"):
         if (DEBUG & DBG_Detection):
             print("trying: ", potential)
 
-        if True:  #try:
+        try:
             d = Drobo(potential, DEBUG)
             devices.append(potential)
-        else:  #except:
+        except:
             pass
 
     return devices
