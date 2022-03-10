@@ -230,7 +230,7 @@ then use it can be used to get a copy of the source tree::
 
   # apt-get install git
   # git clone git://github.com/petersilva/drobo-utils
-  # cd droo-utils
+  # cd drobo-utils
   # ./drobom status
   # git pull
 
