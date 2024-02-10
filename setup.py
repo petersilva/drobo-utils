@@ -10,8 +10,8 @@ setup(name='Drobo-utils',
       py_modules=['Drobo', 'DroboGUI', 'DroboIOctl'],
       scripts=['drobom', 'droboview'],
       data_files=[('share/pixmaps', ['Drobo-Front-0000.gif']),
-                  ('share/drobo-utils-doc', ['README.html']),
-                  ('share/drobo-utils-doc', ['DEVELOPERS.html']),
-                  ('share/drobo-utils-doc', ['drobom.html']),
-                  ('share/drobo-utils-doc', ['droboview.html']),
-                  ('share/drobo-utils-doc', ['CHANGES.html'])])
+                  ('share/drobo-utils-doc', ['README.rst']),
+                  ('share/drobo-utils-doc', ['DEVELOPERS.rst']),
+                  ('share/drobo-utils-doc', ['drobom.8.rst']),
+                  ('share/drobo-utils-doc', ['droboview.8.rst']),
+                  ('share/drobo-utils-doc', ['CHANGES.rst'])])
