@@ -223,7 +223,7 @@ class DroboGUI(QtWidgets.QMainWindow):
 
         c = self.drobo.GetSubPageCapacity()
         if c[2] > 0:
-            self.Device.fullbar.setValue(c[1] * 100 / c[2])
+            self.Device.fullbar.setValue(int(c[1] * 100 / c[2]))
             self.Device.fullbar.setToolTip(
                 ','.join(self.drobo.DiscoverMounts()) + "\nused: " +
                 _toGB(c[1]) + ' free: ' + _toGB(c[0]) + ' Total: ' +
