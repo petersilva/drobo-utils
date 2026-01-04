@@ -10,3 +10,7 @@ debian/drobo-utils.substvars
 debian/drobo-utils/
 debian/files
 debian/.debhelper/
+
+# Claude Code and Speckit
+.claude/
+.specify/
