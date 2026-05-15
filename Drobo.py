@@ -831,7 +831,7 @@ class Drobo:
         list_of_firmware_string = listing_file.read().decode().strip("\t\r")
         list_of_firmware = list_of_firmware_string.split("|")
         i = 1
-        p = re.compile('\[(.*)\]')
+        p = re.compile(r'\[(.*)\]')
         while i < len(list_of_firmware):
             key = list_of_firmware[i - 1].split()[1]
             value = list_of_firmware[i].split()[1]
