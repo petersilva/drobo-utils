@@ -2,7 +2,7 @@
 # Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 # named COPYING in the root of the source directory tree.
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='Drobo-utils',
       version='9999',
