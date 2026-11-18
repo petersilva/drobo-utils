@@ -1,15 +1,20 @@
 
+
 -----------
 Drobo-Utils
 -----------
 
 Drobo-utils is a set of linux tools to query and manage `Data Robotics`_
-Drobo storage systems.  Fire up drobom view, and it should look 
+Drobo storage systems. Fire up drobom view, and it should look 
 familiar to those who have seen the dashboard on other operating systems. 
 Drobom view is built on a little python programmer interface which can be installed 
 on the system and used by other applications as well.  For experienced Linux hands, 
 the rest of the command line interface is provided by other sub-commands of 
 drobom, and offer the same functionality as the view graphical interface.  
+
+NOTE: There is now a re-write of this project written un Rust. Check it out:
+
+ http://www.github.com/petersilva/drobo-rutils
 
 .. _`Data Robotics`: http://www.drobo.com
 
