@@ -1,7 +1,16 @@
+drobo-utils (9999+trixie1) stable; urgency=medium
+
+  * Update Python packaging for Debian 13 trixie.
+  * Use setuptools instead of removed distutils.
+  * Refresh debhelper and Python 3 dependency metadata.
+  * Update GUI dependency documentation from Qt4 to PyQt5.
+
+ -- Codex <codex@example.invalid>  Thu, 14 May 2026 00:00:00 -0700
+
 drobo-utils (9999) stable; urgency=low
 
- * ported to: python3, qt5, dh-python.
- * diagnostics and fw functions now broken, documented as bugs.
+  * ported to: python3, qt5, dh-python.
+  * diagnostics and fw functions now broken, documented as bugs.
  
  -- Peter Silva <Peter.A.Silva@gmail.com>  Mon, 7 Feb 2010 21:22:31 -0500
 

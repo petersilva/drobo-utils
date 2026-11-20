@@ -73,7 +73,7 @@ physical channel is below:
   data - works: device functions for data i/o, but Drobo-utils cannot access it for configuration.
   n/a - not applicable (device does not have this interface.)
   \*1 - Droboshare is not usable with drobo-utils on a linux server. If you 
-       install Droboshare Augmented Root File System (DARFS_) then one can 
+       install Droboshare Augmented Root File System (DARFS) then one can
        run a drobo-utils in line mode on the droboshare itself.
   \*2 - Will not detect, out of the box, an iSCSI drobo.  One must configure 
        the iSCSI subsystem to obtain a /dev/sdX file.  see `iSCSI Setup`_ for 
@@ -143,12 +143,12 @@ These packages are called Dependencies.
    derived distributions (debian, \*ubuntu, MEPIS, PCLinux-OS, etc...) should 
    inherit the package in due course.  
 
-Ubuntu 20.04
-============
+Debian 13 / Ubuntu 20.04+
+=========================
 
-later OS versions ship with python3. The dependencies for the current
-package are whatever seems current for a given OS. Nothing newish required.
-code just minimally ported to be functional on modern platform.
+Later OS versions ship with python3. Debian 13 "trixie" uses Python 3.13,
+where the old distutils module is no longer part of the standard library.
+The current package uses setuptools for installation and packaging.
 
 
 Dependencies
@@ -158,7 +158,7 @@ Before one can install drobo-utils itself, the other packages needed are somethi
 like those below (these examples are ubuntu packages, names may vary on other 
 distributions)::
 
-     python      -- interpreter for python language
+     python3     -- interpreter for python language
      parted      -- partitioner, usually included with the distro.
 
 If using Redhat Enterprise Linux (RHEL, aka. CentOS, Scientific Linux etc...), 
@@ -1027,7 +1027,8 @@ things, so while it looks ok, there is some key broken stuff (diagnostics and fi
 I have read everything. Help?
 =============================
 
-Best first stop is the google Group_.
+Best first stop is the google group:
+http://groups.google.com/group/drobo-talk?hl=en
 
 
 What is Drobo-utils' License?
@@ -1056,8 +1057,6 @@ Administrivia
 -------------
 
 version 9999, somewhen
-
-
 
 copyright:
 

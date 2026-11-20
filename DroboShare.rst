@@ -14,7 +14,7 @@ DARFS
 The Droboshare Augmented Root File System (darfs) is a 60 MB or so download
 you can get from drobo-utils.sf.net.  There isn't any source code, because,
 well, nothing from any of the packages has been modified.  there are
-instructions on how to build DARFS in DEVELOPERS_
+instructions on how to build DARFS in DEVELOPERS.rst
 
 DARFS is a standard droboshare root file system, with some packages added:
 openssl, openssh, berkeleydb, bzip2, a fairly complete Python 2.6.2.  drobo-
@@ -395,11 +395,6 @@ Build procedures is basically out of the box after this point::
 
 
 so there you go, samples of building a whole bunch of packages.
-
-
-
-
-
 
 copyright:
 

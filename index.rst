@@ -102,7 +102,7 @@ If more information is needed, then there are a number of resources available:
 
 
 .. _`Screen Shots`: gallery.html
-.. _Group: http://groups.google.com/group/drobo-talk?hl=en">http://groups.google.com/group/drobo-talk?hl=en
+.. _Group: http://groups.google.com/group/drobo-talk?hl=en
 .. _Drobo: http://www.drobo.com  
 .. _Download: no downloads maintained, please build from source.
 .. _Project: http://github.com/petersilva/drobo-utils
@@ -126,4 +126,3 @@ copyright:
 Drobo Utils Copyright (C) 2008,2009  Peter Silva (Peter.A.Silva@gmail.com)
 Drobo Utils comes with ABSOLUTELY NO WARRANTY; For details type see the file
 named COPYING in the root of the source directory tree.
-

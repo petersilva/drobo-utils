@@ -6,7 +6,7 @@ build: doc
 clean:
 	-python3 setup.py clean
 	-find . -name "*\.pyc" -delete
-	-rm *.html
+	-rm -f *.html
 	-rm -rf build*
 
 man:
